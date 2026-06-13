@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rodinný Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sidebar-bg: #0F172A;
+  --sidebar-w: 240px;
+  --accent: #6366F1;
+  --accent-light: #EEF2FF;
+  --accent2: #10B981;
+  --accent2-light: #ECFDF5;
+  --danger: #EF4444;
+  --danger-light: #FEF2F2;
+  --warning: #F59E0B;
+  --warning-light: #FFFBEB;
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
+  --text: #0F172A;
+  --text-2: #64748B;
+  --text-3: #94A3B8;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* AUTH */
+#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0F172A 0%,#1E293B 50%,#312E81 100%)}
+.auth-card{background:white;border-radius:24px;padding:52px 44px;width:100%;max-width:420px;text-align:center;box-shadow:0 25px 80px rgba(0,0,0,0.4)}
+.auth-icon{width:72px;height:72px;background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:20px;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 8px 24px rgba(99,102,241,0.4)}
+.auth-card h1{font-size:26px;font-weight:800;margin-bottom:6px;color:#0F172A}
+.auth-card p{color:#64748B;margin-bottom:36px;font-size:15px}
+.btn-google{width:100%;padding:15px;border:2px solid #E2E8F0;border-radius:14px;background:white;cursor:pointer;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:12px;transition:all .2s;color:#0F172A;font-family:inherit}
+.btn-google:hover{border-color:#6366F1;background:#EEF2FF;transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,0.2)}
+.btn-google svg{width:22px;height:22px}
+
+/* APP */
+#app{display:none;min-height:100vh}
+
+/* LAYOUT */
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s}
+.sidebar-brand{padding:24px 20px 8px;display:flex;align-items:center;gap:12px}
+.sidebar-brand-icon{width:38px;height:38px;background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sidebar-brand-text{font-size:15px;font-weight:700;color:white;line-height:1.2}
+.sidebar-brand-sub{font-size:11px;color:#94A3B8;font-weight:400}
+.sidebar-divider{height:1px;background:rgba(255,255,255,0.08);margin:12px 20px}
+.sidebar-section{padding:8px 12px 4px;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:2px 8px;border-radius:10px;cursor:pointer;color:#94A3B8;font-size:13px;font-weight:500;transition:all .2s;border:none;background:none;width:calc(100% - 16px);text-align:left}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#E2E8F0}
+.nav-item.active{background:rgba(99,102,241,0.2);color:#A5B4FC}
+.nav-item-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:rgba(255,255,255,0.05)}
+.nav-item.active .nav-item-icon{background:rgba(99,102,241,0.3)}
+.sidebar-user{margin-top:auto;padding:16px 12px;border-top:1px solid rgba(255,255,255,0.08)}
+.sidebar-user-inner{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:background .2s}
+.sidebar-user-inner:hover{background:rgba(255,255,255,0.07)}
+.sidebar-user-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0}
+.sidebar-user-name{font-size:13px;font-weight:600;color:#E2E8F0}
+.sidebar-user-email{font-size:11px;color:#64748B}
+
+/* MOBILE TOPBAR */
+.mobile-top{display:none;background:var(--sidebar-bg);padding:12px 16px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99}
+.mobile-menu-btn{background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:4px}
+.mobile-brand{font-size:15px;font-weight:700;color:white;display:flex;align-items:center;gap:8px}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;padding:28px;max-width:1100px}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .mobile-top{display:flex}
+  .main{margin-left:0;padding:16px}
+  .sidebar-overlay{display:block!important}
+}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:24px}
+.page-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--text-2)}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:22px}
+.card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+
+/* GRID */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+@media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.grid-4,.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* STAT CARDS */
+.stat-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.stat-card.green::before{background:var(--accent2)}
+.stat-card.red::before{background:var(--danger)}
+.stat-card.orange::before{background:var(--warning)}
+.stat-icon{font-size:20px;margin-bottom:10px}
+.stat-label{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.stat-value{font-size:26px;font-weight:800;color:var(--text);line-height:1}
+.stat-sub{font-size:11px;color:var(--text-3);margin-top:4px}
+
+/* FORM */
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;background:white;color:var(--text);transition:border-color .2s;outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,0.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-textarea{resize:vertical;min-height:80px}
+@media(max-width:500px){.form-row{grid-template-columns:1fr}}
+
+/* BUTTONS */
+.btn{padding:9px 16px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:white}
+.btn-primary:hover{background:#4F46E5;transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,0.3)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-ghost{background:var(--bg);color:var(--text);border:1.5px solid var(--border)}
+.btn-ghost:hover{background:var(--border)}
+.btn-danger{background:var(--danger-light);color:var(--danger);border:1.5px solid #FECACA}
+.btn-danger:hover{background:#FECACA}
+.btn-success{background:var(--accent2-light);color:var(--accent2);border:1.5px solid #A7F3D0}
+.btn-sm{padding:6px 11px;font-size:12px}
+.btn-full{width:100%;justify-content:center;padding:12px}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:500px}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);border-bottom:1px solid var(--border);background:#F8FAFC;white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFBFF}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-purple{background:var(--accent-light);color:var(--accent)}
+.badge-green{background:var(--accent2-light);color:var(--accent2)}
+.badge-red{background:var(--danger-light);color:var(--danger)}
+.badge-orange{background:var(--warning-light);color:var(--warning)}
+.badge-gray{background:#F1F5F9;color:#64748B}
+
+/* PROGRESS */
+.progress-wrap{background:#F1F5F9;border-radius:999px;height:8px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),#8B5CF6);transition:width .6s}
+.progress-fill.green{background:linear-gradient(90deg,var(--accent2),#34D399)}
+.progress-fill.orange{background:linear-gradient(90deg,var(--warning),#FBBF24)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:white;border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,0.3)}
+.modal-header{padding:22px 22px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-title{font-size:16px;font-weight:800}
+.modal-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-2);width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.modal-close:hover{background:var(--bg)}
+.modal-body{padding:0 22px 22px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#1E293B;color:white;padding:13px 20px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:var(--shadow-md);transform:translateY(120px);transition:transform .3s;max-width:320px}
+.toast.show{transform:translateY(0)}
+.toast.success{background:var(--accent2)}
+.toast.error{background:var(--danger)}
+
+/* CHART */
+.chart-month{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px}
+.chart-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.chart-bar-inner{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#6366F1,#8B5CF6);transition:height .5s;min-height:4px;position:relative}
+.chart-bar-inner.green{background:linear-gradient(180deg,#10B981,#34D399)}
+.chart-bar-label{font-size:10px;color:var(--text-3);text-align:center}
+.chart-bar-val{font-size:10px;font-weight:700;color:var(--text-2)}
+
+/* NAKUPNI LIST */
+.nakup-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.nakup-item:last-child{border-bottom:none}
+.nakup-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nakup-check.checked{background:var(--accent2);border-color:var(--accent2);color:white}
+.nakup-text{flex:1;font-size:13px}
+.nakup-text.done{text-decoration:line-through;color:var(--text-3)}
+.nakup-qty{font-size:12px;color:var(--text-3);background:var(--bg);padding:2px 8px;border-radius:6px}
+
+/* INVESTICE */
+.invest-item{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.invest-item:last-child{border-bottom:none}
+.invest-name{font-size:13px;font-weight:600}
+.invest-type{font-size:11px;color:var(--text-3);margin-top:2px}
+.invest-val{font-size:15px;font-weight:800;color:var(--accent)}
+
+/* CIL */
+.cil-item{background:var(--bg);border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid var(--border)}
+.cil-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.cil-title{font-size:13px;font-weight:700}
+.cil-person{font-size:11px;color:var(--text-3);margin-top:2px}
+.cil-progress-label{font-size:11px;color:var(--text-2);display:flex;justify-content:space-between;margin-top:6px}
+
+/* VYDAJ */
+.vydaj-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.vydaj-row:last-child{border-bottom:none}
+.vydaj-name{font-size:13px;font-weight:600}
+.vydaj-cat{font-size:11px;color:var(--text-3)}
+.vydaj-amount{font-size:14px;font-weight:700}
+
+/* PANEL */
+.panel{display:none}
+.panel.active{display:block}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:40px 20px;color:var(--text-2)}
+.empty-icon{font-size:36px;margin-bottom:10px}
+.empty h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+
+/* SPINNER */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RYCHLE AKCE */
+.quick-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.quick-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;background:white;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);transition:all .2s;font-family:inherit}
+.quick-btn:hover{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+
+@media(max-width:480px){.main{padding:12px}.card{padding:14px}}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-icon">🏠</div>
+    <h1>Rodinný Dashboard</h1>
+    <p>Výdaje, cíle a investice na jednom místě</p>
+    <button class="btn-google" id="btn-login">
+      <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Přihlásit se přes Google
+    </button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- Mobile topbar -->
+  <div class="mobile-top">
+    <button class="mobile-menu-btn" id="menu-btn">☰</button>
+    <div class="mobile-brand"><span>🏠</span> Rodinný Dashboard</div>
+    <div id="mob-avatar" style="width:32px;height:32px;border-radius:50%;background:#6366F1;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px">U</div>
+  </div>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">🏠</div>
+        <div><div class="sidebar-brand-text">Rodinný</div><div class="sidebar-brand-sub">Dashboard</div></div>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">Přehled</div>
+      <button class="nav-item active" data-tab="prehled"><div class="nav-item-icon">📊</div>Přehled</button>
+      <div class="sidebar-section" style="margin-top:8px">Finance</div>
+      <button class="nav-item" data-tab="vydaje"><div class="nav-item-icon">💸</div>Výdaje</button>
+      <button class="nav-item" data-tab="investice"><div class="nav-item-icon">📈</div>Investice</button>
+      <div class="sidebar-section" style="margin-top:8px">Rodina</div>
+      <button class="nav-item" data-tab="cile"><div class="nav-item-icon">🎯</div>Cíle roku</button>
+      <button class="nav-item" data-tab="nakup"><div class="nav-item-icon">🛒</div>Nákupní seznam</button>
+      <div class="sidebar-user">
+        <div class="sidebar-user-inner" onclick="handleLogout()">
+          <div class="sidebar-user-avatar" id="sidebar-avatar">U</div>
+          <div>
+            <div class="sidebar-user-name" id="sidebar-name">Uživatel</div>
+            <div class="sidebar-user-email" id="sidebar-email">Odhlásit se</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- PŘEHLED -->
+      <div class="panel active" id="panel-prehled">
+        <div class="page-header">
+          <div class="page-title" id="greeting">Dobré ráno! 👋</div>
+          <div class="page-sub" id="today-date">Načítám...</div>
+        </div>
+
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="switchTab('vydaje');setTimeout(()=>openModal('modal-vydaj'),100)">➕ Nový výdaj</button>
+          <button class="quick-btn" onclick="switchTab('cile');setTimeout(()=>openModal('modal-cil'),100)">🎯 Nový cíl</button>
+          <button class="quick-btn" onclick="switchTab('nakup');setTimeout(()=>document.getElementById('nakup-input').focus(),100)">🛒 Přidat položku</button>
+          <button class="quick-btn" onclick="switchTab('investice');setTimeout(()=>openModal('modal-invest'),100)">📈 Nová investice</button>
+        </div>
+
+        <div class="grid-4">
+          <div class="stat-card">
+            <div class="stat-icon">💸</div>
+            <div class="stat-label">Výdaje tento měsíc</div>
+            <div class="stat-value" id="stat-vydaje-mesic">0 Kč</div>
+            <div class="stat-sub">Povinné výdaje</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Celkem investováno</div>
+            <div class="stat-value" id="stat-invest-total">0 Kč</div>
+            <div class="stat-sub">Všechny investice</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-label">Cíle roku</div>
+            <div class="stat-value" id="stat-cile">0/0</div>
+            <div class="stat-sub" id="stat-cile-sub">Splněno</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🛒</div>
+            <div class="stat-label">Nákupní seznam</div>
+            <div class="stat-value" id="stat-nakup">0</div>
+            <div class="stat-sub">Položek čeká</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">💸 Výdaje podle kategorií</div>
+            <div id="chart-vydaje">
+              <div class="empty"><div class="empty-icon">📊</div><p>Zatím žádné výdaje</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">🎯 Aktuální cíle</div>
+            <div id="prehled-cile">
+              <div class="empty"><div class="empty-icon">🎯</div><p>Zatím žádné cíle</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">📈 Investice přehled</div>
+            <div id="prehled-invest">
+              <div class="empty"><div class="empty-icon">📈</div><p>Zatím žádné investice</p></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">🛒 Nákupní seznam</div>
+            <div id="prehled-nakup">
+              <div class="empty"><div class="empty-icon">🛒</div><p>Seznam je prázdný</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VÝDAJE -->
+      <div class="panel" id="panel-vydaje">
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="page-title">💸 Výdaje</div>
+            <div class="page-sub">Přehled měsíčních výdajů rodiny</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-vydaj')">➕ Přidat výdaj</button>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-label">Povinné měsíčně</div>
+            <div class="stat-value" id="v-povinne">0 Kč</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Volitelné měsíčně</div>
+            <div class="stat-value" id="v-volitelne">0 Kč</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-label">Celkem měsíčně</div>
+            <div class="stat-value" id="v-celkem">0 Kč</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <select class="form-select" id="v-filter-kat" style="max-width:180px" onchange="renderVydaje()">
+              <option value="">Všechny kategorie</option>
+              <option value="Bydlení">🏠 Bydlení</option>
+              <option value="Energie">⚡ Energie</option>
+              <option value="Pojištění">🛡️ Pojištění</option>
+              <option value="Splátky">💳 Splátky</option>
+              <option value="Jídlo">🍽️ Jídlo</option>
+              <option value="Doprava">🚗 Doprava</option>
+              <option value="Zdraví">❤️ Zdraví</option>
+              <option value="Vzdělání">📚 Vzdělání</option>
+              <option value="Zábava">🎉 Zábava</option>
+              <option value="Ostatní">📦 Ostatní</option>
+            </select>
+            <select class="form-select" id="v-filter-typ" style="max-width:160px" onchange="renderVydaje()">
+              <option value="">Všechny typy</option>
+              <option value="povinny">Povinné</option>
+              <option value="volitelny">Volitelné</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Název</th><th>Kategorie</th><th>Typ</th><th>Částka/měsíc</th><th>Poznámka</th><th>Akce</th></tr></thead>
+              <tbody id="vydaje-tbody"><tr><td colspan="6"><div class="empty"><div class="empty-icon">💸</div><h3>Žádné výdaje</h3><p>Přidej první výdaj tlačítkem výše</p></div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVESTICE -->
+      <div class="panel" id="panel-investice">
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="page-title">📈 Investice</div>
+            <div class="page-sub">Přehled kde a kolik máte investováno</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-invest')">➕ Přidat investici</button>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-label">Celkem investováno</div>
+            <div class="stat-value" id="i-celkem">0 Kč</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Počet investic</div>
+            <div class="stat-value" id="i-pocet">0</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-label">Největší investice</div>
+            <div class="stat-value" id="i-nejvetsi">–</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Přehled investic</div>
+          <div id="investice-list">
+            <div class="empty"><div class="empty-icon">📈</div><h3>Žádné investice</h3><p>Přidej první investici tlačítkem výše</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CÍLE -->
+      <div class="panel" id="panel-cile">
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="page-title">🎯 Cíle roku</div>
+            <div class="page-sub">Společné i osobní cíle rodiny</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-cil')">➕ Přidat cíl</button>
+        </div>
+
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-label">Celkem cílů</div>
+            <div class="stat-value" id="c-celkem">0</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Splněno</div>
+            <div class="stat-value" id="c-splneno">0</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-label">V průběhu</div>
+            <div class="stat-value" id="c-prubeh">0</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">👨‍👩‍👧 Společné cíle</div>
+            <div id="cile-spolecne"><div class="empty"><div class="empty-icon">🎯</div><p>Žádné společné cíle</p></div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">👤 Osobní cíle</div>
+            <div id="cile-osobni"><div class="empty"><div class="empty-icon">🎯</div><p>Žádné osobní cíle</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NÁKUPNÍ SEZNAM -->
+      <div class="panel" id="panel-nakup">
+        <div class="page-header">
+          <div class="page-title">🛒 Nákupní seznam</div>
+          <div class="page-sub">Sdílený seznam pro celou rodinu</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">➕ Přidat položku</div>
+            <div class="form-group">
+              <label class="form-label">Název položky</label>
+              <input type="text" class="form-input" id="nakup-input" placeholder="např. Mléko" onkeypress="if(event.key==='Enter')pridatNakup()">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Množství</label>
+                <input type="text" class="form-input" id="nakup-qty" placeholder="2 ks, 1 l...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kategorie</label>
+                <select class="form-select" id="nakup-kat">
+                  <option value="Potraviny">🥦 Potraviny</option>
+                  <option value="Drogerie">🧴 Drogerie</option>
+                  <option value="Domácnost">🏠 Domácnost</option>
+                  <option value="Ostatní">📦 Ostatní</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="pridatNakup()">➕ Přidat</button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>📋 Seznam (<span id="nakup-count">0</span>)</span>
+              <button class="btn btn-ghost btn-sm" onclick="smazatSplnene()">🗑️ Smazat splněné</button>
+            </div>
+            <div id="nakup-list">
+              <div class="empty"><div class="empty-icon">🛒</div><h3>Seznam je prázdný</h3><p>Přidej první položku</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- MODAL VÝDAJ -->
+<div class="modal-overlay" id="modal-vydaj" style="display:none" onclick="if(event.target===this)closeModal('modal-vydaj')">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="vydaj-modal-title">Přidat výdaj</span><button class="modal-close" onclick="closeModal('modal-vydaj')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="vydaj-edit-id">
+      <div class="form-group"><label class="form-label">Název *</label><input type="text" class="form-input" id="v-nazev" placeholder="např. Nájem"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Kategorie</label>
+          <select class="form-select" id="v-kat">
+            <option value="Bydlení">🏠 Bydlení</option><option value="Energie">⚡ Energie</option>
+            <option value="Pojištění">🛡️ Pojištění</option><option value="Splátky">💳 Splátky</option>
+            <option value="Jídlo">🍽️ Jídlo</option><option value="Doprava">🚗 Doprava</option>
+            <option value="Zdraví">❤️ Zdraví</option><option value="Vzdělání">📚 Vzdělání</option>
+            <option value="Zábava">🎉 Zábava</option><option value="Ostatní">📦 Ostatní</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Typ</label>
+          <select class="form-select" id="v-typ">
+            <option value="povinny">Povinný</option><option value="volitelny">Volitelný</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Částka / měsíc (Kč) *</label><input type="number" class="form-input" id="v-castka" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Poznámka</label><input type="text" class="form-input" id="v-pozn" placeholder="Volitelná poznámka"></div>
+      <button class="btn btn-primary btn-full" id="btn-vydaj-save" onclick="ulozitVydaj()">💾 Uložit</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INVESTICE -->
+<div class="modal-overlay" id="modal-invest" style="display:none" onclick="if(event.target===this)closeModal('modal-invest')">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="invest-modal-title">Přidat investici</span><button class="modal-close" onclick="closeModal('modal-invest')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="invest-edit-id">
+      <div class="form-group"><label class="form-label">Název *</label><input type="text" class="form-input" id="i-nazev" placeholder="např. Fond Conseq"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Typ</label>
+          <select class="form-select" id="i-typ">
+            <option value="Podílové fondy">📊 Podílové fondy</option>
+            <option value="Akcie">📈 Akcie</option>
+            <option value="ETF">🌍 ETF</option>
+            <option value="Spořicí účet">🏦 Spořicí účet</option>
+            <option value="Nemovitosti">🏠 Nemovitosti</option>
+            <option value="Krypto">₿ Krypto</option>
+            <option value="Stavební spoření">🏗️ Stavební spoření</option>
+            <option value="DIP">💼 DIP</option>
+            <option value="Ostatní">📦 Ostatní</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Kdo</label>
+          <select class="form-select" id="i-kdo">
+            <option value="Oba">👨‍👩‍👧 Oba</option>
+            <option value="Já">👨 Já</option>
+            <option value="Manželka">👩 Manželka</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Aktuální hodnota (Kč) *</label><input type="number" class="form-input" id="i-hodnota" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Poznámka</label><input type="text" class="form-input" id="i-pozn" placeholder="Broker, ISIN, poznámka..."></div>
+      <button class="btn btn-primary btn-full" id="btn-invest-save" onclick="ulozitInvestici()">💾 Uložit</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CÍL -->
+<div class="modal-overlay" id="modal-cil" style="display:none" onclick="if(event.target===this)closeModal('modal-cil')">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="cil-modal-title">Přidat cíl</span><button class="modal-close" onclick="closeModal('modal-cil')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="cil-edit-id">
+      <div class="form-group"><label class="form-label">Název cíle *</label><input type="text" class="form-input" id="c-nazev" placeholder="např. Dovolená v Chorvatsku"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Kdo</label>
+          <select class="form-select" id="c-kdo">
+            <option value="Společný">👨‍👩‍👧 Společný</option>
+            <option value="Já">👨 Já</option>
+            <option value="Manželka">👩 Manželka</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Kategorie</label>
+          <select class="form-select" id="c-kat">
+            <option value="Cestování">✈️ Cestování</option>
+            <option value="Finance">💰 Finance</option>
+            <option value="Zdraví">❤️ Zdraví</option>
+            <option value="Vzdělání">📚 Vzdělání</option>
+            <option value="Rodina">👨‍👩‍👧 Rodina</option>
+            <option value="Domov">🏠 Domov</option>
+            <option value="Zábava">🎉 Zábava</option>
+            <option value="Ostatní">📦 Ostatní</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Postup (%) – <span id="c-progress-val">0</span>%</label>
+        <input type="range" class="form-input" id="c-progress" min="0" max="100" value="0" style="padding:4px 0;height:auto" oninput="document.getElementById('c-progress-val').textContent=this.value">
+      </div>
+      <div class="form-group"><label class="form-label">Popis / poznámka</label><textarea class="form-textarea" id="c-popis" placeholder="Detaily cíle..."></textarea></div>
+      <button class="btn btn-primary btn-full" id="btn-cil-save" onclick="ulozitCil()">💾 Uložit</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA8WFwNZ_ljLSmK7cvdWufEsY9vGsi9Ers",
+  authDomain: "rodinny-dashboard-4c316.firebaseapp.com",
+  projectId: "rodinny-dashboard-4c316",
+  storageBucket: "rodinny-dashboard-4c316.firebasestorage.app",
+  messagingSenderId: "854662524014",
+  appId: "1:854662524014:web:6b960a6088878c34c4ca7f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+window._db = { vydaje:[], investice:[], cile:[], nakup:[] };
+
+// AUTH
+document.getElementById('btn-login').onclick = async () => {
+  try { await signInWithPopup(auth, provider); } catch(e) { showToast('Chyba přihlášení', 'error'); }
+};
+
+window.handleLogout = async () => {
+  if(confirm('Odhlásit se?')) await signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  if(user) {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    const name = user.displayName?.split(' ')[0] || 'Uživatel';
+    document.getElementById('sidebar-name').textContent = user.displayName || 'Uživatel';
+    document.getElementById('sidebar-email').textContent = user.email || '';
+    const av = document.getElementById('sidebar-avatar');
+    av.textContent = name[0].toUpperCase();
+    document.getElementById('mob-avatar').textContent = name[0].toUpperCase();
+    setGreeting(name);
+    nacistVse();
+  } else {
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+function setGreeting(name) {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Dobré ráno' : h < 18 ? 'Dobré odpoledne' : 'Dobrý večer';
+  document.getElementById('greeting').textContent = `${g}, ${name}! 👋`;
+  const days = ['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'];
+  const months = ['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];
+  const d = new Date();
+  document.getElementById('today-date').textContent = `${days[d.getDay()]} ${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// LOAD ALL
+async function nacistVse() {
+  await Promise.all([nacistVydaje(), nacistInvestice(), nacistCile(), nacistNakup()]);
+}
+
+// === VÝDAJE ===
+async function nacistVydaje() {
+  const snap = await getDocs(query(collection(db,'vydaje'), orderBy('created','desc')));
+  window._db.vydaje = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderVydaje(); updateStats();
+}
+
+window.renderVydaje = () => {
+  const vydaje = window._db.vydaje;
+  const kat = document.getElementById('v-filter-kat').value;
+  const typ = document.getElementById('v-filter-typ').value;
+  let list = vydaje.filter(v => (!kat || v.kategorie===kat) && (!typ || v.typ===typ));
+
+  const povinne = vydaje.filter(v=>v.typ==='povinny').reduce((s,v)=>s+(v.castka||0),0);
+  const volitelne = vydaje.filter(v=>v.typ==='volitelny').reduce((s,v)=>s+(v.castka||0),0);
+  document.getElementById('v-povinne').textContent = formatKc(povinne);
+  document.getElementById('v-volitelne').textContent = formatKc(volitelne);
+  document.getElementById('v-celkem').textContent = formatKc(povinne+volitelne);
+
+  const tbody = document.getElementById('vydaje-tbody');
+  if(!list.length) { tbody.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="empty-icon">💸</div><h3>Žádné výdaje</h3><p>Přidej první výdaj</p></div></td></tr>`; return; }
+  tbody.innerHTML = list.map(v=>`
+    <tr>
+      <td><strong>${v.nazev}</strong></td>
+      <td>${katLabel(v.kategorie)}</td>
+      <td><span class="badge ${v.typ==='povinny'?'badge-red':'badge-green'}">${v.typ==='povinny'?'Povinný':'Volitelný'}</span></td>
+      <td><strong>${formatKc(v.castka)}</strong></td>
+      <td style="color:var(--text-2);font-size:12px">${v.poznamka||'–'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="editVydaj('${v.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="smazatVydaj('${v.id}')">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+};
+
+window.ulozitVydaj = async () => {
+  const nazev = document.getElementById('v-nazev').value.trim();
+  const castka = parseFloat(document.getElementById('v-castka').value)||0;
+  const kategorie = document.getElementById('v-kat').value;
+  const typ = document.getElementById('v-typ').value;
+  const poznamka = document.getElementById('v-pozn').value.trim();
+  const editId = document.getElementById('vydaj-edit-id').value;
+  if(!nazev||!castka){showToast('Vyplňte název a částku','error');return;}
+  const data = {nazev,castka,kategorie,typ,poznamka};
+  if(editId) { await updateDoc(doc(db,'vydaje',editId),data); showToast('Výdaj aktualizován ✅','success'); }
+  else { await addDoc(collection(db,'vydaje'),{...data,created:serverTimestamp()}); showToast('Výdaj přidán ✅','success'); }
+  closeModal('modal-vydaj'); resetVydajForm(); await nacistVydaje();
+};
+
+window.editVydaj = (id) => {
+  const v = window._db.vydaje.find(x=>x.id===id); if(!v)return;
+  document.getElementById('vydaj-edit-id').value = id;
+  document.getElementById('vydaj-modal-title').textContent = 'Upravit výdaj';
+  document.getElementById('v-nazev').value = v.nazev||'';
+  document.getElementById('v-castka').value = v.castka||'';
+  document.getElementById('v-kat').value = v.kategorie||'Ostatní';
+  document.getElementById('v-typ').value = v.typ||'povinny';
+  document.getElementById('v-pozn').value = v.poznamka||'';
+  openModal('modal-vydaj');
+};
+
+window.smazatVydaj = async (id) => {
+  if(!confirm('Smazat výdaj?'))return;
+  await deleteDoc(doc(db,'vydaje',id)); showToast('Výdaj smazán'); await nacistVydaje();
+};
+
+function resetVydajForm() {
+  ['vydaj-edit-id','v-nazev','v-castka','v-pozn'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('vydaj-modal-title').textContent='Přidat výdaj';
+  document.getElementById('v-kat').value='Bydlení';
+  document.getElementById('v-typ').value='povinny';
+}
+
+// === INVESTICE ===
+async function nacistInvestice() {
+  const snap = await getDocs(query(collection(db,'investice'),orderBy('created','desc')));
+  window._db.investice = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderInvestice(); updateStats();
+}
+
+function renderInvestice() {
+  const inv = window._db.investice;
+  const total = inv.reduce((s,i)=>s+(i.hodnota||0),0);
+  const nejvetsi = inv.length ? inv.reduce((a,b)=>(a.hodnota||0)>(b.hodnota||0)?a:b) : null;
+  document.getElementById('i-celkem').textContent = formatKc(total);
+  document.getElementById('i-pocet').textContent = inv.length;
+  document.getElementById('i-nejvetsi').textContent = nejvetsi ? formatKc(nejvetsi.hodnota) : '–';
+
+  const list = document.getElementById('investice-list');
+  const prev = document.getElementById('prehled-invest');
+  if(!inv.length) {
+    list.innerHTML=`<div class="empty"><div class="empty-icon">📈</div><h3>Žádné investice</h3><p>Přidej první investici</p></div>`;
+    prev.innerHTML=`<div class="empty"><div class="empty-icon">📈</div><p>Zatím žádné investice</p></div>`;
+    return;
+  }
+
+  const html = inv.map(i=>{
+    const pct = total>0?((i.hodnota/total)*100).toFixed(0):0;
+    return `<div class="invest-item">
+      <div>
+        <div class="invest-name">${i.nazev}</div>
+        <div class="invest-type">${i.typ||''} · ${i.kdo||''} · ${pct}% portfolia</div>
+        ${i.poznamka?`<div style="font-size:11px;color:var(--text-3);margin-top:2px">${i.poznamka}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="invest-val">${formatKc(i.hodnota)}</div>
+        <button class="btn btn-ghost btn-sm" onclick="editInvest('${i.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="smazatInvest('${i.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+  list.innerHTML = html;
+
+  // Bar chart pro přehled
+  const top3 = [...inv].sort((a,b)=>(b.hodnota||0)-(a.hodnota||0)).slice(0,4);
+  const max = top3[0]?.hodnota||1;
+  prev.innerHTML = `<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">Celkem: ${formatKc(total)}</div>`+
+    top3.map(i=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px">
+      <div style="width:90px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.nazev}</div>
+      <div style="flex:1;height:6px;background:#F1F5F9;border-radius:3px"><div style="width:${((i.hodnota/max)*100).toFixed(0)}%;height:100%;background:linear-gradient(90deg,#6366F1,#8B5CF6);border-radius:3px"></div></div>
+      <div style="width:70px;text-align:right;font-weight:700">${formatKc(i.hodnota)}</div>
+    </div>`).join('');
+}
+
+window.ulozitInvestici = async () => {
+  const nazev = document.getElementById('i-nazev').value.trim();
+  const hodnota = parseFloat(document.getElementById('i-hodnota').value)||0;
+  const typ = document.getElementById('i-typ').value;
+  const kdo = document.getElementById('i-kdo').value;
+  const poznamka = document.getElementById('i-pozn').value.trim();
+  const editId = document.getElementById('invest-edit-id').value;
+  if(!nazev||!hodnota){showToast('Vyplňte název a hodnotu','error');return;}
+  const data={nazev,hodnota,typ,kdo,poznamka};
+  if(editId){await updateDoc(doc(db,'investice',editId),data);showToast('Investice aktualizována ✅','success');}
+  else{await addDoc(collection(db,'investice'),{...data,created:serverTimestamp()});showToast('Investice přidána ✅','success');}
+  closeModal('modal-invest'); resetInvestForm(); await nacistInvestice();
+};
+
+window.editInvest = (id) => {
+  const i = window._db.investice.find(x=>x.id===id);if(!i)return;
+  document.getElementById('invest-edit-id').value=id;
+  document.getElementById('invest-modal-title').textContent='Upravit investici';
+  document.getElementById('i-nazev').value=i.nazev||'';
+  document.getElementById('i-hodnota').value=i.hodnota||'';
+  document.getElementById('i-typ').value=i.typ||'Ostatní';
+  document.getElementById('i-kdo').value=i.kdo||'Oba';
+  document.getElementById('i-pozn').value=i.poznamka||'';
+  openModal('modal-invest');
+};
+
+window.smazatInvest = async (id) => {
+  if(!confirm('Smazat investici?'))return;
+  await deleteDoc(doc(db,'investice',id));showToast('Investice smazána');await nacistInvestice();
+};
+
+function resetInvestForm(){
+  ['invest-edit-id','i-nazev','i-hodnota','i-pozn'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('invest-modal-title').textContent='Přidat investici';
+}
+
+// === CÍLE ===
+async function nacistCile() {
+  const snap = await getDocs(query(collection(db,'cile'),orderBy('created','desc')));
+  window._db.cile = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderCile(); updateStats();
+}
+
+function renderCile() {
+  const cile = window._db.cile;
+  const splnene = cile.filter(c=>c.progress>=100).length;
+  document.getElementById('c-celkem').textContent = cile.length;
+  document.getElementById('c-splneno').textContent = splnene;
+  document.getElementById('c-prubeh').textContent = cile.length - splnene;
+
+  const spolecne = cile.filter(c=>c.kdo==='Společný');
+  const osobni = cile.filter(c=>c.kdo!=='Společný');
+
+  const cilHtml = (c) => `<div class="cil-item">
+    <div class="cil-header">
+      <div>
+        <div class="cil-title">${c.nazev}</div>
+        <div class="cil-person">${c.kdo} · ${c.kategorie||''}</div>
+        ${c.popis?`<div style="font-size:12px;color:var(--text-2);margin-top:4px">${c.popis}</div>`:''}
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-ghost btn-sm" onclick="editCil('${c.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="smazatCil('${c.id}')">🗑️</button>
+      </div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill ${c.progress>=100?'green':c.progress>=50?'':'orange'}" style="width:${c.progress||0}%"></div></div>
+    <div class="cil-progress-label"><span>${c.progress>=100?'✅ Splněno!':'V průběhu'}</span><span>${c.progress||0}%</span></div>
+  </div>`;
+
+  document.getElementById('cile-spolecne').innerHTML = spolecne.length ? spolecne.map(cilHtml).join('') : `<div class="empty"><div class="empty-icon">🎯</div><p>Žádné společné cíle</p></div>`;
+  document.getElementById('cile-osobni').innerHTML = osobni.length ? osobni.map(cilHtml).join('') : `<div class="empty"><div class="empty-icon">🎯</div><p>Žádné osobní cíle</p></div>`;
+
+  // Přehled
+  const top = cile.slice(0,3);
+  document.getElementById('prehled-cile').innerHTML = top.length ? top.map(c=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:4px">
+        <span>${c.nazev}</span><span>${c.progress||0}%</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-fill ${c.progress>=100?'green':''}" style="width:${c.progress||0}%"></div></div>
+    </div>`).join('') : `<div class="empty"><div class="empty-icon">🎯</div><p>Zatím žádné cíle</p></div>`;
+}
+
+window.ulozitCil = async () => {
+  const nazev = document.getElementById('c-nazev').value.trim();
+  const kdo = document.getElementById('c-kdo').value;
+  const kategorie = document.getElementById('c-kat').value;
+  const progress = parseInt(document.getElementById('c-progress').value)||0;
+  const popis = document.getElementById('c-popis').value.trim();
+  const editId = document.getElementById('cil-edit-id').value;
+  if(!nazev){showToast('Vyplňte název cíle','error');return;}
+  const data={nazev,kdo,kategorie,progress,popis};
+  if(editId){await updateDoc(doc(db,'cile',editId),data);showToast('Cíl aktualizován ✅','success');}
+  else{await addDoc(collection(db,'cile'),{...data,created:serverTimestamp()});showToast('Cíl přidán ✅','success');}
+  closeModal('modal-cil'); resetCilForm(); await nacistCile();
+};
+
+window.editCil = (id) => {
+  const c = window._db.cile.find(x=>x.id===id);if(!c)return;
+  document.getElementById('cil-edit-id').value=id;
+  document.getElementById('cil-modal-title').textContent='Upravit cíl';
+  document.getElementById('c-nazev').value=c.nazev||'';
+  document.getElementById('c-kdo').value=c.kdo||'Společný';
+  document.getElementById('c-kat').value=c.kategorie||'Ostatní';
+  document.getElementById('c-progress').value=c.progress||0;
+  document.getElementById('c-progress-val').textContent=c.progress||0;
+  document.getElementById('c-popis').value=c.popis||'';
+  openModal('modal-cil');
+};
+
+window.smazatCil = async (id) => {
+  if(!confirm('Smazat cíl?'))return;
+  await deleteDoc(doc(db,'cile',id));showToast('Cíl smazán');await nacistCile();
+};
+
+function resetCilForm(){
+  ['cil-edit-id','c-nazev','c-popis'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cil-modal-title').textContent='Přidat cíl';
+  document.getElementById('c-progress').value=0;
+  document.getElementById('c-progress-val').textContent=0;
+}
+
+// === NÁKUPNÍ SEZNAM ===
+async function nacistNakup() {
+  const snap = await getDocs(query(collection(db,'nakup'),orderBy('created','asc')));
+  window._db.nakup = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderNakup(); updateStats();
+}
+
+function renderNakup() {
+  const items = window._db.nakup;
+  const nesplnene = items.filter(i=>!i.done).length;
+  document.getElementById('nakup-count').textContent = items.length;
+  document.getElementById('stat-nakup').textContent = nesplnene;
+
+  const list = document.getElementById('nakup-list');
+  const prev = document.getElementById('prehled-nakup');
+  if(!items.length){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><h3>Seznam je prázdný</h3><p>Přidej první položku</p></div>`;
+    prev.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><p>Seznam je prázdný</p></div>`;
+    return;
+  }
+  list.innerHTML = items.map(i=>`
+    <div class="nakup-item">
+      <div class="nakup-check ${i.done?'checked':''}" onclick="toggleNakup('${i.id}',${!i.done})">${i.done?'✓':''}</div>
+      <div class="nakup-text ${i.done?'done':''}">${i.nazev}${i.kategorie?` <span style="font-size:11px;color:var(--text-3)">[${i.kategorie}]</span>`:''}</div>
+      ${i.qty?`<span class="nakup-qty">${i.qty}</span>`:''}
+      <button class="btn btn-danger btn-sm" onclick="smazatNakup('${i.id}')">✕</button>
+    </div>
+  `).join('');
+
+  const top5 = items.filter(i=>!i.done).slice(0,5);
+  prev.innerHTML = top5.length ? top5.map(i=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <div class="nakup-check ${i.done?'checked':''}" onclick="toggleNakup('${i.id}',true)" style="width:16px;height:16px;font-size:10px">${i.done?'✓':''}</div>
+      <span>${i.nazev}</span>
+      ${i.qty?`<span style="color:var(--text-3)">${i.qty}</span>`:''}
+    </div>`).join('') + (nesplnene>5?`<div style="font-size:11px;color:var(--text-3);margin-top:8px">+${nesplnene-5} dalších položek</div>`:'')
+    : `<div class="empty" style="padding:16px"><div class="empty-icon">✅</div><p>Vše nakoupeno!</p></div>`;
+}
+
+window.pridatNakup = async () => {
+  const nazev = document.getElementById('nakup-input').value.trim();
+  const qty = document.getElementById('nakup-qty').value.trim();
+  const kategorie = document.getElementById('nakup-kat').value;
+  if(!nazev){showToast('Zadej název položky','error');return;}
+  await addDoc(collection(db,'nakup'),{nazev,qty,kategorie,done:false,created:serverTimestamp()});
+  document.getElementById('nakup-input').value='';
+  document.getElementById('nakup-qty').value='';
+  showToast('Položka přidána ✅','success');
+  await nacistNakup();
+};
+
+window.toggleNakup = async (id, done) => {
+  await updateDoc(doc(db,'nakup',id),{done});
+  window._db.nakup = window._db.nakup.map(i=>i.id===id?{...i,done}:i);
+  renderNakup();
+};
+
+window.smazatNakup = async (id) => {
+  await deleteDoc(doc(db,'nakup',id));
+  showToast('Položka smazána');
+  await nacistNakup();
+};
+
+window.smazatSplnene = async () => {
+  const splnene = window._db.nakup.filter(i=>i.done);
+  if(!splnene.length){showToast('Žádné splněné položky','error');return;}
+  if(!confirm(`Smazat ${splnene.length} splněných položek?`))return;
+  await Promise.all(splnene.map(i=>deleteDoc(doc(db,'nakup',i.id))));
+  showToast('Splněné položky smazány');
+  await nacistNakup();
+};
+
+// STATS UPDATE
+function updateStats() {
+  const vydaje = window._db.vydaje;
+  const inv = window._db.investice;
+  const cile = window._db.cile;
+
+  const povinne = vydaje.filter(v=>v.typ==='povinny').reduce((s,v)=>s+(v.castka||0),0);
+  document.getElementById('stat-vydaje-mesic').textContent = formatKc(povinne);
+
+  const totalInv = inv.reduce((s,i)=>s+(i.hodnota||0),0);
+  document.getElementById('stat-invest-total').textContent = formatKc(totalInv);
+
+  const splnene = cile.filter(c=>c.progress>=100).length;
+  document.getElementById('stat-cile').textContent = `${splnene}/${cile.length}`;
+  document.getElementById('stat-cile-sub').textContent = cile.length ? `${Math.round(splnene/cile.length*100)}% splněno` : 'Přidej cíle';
+
+  // Chart vydaje
+  const katMap = {};
+  vydaje.forEach(v=>{ if(v.kategorie) katMap[v.kategorie]=(katMap[v.kategorie]||0)+(v.castka||0); });
+  const sorted = Object.entries(katMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxV = sorted[0]?.[1]||1;
+  const chart = document.getElementById('chart-vydaje');
+  if(!sorted.length){
+    chart.innerHTML=`<div class="empty"><div class="empty-icon">📊</div><p>Zatím žádné výdaje</p></div>`;
+  } else {
+    chart.innerHTML = sorted.map(([k,v])=>`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px">
+        <div style="width:90px;color:var(--text-2)">${katLabel(k)}</div>
+        <div style="flex:1;height:8px;background:#F1F5F9;border-radius:4px"><div style="width:${(v/maxV*100).toFixed(0)}%;height:100%;background:linear-gradient(90deg,#6366F1,#8B5CF6);border-radius:4px"></div></div>
+        <div style="width:75px;text-align:right;font-weight:700">${formatKc(v)}</div>
+      </div>`).join('');
+  }
+}
+
+// HELPERS
+function formatKc(val){
+  if(!val&&val!==0)return'–';
+  return new Intl.NumberFormat('cs-CZ',{style:'currency',currency:'CZK',maximumFractionDigits:0}).format(val);
+}
+
+function katLabel(k){
+  const m={'Bydlení':'🏠 Bydlení','Energie':'⚡ Energie','Pojištění':'🛡️ Pojištění','Splátky':'💳 Splátky','Jídlo':'🍽️ Jídlo','Doprava':'🚗 Doprava','Zdraví':'❤️ Zdraví','Vzdělání':'📚 Vzdělání','Zábava':'🎉 Zábava','Ostatní':'📦 Ostatní'};
+  return m[k]||k;
+}
+
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// TABS
+document.querySelectorAll('.nav-item[data-tab]').forEach(btn=>{
+  btn.onclick=()=>switchTab(btn.dataset.tab);
+});
+
+window.switchTab = (name) => {
+  document.querySelectorAll('.nav-item[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+name));
+  closeSidebar();
+};
+
+// MODALS
+window.openModal = (id)=>document.getElementById(id).style.display='flex';
+window.closeModal = (id)=>document.getElementById(id).style.display='none';
+
+// MOBILE SIDEBAR
+document.getElementById('menu-btn').onclick=()=>{
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').style.display='block';
+};
+window.closeSidebar=()=>{
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').style.display='none';
+};
+</script>
+</body>
+</html>
