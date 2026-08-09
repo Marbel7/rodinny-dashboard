@@ -12,7 +12,9 @@
 <meta name="theme-color" content="#0F172A">
 <title>Rodinný Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
-<style>
+<style>.panel { display: none; }
+.panel.active { display: block; }
+
 :root{--sidebar-bg:#0F172A;--sidebar-w:232px;--accent:#6366F1;--accent-hover:#4F46E5;--accent-light:#EEF2FF;--accent-glow:rgba(99,102,241,0.15);--green:#10B981;--green-light:#ECFDF5;--red:#EF4444;--red-light:#FEF2F2;--orange:#F59E0B;--orange-light:#FFFBEB;--blue:#3B82F6;--blue-light:#EFF6FF;--pink:#EC4899;--pink-light:#FDF2F8;--bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;--border-light:#F1F5F9;--text:#0F172A;--text-2:#64748B;--text-3:#94A3B8;--radius:14px;--radius-sm:8px;--shadow:0 1px 3px rgba(0,0,0,0.06);--shadow-md:0 4px 16px rgba(0,0,0,0.10)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
@@ -94,7 +96,6 @@ td{padding:10px 12px;border-bottom:1px solid var(--border-light);font-size:13px}
 .modal-b{padding:0 20px 20px}
 .toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:#1E293B;color:white;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:var(--shadow-md);transform:translateY(120px);transition:transform .3s;max-width:320px;display:flex;align-items:center;gap:8px}
 .toast.show{transform:translateY(0)}.toast.success{background:var(--green)}.toast.error{background:var(--red)}
-.panel{display:none}.panel.active{display:block}
 .empty{text-align:center;padding:36px 20px;color:var(--text-2)}.empty-ico{margin-bottom:10px;color:var(--text-3)}.empty h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
 .qa{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
 .qa-btn{display:flex;align-items:center;gap:7px;padding:9px 14px;background:white;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text);transition:all .15s;font-family:inherit}
@@ -366,9 +367,6 @@ td{padding:10px 12px;border-bottom:1px solid var(--border-light);font-size:13px}
 }
 
 /* Panel přepínání */
-.panel { display: none !important; }
-.panel.active { display: block !important; }
-
 /* Desktop (>768px) - sidebar vždy viditelný */
 @media (min-width: 769px) {
   .sidebar { transform: translateX(0) !important; }
@@ -386,7 +384,7 @@ td{padding:10px 12px;border-bottom:1px solid var(--border-light);font-size:13px}
   .modal { width: 96% !important; max-height: 88vh; overflow-y: auto; }
   .fr { flex-direction: column !important; }
   .g4 { grid-template-columns: repeat(2,1fr) !important; }
-  .panel.active { padding: 12px !important; }
+  .panel.active { padding: 12px; }
 }
 
 /* Safe area iPhone */
@@ -1183,8 +1181,8 @@ select.fi {
 }
 
 /* --- PANELS --- */
-.panel { display: none !important; }
-.panel.active { display: block !important; }
+.panel { display: none; }
+.panel.active { display: block; }
 
 /* --- SAFE AREA --- */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
@@ -1823,15 +1821,13 @@ import{getFirestore,collection,addDoc,getDocs,doc,updateDoc,deleteDoc,query,orde
 // NAVIGACE - jediná definice
 // ============================================================
 window.switchTab = function(name) {
-  // Skrýt všechny panely
+  // Skrýt všechny panely — pouze přes classList, žádný inline style
   document.querySelectorAll('.panel').forEach(function(p) {
-    p.style.display = 'none';
     p.classList.remove('active');
   });
-  // Zobrazit cílový panel
+  // Zobrazit cílový panel — pouze přes classList
   var target = document.getElementById('panel-' + name);
   if (target) {
-    target.style.display = 'block';
     target.classList.add('active');
   }
   // Sidebar záložky
