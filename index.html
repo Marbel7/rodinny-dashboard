@@ -1118,6 +1118,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Registrace Service Workeru
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js')
+        .then(function(reg) { console.log('Service Worker registered:', reg.scope); })
+        .catch(function(err) { console.warn('Service Worker registration failed:', err); });
+    });
+  }
+
   // Inicializovat první panel
   window.switchTab('prehled');
 });
@@ -1362,12 +1371,17 @@ window.povolNotifikace=async()=>{
     document.getElementById('notif-enable-btn').disabled=true;
     localStorage.setItem('notif-enabled','1');
     toast('Notifikace povoleny! ✓','success');
-    // Zaregistruj SW
+    // Získat SW registration s timeoutem (SW musí být registrován přes sw.js)
     if('serviceWorker' in navigator){
       try{
-        const reg=await navigator.serviceWorker.ready;
+        const swReadyTimeout = new Promise((_,reject)=>setTimeout(()=>reject(new Error('SW timeout')),3000));
+        const reg=await Promise.race([navigator.serviceWorker.ready, swReadyTimeout]);
         window._swReg=reg;
-      }catch(e){console.warn('SW not ready:',e)}
+        console.log('SW ready:', reg.scope);
+      }catch(e){
+        console.warn('SW not ready (pokračuji bez SW):', e.message);
+        window._swReg=null;
+      }
     }
   }else{
     updateNotifStatus('Povolení zamítnuto','red');
@@ -1395,7 +1409,7 @@ window.testNotif=type=>{
 };
 
 // ===== AUTOMATICKÁ KONTROLA PŘI OTEVŘENÍ =====
-function zkontrolovatVse(){
+window.zkontrolovatVse=function(){
   const today=new Date();today.setHours(0,0,0,0);
   const todayStr=today.toISOString().slice(0,10);
   if(Notification.permission!=='granted')return;
