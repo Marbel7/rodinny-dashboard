@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
-const CACHE_NAME = 'rodinny-dashboard-v10';
+const CACHE_NAME = 'rodinny-dashboard-v11';
 
 self.addEventListener('install', function(event) {
   self.skipWaiting();
@@ -38,11 +38,20 @@ self.addEventListener('fetch', function(event) {
       if (!type.includes('text/html')) return response;
       let html = await response.text();
 
-      // Oprava původního CSS: modal overlay nesmí být viditelný při načtení.
-      // Inline style="display:none" pak funguje správně a openM() jej může změnit na flex.
+      // Důležité: zdrojová stránka má modal při načtení skrytý přes inline style.
+      // CSS však dříve obsahovalo display:flex, takže na některých zařízeních
+      // modal překryl inline display:none. Opravujeme obě možné varianty.
+      html = html.replace(
+        '.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:flex;',
+        '.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:none;'
+      );
       html = html.replace(
         '.modal-ov {\n  position: fixed !important;\n  inset: 0 !important;\n  background: rgba(15,23,42,.45) !important;\n  display: flex !important;',
         '.modal-ov {\n  position: fixed !important;\n  inset: 0 !important;\n  background: rgba(15,23,42,.45) !important;\n  display: flex;'
+      );
+      html = html.replace(
+        '.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:flex !important;',
+        '.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:none;'
       );
 
       // Ochrana výchozího panelu po přihlášení.
