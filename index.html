@@ -1335,139 +1335,7 @@ select.fi {
 
 </style>
 
-<style>
-/* === NAVIGACE OVERRIDE === */
-.panel { display: none !important; }
-.panel.active { display: block !important; }
 
-/* Sidebar */
-.sidebar {
-  position: fixed !important;
-  top: 0; left: 0;
-  height: 100vh;
-  z-index: 200;
-  transition: transform 0.28s ease;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* Overlay */
-#sb-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 199;
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
-}
-#sb-overlay.open { display: block; }
-
-/* Desktop - sidebar vždy viditelný */
-@media (min-width: 769px) {
-  .sidebar { transform: translateX(0) !important; }
-  .main { margin-left: var(--sidebar-w) !important; }
-  .mob-topbar { display: none !important; }
-  .mobile-nav { display: none !important; }
-}
-
-/* Mobil - sidebar skrytý */
-@media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open {
-    transform: translateX(0) !important;
-    box-shadow: 8px 0 40px rgba(0,0,0,0.6);
-  }
-  .main { margin-left: 0 !important; padding: 0 !important; }
-  .mob-topbar { display: flex !important; }
-  input, select, textarea { font-size: 16px !important; }
-  .modal { width: 96% !important; max-height: 90vh !important; overflow-y: auto !important; }
-  .panel.active { padding: 12px !important; padding-bottom: 90px !important; }
-}
-
-/* iPhone safe area */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .mobile-nav { padding-bottom: env(safe-area-inset-bottom); }
-  @media (max-width: 768px) {
-    .panel.active { padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important; }
-  }
-}
-
-/* Mobilní topbar */
-.mob-topbar {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 150;
-  background: var(--sidebar-bg);
-  padding: 10px 16px;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  min-height: 54px;
-}
-.mob-logo {
-  font-size: 15px;
-  font-weight: 700;
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.hamburger-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  touch-action: manipulation;
-}
-.hamburger-btn span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: white;
-  border-radius: 2px;
-  transition: all 0.3s;
-}
-
-/* Spodní navigace */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--sidebar-bg);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 6px 0;
-  z-index: 150;
-  justify-content: space-around;
-  align-items: center;
-}
-@media (max-width: 768px) {
-  .mobile-nav { display: flex !important; }
-}
-.mob-nav-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  color: #64748B;
-  font-size: 10px;
-  font-weight: 600;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 8px;
-  min-width: 50px;
-  min-height: 44px;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-.mob-nav-btn.active { color: #A5B4FC; }
-.mob-nav-btn svg { width: 22px; height: 22px; }
-</style>
 </head>
 <body>
 
@@ -2096,6 +1964,7 @@ function showApp(user){
   setGreeting(n);
   if(familyId){document.getElementById('family-code-sb').textContent=familyId;
     getDoc(doc(db,'families',familyId)).then(s=>{if(s.exists()){const m=s.data().members||[];document.getElementById('family-members-sb').textContent=m.map(x=>x.displayName?.split(' ')[0]).join(', ')}}).catch(()=>{});}
+  window.switchTab('prehled');
   loadAll();
   setTimeout(()=>{initPush();autoCheckNotif();},2000);
   // Nastavení panel
