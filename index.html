@@ -1980,6 +1980,73 @@ window.importJSON = function() {
   };
   input.click();
 };
+
+// ===== JIDELNICEK DO NAKUPU =====
+window.jidelnicekDoNakupu = async function() {
+  if (!familyId) { toast('Nejsi přihlášen', 'error'); return; }
+
+  // Získat aktuální týdenní jídelníček se surovinami
+  const jidelnicek = window.D.jidelnicek || [];
+  const seSurovinami = jidelnicek.filter(function(j) {
+    return j.suroviny && j.suroviny.trim();
+  });
+
+  if (!seSurovinami.length) {
+    toast('Žádné suroviny v jídelníčku — doplň je u jednotlivých jídel', 'error');
+    return;
+  }
+
+  // Najít nákupní seznam (první seznam s "nákup" v názvu)
+  const seznamy = window.D.seznamy || [];
+  let nakupSz = seznamy.find(function(s) {
+    return s.nazev && s.nazev.toLowerCase().includes('nákup');
+  });
+
+  // Pokud nákupní seznam neexistuje, vytvoř ho
+  if (!nakupSz) {
+    const ref = await addDoc(famCol('seznamy'), {
+      nazev: 'Nákup',
+      icon: 'shopping-cart',
+      items: [],
+      created: serverTimestamp()
+    });
+    await loadSz();
+    nakupSz = (window.D.seznamy || []).find(function(s) { return s.id === ref.id; });
+    if (!nakupSz) { toast('Nepodařilo se vytvořit nákupní seznam', 'error'); return; }
+  }
+
+  // Sestavit nové položky ze surovin (každá surovina = jedna položka)
+  const existingItems = nakupSz.items || [];
+  const existingTexts = existingItems.map(function(i) { return i.text.toLowerCase().trim(); });
+
+  let added = 0;
+  const newItems = [...existingItems];
+
+  seSurovinami.forEach(function(jidlo) {
+    // Suroviny oddělené čárkou
+    jidlo.suroviny.split(',').forEach(function(surovina) {
+      const text = surovina.trim();
+      if (!text) return;
+      // Nepřidávat duplicity
+      if (!existingTexts.includes(text.toLowerCase())) {
+        newItems.push({ text: text, qty: '', done: false });
+        existingTexts.push(text.toLowerCase());
+        added++;
+      }
+    });
+  });
+
+  if (added === 0) {
+    toast('Všechny suroviny jsou už v nákupním seznamu', 'success');
+    return;
+  }
+
+  // Uložit do Firestore
+  await updateDoc(famDoc('seznamy', nakupSz.id), { items: newItems });
+  nakupSz.items = newItems;
+  renderSzGrid();
+  toast('Přidáno ' + added + ' surovin do nákupu ✓', 'success');
+};
 </script>
 
 <!-- ============================================================ -->
