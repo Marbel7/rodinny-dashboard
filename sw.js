@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
-const CACHE_NAME = 'rodinny-dashboard-v12';
+const CACHE_NAME = 'rodinny-dashboard-v13';
 
 self.addEventListener('install', function(event) {
   self.skipWaiting();
@@ -61,7 +61,7 @@ self.addEventListener('fetch', function(event) {
       const newAdd = "window.addSzItem=async()=>{const text=document.getElementById('sz-input').value.trim(),qty=document.getElementById('sz-qty').value.trim();if(!text){toast('Zadej položku','error');return}const sz=D.seznamy.find(s=>s.id===D.currentSz);if(!sz){toast('Seznam není načten','error');return}const items=[...(sz.items||[]),{text,qty,done:false}];try{await setDoc(famDoc('seznamy',D.currentSz),{items},{merge:true});sz.items=items;document.getElementById('sz-input').value='';document.getElementById('sz-qty').value='';renderSzDetail();renderSzGrid();stats();toast('Položka přidána','success')}catch(e){console.error('[Seznam] addSzItem',e);toast('Položku se nepodařilo uložit: '+(e.code||e.message||'chyba'),'error')}};";
       if (html.includes(oldAdd)) html = html.replace(oldAdd, newAdd);
 
-      // Jediná nová funkce: mikrofon jako prostřední tlačítko mobilní spodní navigace.
+      // Mobilní navigace: mikrofon je prostřední a zvýrazněné tlačítko.
       const micMarker = `  <button class="mob-nav-btn" data-tab="seznamy" onclick="window.switchTab('seznamy')">`;
       const micButton = `  <button class="mob-nav-btn mob-nav-mic" type="button" onclick="toggleMic('todo-input-dash')" aria-label="Hlasové zadání úkolu" title="Hlasové zadání úkolu">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -71,6 +71,10 @@ self.addEventListener('fetch', function(event) {
       if (html.includes(micMarker) && !html.includes('class="mob-nav-btn mob-nav-mic"')) {
         html = html.replace(micMarker, micButton + micMarker);
       }
+
+      // Nastavení zůstává v hamburger menu, proto ho ze spodní mobilní lišty odstraníme.
+      const mobileNavSettings = /(<nav class="mobile-nav">[\s\S]*?)  <button class="mob-nav-btn" data-tab="nastaveni"[\s\S]*?<\/button>/;
+      html = html.replace(mobileNavSettings, '$1');
 
       const css = `<style id="shopping-list-fix">
 #seznam-detail #sz-input{flex:1 1 auto!important;min-width:0!important;width:auto!important;height:44px!important;}
@@ -86,8 +90,9 @@ self.addEventListener('fetch', function(event) {
 @media(max-width:768px){
   .mobile-nav{display:flex!important;justify-content:space-around!important;align-items:center!important;}
   .mobile-nav .mob-nav-btn{flex:1 1 0!important;min-width:0!important;max-width:none!important;}
-  .mobile-nav .mob-nav-mic{color:#A5B4FC!important;}
-  .mobile-nav .mob-nav-mic svg{width:24px!important;height:24px!important;stroke:#A5B4FC!important;}
+  .mobile-nav .mob-nav-mic{flex:0 0 58px!important;width:58px!important;height:58px!important;min-height:58px!important;margin-top:-18px!important;padding:0!important;border-radius:50%!important;background:#6366F1!important;color:#fff!important;border:4px solid var(--sidebar-bg)!important;box-shadow:0 4px 14px rgba(99,102,241,.45)!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important;}
+  .mobile-nav .mob-nav-mic svg{width:25px!important;height:25px!important;stroke:#fff!important;}
+  .mobile-nav .mob-nav-mic{font-size:9px!important;font-weight:700!important;}
 }
 </style>`;
       if (!html.includes('id="mobile-mic-nav-fix"')) html = html.replace('</head>', micCss + '</head>');
