@@ -75,6 +75,14 @@ self.addEventListener('fetch', function(event) {
         "window.closeM=id=>{const e=document.getElementById(id);if(e){e.classList.remove('open');e.style.display='none'}};"
       );
 
+      // MOBILNÍ RYCHLÉ ZACHYCENÍ HLASU:
+      // V dolní liště nahradíme málo používané Nastavení centrálním mikrofonem.
+      // Samotné rozpoznávání zůstává beze změny a používá existující toggleMic().
+      const settingsBtn = '<button class="mob-nav-btn" data-tab="nastaveni" onclick="window.switchTab(\'nastaveni\')">';
+      const micBtn = '<button class="mob-nav-btn mob-mic-btn" onclick="toggleMic(\'todo-input-dash\')" aria-label="Nadiktovat úkol" title="Nadiktovat úkol"><span aria-hidden="true">🎙️</span><span>Hlasem</span></button>';
+      html = html.replace(settingsBtn, micBtn);
+      html = html.replace('</style>', '.mob-mic-btn { color:#FFFFFF !important; background:#6366F1 !important; border-radius:14px !important; min-width:58px !important; min-height:52px !important; margin-top:-10px !important; padding:6px 9px !important; box-shadow:0 6px 16px rgba(99,102,241,.28) !important; font-weight:700 !important; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; gap:1px !important; } .mob-mic-btn span:first-child { font-size:20px; line-height:20px; } .mob-mic-btn span:last-child { font-size:9px; line-height:11px; font-weight:700; } .mob-mic-btn:active { transform:translateY(-8px) scale(.97) !important; }\n</style>');
+
       const headers = new Headers(response.headers);
       headers.set('content-type', 'text/html; charset=utf-8');
       return new Response(html, {status:response.status, statusText:response.statusText, headers});
