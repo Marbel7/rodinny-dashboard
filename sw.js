@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
 // Opravuje modal CSS konflikt, mobilní rychlou navigaci a robustní ukládání položek seznamů.
-const CACHE_NAME = 'rodinny-dashboard-v6';
+const CACHE_NAME = 'rodinny-dashboard-v7';
 
 self.addEventListener('install', function(event) {
   console.log('[SW] Install', CACHE_NAME);
@@ -87,83 +87,6 @@ self.addEventListener('fetch', function(event) {
       const oldAdd = "window.addSzItem=async()=>{const text=document.getElementById('sz-input').value.trim(),qty=document.getElementById('sz-qty').value.trim();if(!text)return;const sz=D.seznamy.find(s=>s.id===D.currentSz);if(!sz)return;const items=[...(sz.items||[]),{text,qty,done:false}];await updateDoc(famDoc('seznamy',D.currentSz),{items});sz.items=items;document.getElementById('sz-input').value='';document.getElementById('sz-qty').value='';renderSzDetail();renderSzGrid();stats()};";
       const newAdd = "window.addSzItem=async()=>{const text=document.getElementById('sz-input').value.trim(),qty=document.getElementById('sz-qty').value.trim();if(!text){toast('Zadej položku','error');return}const sz=D.seznamy.find(s=>s.id===D.currentSz);if(!sz){toast('Seznam není načten','error');return}const items=[...(sz.items||[]),{text,qty,done:false}];try{await setDoc(famDoc('seznamy',D.currentSz),{items},{merge:true});sz.items=items;document.getElementById('sz-input').value='';document.getElementById('sz-qty').value='';renderSzDetail();renderSzGrid();stats();toast('Položka přidána','success')}catch(e){console.error('[Seznam] addSzItem',e);toast('Položku se nepodařilo uložit: '+(e.code||e.message||'chyba'),'error')}};";
       if (html.includes(oldAdd)) html = html.replace(oldAdd, newAdd);
-
-      // NOVÝ VZHLED FORMULÁŘE SEZNAMU:
-      // V DOMu je nyní množství před hlavním textovým polem. Přeskládáme
-      // pouze tento konkrétní řádek do pořadí: položka | množství | +.
-      // Řádek je flexbox, takže se chová správně i na mobilu.
-      const listFixScript = `<script>(function(){
-        function fixShoppingUI(){
-          var text=document.getElementById('sz-input');
-          var qty=document.getElementById('sz-qty');
-          if(text&&qty){
-            var parent=text.parentElement;
-            if(parent&&qty.parentElement===parent){
-              var children=Array.from(parent.children);
-              var addBtn=children.find(function(el){return el.tagName==='BUTTON';});
-              parent.style.display='flex';
-              parent.style.flexDirection='row';
-              parent.style.alignItems='center';
-              parent.style.gap='10px';
-              parent.style.width='100%';
-              parent.style.flexWrap='nowrap';
-              parent.style.gridTemplateColumns='none';
-              parent.appendChild(text);
-              parent.appendChild(qty);
-              if(addBtn) parent.appendChild(addBtn);
-              text.style.display='block';
-              text.style.flex='1 1 auto';
-              text.style.width='auto';
-              text.style.minWidth='0';
-              text.style.height='56px';
-              text.style.padding='0 16px';
-              text.style.fontSize='16px';
-              text.placeholder='Co potřebujete?';
-              qty.style.display='block';
-              qty.style.flex='0 0 110px';
-              qty.style.width='110px';
-              qty.style.minWidth='0';
-              qty.style.height='56px';
-              qty.style.padding='0 12px';
-              qty.style.fontSize='15px';
-              qty.placeholder='Množ.';
-              if(addBtn){
-                addBtn.style.flex='0 0 56px';
-                addBtn.style.width='56px';
-                addBtn.style.height='56px';
-                addBtn.style.minWidth='56px';
-                addBtn.style.padding='0';
-                addBtn.style.display='inline-flex';
-                addBtn.style.alignItems='center';
-                addBtn.style.justifyContent='center';
-                addBtn.setAttribute('aria-label','Přidat položku');
-              }
-            }
-          }
-          document.querySelectorAll('.list-item').forEach(function(row){
-            var buttons=row.querySelectorAll('button');
-            if(buttons.length){
-              var del=buttons[buttons.length-1];
-              del.style.width='36px';
-              del.style.height='36px';
-              del.style.minWidth='36px';
-              del.style.padding='0';
-              del.style.borderRadius='10px';
-              del.style.display='inline-flex';
-              del.style.alignItems='center';
-              del.style.justifyContent='center';
-              del.style.background='#FEF2F2';
-              del.style.color='#EF4444';
-              del.style.border='1px solid #FECACA';
-              del.setAttribute('aria-label','Smazat položku');
-              if(!del.textContent.trim() || del.textContent.trim().length>4) del.textContent='×';
-            }
-          });
-        }
-        if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fixShoppingUI); else fixShoppingUI();
-        new MutationObserver(fixShoppingUI).observe(document.documentElement,{childList:true,subtree:true});
-      })();</script>`;
-      html = html.replace('</body>', listFixScript + '</body>');
 
       const headers = new Headers(response.headers);
       headers.set('content-type', 'text/html; charset=utf-8');
