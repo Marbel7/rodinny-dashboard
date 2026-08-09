@@ -1591,7 +1591,6 @@ function renderOdchod(){
   buildList(document.getElementById('odchod-full-list'));
 }
 
-document.getElementById('menu-btn').onclick=()=>{document.getElementById('sidebar').classList.add('open');document.getElementById('sb-overlay').style.display='block'};
 window.closeSB=()=>{document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').style.display='none'};
 
 // ===== CHYBĚJÍCÍ FUNKCE =====
@@ -1648,15 +1647,7 @@ function renderMesicPrehled(){
 // Přiřadit kliknutí na záložky
 
 // Mobilní menu tlačítko
-const menuBtn = document.getElementById('menu-btn');
-if(menuBtn) {
-  menuBtn.onclick = () => {
-    const sb = document.getElementById('sidebar');
-    const ov = document.getElementById('sb-overlay');
-    if(sb) sb.classList.toggle('open');
-    if(ov) ov.classList.toggle('open');
-  };
-}
+
 const sbOv = document.getElementById('sb-overlay');
 if(sbOv) sbOv.onclick = () => {
   document.getElementById('sidebar')?.classList.remove('open');
@@ -1912,12 +1903,7 @@ window.quickAddTodo=async()=>{
 
 
 // Hamburger button
-const hBtn = document.getElementById('menu-btn');
-if (hBtn) hBtn.addEventListener('click', toggleSidebar);
 
-// Menu btn (starý)
-const mBtn = document.getElementById('menu-btn');
-if (mBtn) mBtn.addEventListener('click', toggleSidebar);
 
 // Overlay zavře sidebar
 const sOver = document.getElementById('sb-overlay');
