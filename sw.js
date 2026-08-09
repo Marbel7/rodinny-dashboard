@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
 // Opravuje modal CSS konflikt a upravuje mobilní rychlou navigaci.
-const CACHE_NAME = 'rodinny-dashboard-v3';
+const CACHE_NAME = 'rodinny-dashboard-v4';
 
 self.addEventListener('install', function(event) {
   console.log('[SW] Install', CACHE_NAME);
@@ -74,19 +74,20 @@ self.addEventListener('fetch', function(event) {
       );
 
       // MOBILNÍ NAVIGACE:
-      // Nahraď CELÝ mobilní button Nastavení jedním centrálním tlačítkem Hlasem.
-      // Nezasahujeme do desktopového sidebaru.
+      // Nahraď Nastavení centrálním tlačítkem Hlasem.
       const micBtn = '<button class="mob-nav-btn mob-mic-btn" onclick="toggleMic(\'todo-input-dash\')" aria-label="Nadiktovat úkol" title="Nadiktovat úkol"><span aria-hidden="true">🎙️</span><span>Hlasem</span></button>';
       const settingsPattern = /<button\b[^>]*class=["'][^"']*mob-nav-btn[^"']*["'][^>]*data-tab=["']nastaveni["'][^>]*>[\s\S]*?<\/button>/i;
       if (settingsPattern.test(html)) {
         html = html.replace(settingsPattern, micBtn);
       } else {
-        // Fallback pro případ, že pořadí atributů v HTML bude jiné.
         const settingsPattern2 = /<button\b[^>]*data-tab=["']nastaveni["'][^>]*class=["'][^"']*mob-nav-btn[^"']*["'][^>]*>[\s\S]*?<\/button>/i;
         html = html.replace(settingsPattern2, micBtn);
       }
 
-      html = html.replace('</style>', '.mob-mic-btn { color:#FFFFFF !important; background:#6366F1 !important; border:0 !important; border-radius:14px !important; min-width:58px !important; min-height:52px !important; margin-top:-10px !important; padding:6px 9px !important; box-shadow:0 6px 16px rgba(99,102,241,.28) !important; font-weight:700 !important; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; gap:1px !important; } .mob-mic-btn span:first-child { font-size:20px; line-height:20px; } .mob-mic-btn span:last-child { font-size:9px; line-height:11px; font-weight:700; } .mob-mic-btn:active { transform:translateY(-8px) scale(.97) !important; }\n</style>');
+      // Přesné rozložení podle schváleného mobilního návrhu:
+      // Přehled | Úkoly | Hlasem | Nákup | Výdaje
+      // Každá položka má stejnou šířku 20 %. Mikrofon je přesně ve středu.
+      html = html.replace('</style>', '.mobile-nav .mob-nav-btn { flex:1 1 0 !important; width:20% !important; min-width:0 !important; max-width:20% !important; padding-left:0 !important; padding-right:0 !important; } .mobile-nav .mob-nav-btn[data-tab="prehled"] { order:1 !important; } .mobile-nav .mob-nav-btn[data-tab="ukoly"] { order:2 !important; } .mobile-nav .mob-nav-btn[data-tab="seznamy"] { order:4 !important; } .mobile-nav .mob-nav-btn[data-tab="vydaje"] { order:5 !important; } .mobile-nav .mob-mic-btn { order:3 !important; position:relative !important; overflow:visible !important; color:#FFFFFF !important; background:transparent !important; box-shadow:none !important; border-radius:0 !important; min-height:48px !important; margin-top:0 !important; padding:0 !important; z-index:2 !important; } .mobile-nav .mob-mic-btn::before { content:""; position:absolute; left:50%; top:50%; width:66px; height:66px; transform:translate(-50%,-50%); border-radius:50%; background:#6366F1; box-shadow:0 6px 18px rgba(99,102,241,.34); z-index:-1; } .mobile-nav .mob-mic-btn span:first-child { font-size:22px !important; line-height:22px !important; display:block !important; position:relative !important; z-index:1 !important; } .mobile-nav .mob-mic-btn span:last-child { font-size:10px !important; line-height:12px !important; font-weight:700 !important; display:block !important; position:relative !important; z-index:1 !important; margin-top:2px !important; } .mobile-nav .mob-mic-btn:active { transform:scale(.97) !important; }\n</style>');
 
       const headers = new Headers(response.headers);
       headers.set('content-type', 'text/html; charset=utf-8');
