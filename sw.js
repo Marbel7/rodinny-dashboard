@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
-// Opravuje konflikt modal CSS !important vs inline display:none.
-const CACHE_NAME = 'rodinny-dashboard-v2';
+// Opravuje modal CSS konflikt a upravuje mobilní rychlou navigaci.
+const CACHE_NAME = 'rodinny-dashboard-v3';
 
 self.addEventListener('install', function(event) {
   console.log('[SW] Install', CACHE_NAME);
@@ -54,9 +54,7 @@ self.addEventListener('fetch', function(event) {
       if (!type.includes('text/html')) return response;
       let html = await response.text();
 
-      // Skryj všechny modaly ve výchozím stavu. Původní index obsahuje
-      // pozdější .modal-ov { display:flex !important }, který přebíjí
-      // style="display:none" a proto se při startu zobrazují všechny modaly.
+      // Skryj modaly ve výchozím stavu. Otevření řídí třída .open.
       html = html.replace(
         /\.modal-ov\s*\{\s*position:\s*fixed !important;([\s\S]*?)display:\s*flex !important;/,
         function(match, rest) {
@@ -65,7 +63,7 @@ self.addEventListener('fetch', function(event) {
       );
       html = html.replace('</style>', '.modal-ov.open { display: flex !important; }\n</style>');
 
-      // openM/closeM používají třídu open, aby otevření fungovalo i přes !important.
+      // openM/closeM používají třídu open, aby fungovaly i přes !important.
       html = html.replace(
         "window.openM=id=>{document.getElementById(id).style.display='flex';_ci()};",
         "window.openM=id=>{const e=document.getElementById(id);if(e){e.classList.add('open');e.style.display='';}_ci()};"
@@ -75,13 +73,20 @@ self.addEventListener('fetch', function(event) {
         "window.closeM=id=>{const e=document.getElementById(id);if(e){e.classList.remove('open');e.style.display='none'}};"
       );
 
-      // MOBILNÍ RYCHLÉ ZACHYCENÍ HLASU:
-      // V dolní liště nahradíme málo používané Nastavení centrálním mikrofonem.
-      // Samotné rozpoznávání zůstává beze změny a používá existující toggleMic().
-      const settingsBtn = '<button class="mob-nav-btn" data-tab="nastaveni" onclick="window.switchTab(\'nastaveni\')">';
+      // MOBILNÍ NAVIGACE:
+      // Nahraď CELÝ mobilní button Nastavení jedním centrálním tlačítkem Hlasem.
+      // Nezasahujeme do desktopového sidebaru.
       const micBtn = '<button class="mob-nav-btn mob-mic-btn" onclick="toggleMic(\'todo-input-dash\')" aria-label="Nadiktovat úkol" title="Nadiktovat úkol"><span aria-hidden="true">🎙️</span><span>Hlasem</span></button>';
-      html = html.replace(settingsBtn, micBtn);
-      html = html.replace('</style>', '.mob-mic-btn { color:#FFFFFF !important; background:#6366F1 !important; border-radius:14px !important; min-width:58px !important; min-height:52px !important; margin-top:-10px !important; padding:6px 9px !important; box-shadow:0 6px 16px rgba(99,102,241,.28) !important; font-weight:700 !important; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; gap:1px !important; } .mob-mic-btn span:first-child { font-size:20px; line-height:20px; } .mob-mic-btn span:last-child { font-size:9px; line-height:11px; font-weight:700; } .mob-mic-btn:active { transform:translateY(-8px) scale(.97) !important; }\n</style>');
+      const settingsPattern = /<button\b[^>]*class=["'][^"']*mob-nav-btn[^"']*["'][^>]*data-tab=["']nastaveni["'][^>]*>[\s\S]*?<\/button>/i;
+      if (settingsPattern.test(html)) {
+        html = html.replace(settingsPattern, micBtn);
+      } else {
+        // Fallback pro případ, že pořadí atributů v HTML bude jiné.
+        const settingsPattern2 = /<button\b[^>]*data-tab=["']nastaveni["'][^>]*class=["'][^"']*mob-nav-btn[^"']*["'][^>]*>[\s\S]*?<\/button>/i;
+        html = html.replace(settingsPattern2, micBtn);
+      }
+
+      html = html.replace('</style>', '.mob-mic-btn { color:#FFFFFF !important; background:#6366F1 !important; border:0 !important; border-radius:14px !important; min-width:58px !important; min-height:52px !important; margin-top:-10px !important; padding:6px 9px !important; box-shadow:0 6px 16px rgba(99,102,241,.28) !important; font-weight:700 !important; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; gap:1px !important; } .mob-mic-btn span:first-child { font-size:20px; line-height:20px; } .mob-mic-btn span:last-child { font-size:9px; line-height:11px; font-weight:700; } .mob-mic-btn:active { transform:translateY(-8px) scale(.97) !important; }\n</style>');
 
       const headers = new Headers(response.headers);
       headers.set('content-type', 'text/html; charset=utf-8');
