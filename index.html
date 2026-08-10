@@ -16,6 +16,7 @@
 
 
 
+
 /*
  * RODINNÝ DASHBOARD — Core Components v2
  * Fáze 2 — sjednocené komponenty
@@ -553,6 +554,14 @@ textarea.fi{height:auto;padding:12px var(--space-4);resize:vertical;line-height:
 /* ===== Badge gray ===== */
 .badge-gray { background: var(--border-light); color: var(--text-3); }
 
+
+/* ===== UX: Skrýt pozdrav na mobilu ===== */
+@media (max-width: 768px) {
+  .greeting-desktop {
+    display: none;
+  }
+}
+
 </style>
 
 
@@ -804,7 +813,7 @@ input, select, textarea {
 
 <!-- UVÍTÁNÍ -->
 <div style="margin-bottom:14px">
-  <div id="greeting" style="font-size:22px;font-weight:800;color:var(--text)">Ahoj!</div>
+  <div id="greeting" class="greeting-desktop" style="font-size:22px;font-weight:800;color:var(--text)">Ahoj!</div>
   <div id="today-date" style="font-size:13px;color:var(--text-3);margin-top:2px"></div>
 </div>
 
