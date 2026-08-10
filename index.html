@@ -17,6 +17,7 @@
 
 
 
+
 /*
  * RODINNÝ DASHBOARD — Core Components v2
  * Fáze 2 — sjednocené komponenty
@@ -560,6 +561,48 @@ textarea.fi{height:auto;padding:12px var(--space-4);resize:vertical;line-height:
   .greeting-desktop {
     display: none;
   }
+}
+
+
+/* ===== Nejbližší platba — vizuální hierarchie ===== */
+
+/* Container — zvýšit čitelnost */
+#next-pay-widget {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+/* Data state: název — první span, tučný */
+#next-pay-widget > span:first-child {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+/* Data state: částka — druhý span */
+#next-pay-widget > span:nth-child(2) {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Data state: badge "Za X dní" — třetí span (inline styly zůstávají) */
+#next-pay-widget > span:nth-child(3) {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Empty state: jediný span s muted textem */
+#next-pay-widget > span:only-child {
+  font-size: 13px;
+  color: var(--text-3);
+  font-style: italic;
+  padding: 4px 0;
 }
 
 </style>
