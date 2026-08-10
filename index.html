@@ -13,6 +13,8 @@
 <title>Rodinný Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
 <style id="core-components-v2">
+
+
 /*
  * RODINNÝ DASHBOARD — Core Components v2
  * Fáze 2 — sjednocené komponenty
@@ -23,32 +25,57 @@
 *{box-sizing:border-box;margin:0;padding:0}
 
 :root{
+  /* --- Sidebar --- */
   --sidebar-bg:#0F172A;
   --sidebar-w:240px;
+
+  /* --- Brand / Primary (Indigo) --- */
   --accent:#6366F1;
   --accent-hover:#4F46E5;
   --accent-light:#EEF2FF;
+  --accent-soft:#E0E7FF;
   --accent-glow:rgba(99,102,241,0.15);
+
+  /* --- Success (Green) --- */
   --green:#16A34A;
   --green-light:#ECFDF3;
-  --red:#DC2626;
-  --red-light:#FEF3F2;
+  --green-soft:#DCFCE7;
+
+  /* --- Warning (Orange) --- */
   --orange:#D97706;
   --orange-light:#FFFAEB;
+  --orange-soft:#FEF3C7;
+
+  /* --- Danger (Red) --- */
+  --red:#DC2626;
+  --red-light:#FEF3F2;
+  --red-soft:#FEE2E2;
+
+  /* --- Info (Blue) --- */
   --blue:#2563EB;
   --blue-light:#EFF6FF;
+  --blue-soft:#DBEAFE;
+
+  /* --- Family / Celebration (Pink) --- */
   --pink:#DB2777;
   --pink-light:#FDF2F8;
+  --pink-soft:#FCE7F3;
+
+  /* --- Backgrounds --- */
   --bg:#F7F8FC;
   --surface:#FFFFFF;
   --surface-2:#F8FAFC;
+
+  /* --- Borders --- */
   --border:#E7EAF0;
   --border-light:#F0F2F5;
   --border-focus:#6366F1;
-  --text:#172033;
-  --text-2:#667085;
-  --text-3:#98A2B3;
-  --text-4:#C4CAD4;
+
+  /* --- Text (warm charcoal) --- */
+  --text:#1A2035;
+  --text-2:#64748B;
+  --text-3:#94A3B8;
+  --text-4:#CBD5E1;
   --radius-xs:6px;
   --radius-sm:10px;
   --radius:14px;
@@ -123,7 +150,7 @@ body{
 .mob-nav-btn svg{width:22px;height:22px}
 
 /* ===== AUTH ===== */
-#auth-screen{min-height:100vh;background:linear-gradient(135deg,#0F172A 0%,#1E1B4B 50%,#0F172A 100%);display:flex;align-items:center;justify-content:center}
+#auth-screen{min-height:100vh;background:linear-gradient(160deg,#0F172A 0%,#1e1b4b 40%,#312e81 70%,#1e1b4b 100%);display:flex;align-items:center;justify-content:center}
 .auth-card{background:var(--surface);border-radius:24px;padding:40px 36px;width:100%;max-width:400px;text-align:center;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
 .auth-card h1{font-size:22px;font-weight:700;color:var(--text);margin:16px 0 6px}
 .auth-card p{font-size:14px;color:var(--text-2);margin:0 0 28px}
@@ -137,9 +164,9 @@ body{
   box-shadow:var(--shadow-xs);
   padding:var(--space-5);
   margin-bottom:var(--space-4);
-  transition:box-shadow .15s ease;
+  transition:box-shadow .15s ease,border-color .15s ease;
 }
-.card:hover{box-shadow:var(--shadow)}
+.card:hover{box-shadow:var(--shadow);border-color:#d5dae6}
 .card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:var(--space-4);display:flex;align-items:center;gap:8px}
 
 /* ===== BUTTONS ===== */
@@ -193,14 +220,14 @@ textarea.fi{height:auto;padding:12px var(--space-4);resize:vertical;line-height:
 /* ===== BADGES ===== */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--radius-full);font-size:11px;font-weight:700;white-space:nowrap}
 .badge-neutral{background:var(--border-light);color:var(--text-2)}
-.badge-primary{background:var(--accent-light);color:var(--accent)}
-.badge-success{background:var(--green-light);color:var(--green)}
-.badge-warning{background:var(--orange-light);color:var(--orange)}
-.badge-danger{background:var(--red-light);color:var(--red)}
-.badge-blue{background:var(--blue-light);color:var(--blue)}
-.badge-pink{background:var(--pink-light);color:var(--pink)}
-.seg-btn{padding:6px 14px;border-radius:var(--radius-sm);border:none;background:none;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;transition:all .15s;font-family:inherit}
-.seg-btn.active{background:var(--surface);color:var(--text);font-weight:600;box-shadow:var(--shadow-xs)}
+.badge-primary{background:var(--accent-soft);color:var(--accent-hover)}
+.badge-success{background:var(--green-soft);color:var(--green)}
+.badge-warning{background:var(--orange-soft);color:var(--orange)}
+.badge-danger{background:var(--red-soft);color:var(--red)}
+.badge-blue{background:var(--blue-soft);color:var(--blue)}
+.badge-pink{background:var(--pink-soft);color:var(--pink)}
+.seg-btn{padding:6px 14px;border-radius:var(--radius-sm);border:none;background:none;font-size:13px;font-weight:500;color:var(--text-3);cursor:pointer;transition:all .15s;font-family:inherit}
+.seg-btn.active{background:var(--surface);color:var(--text);font-weight:600;box-shadow:var(--shadow-xs);border:1px solid var(--border)}
 
 /* ===== MODALS ===== */
 .modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.5);display:flex;align-items:center;justify-content:center;z-index:500;padding:var(--space-4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
@@ -250,7 +277,7 @@ textarea.fi{height:auto;padding:12px var(--space-4);resize:vertical;line-height:
 .countdown-label{font-size:12px;opacity:.8;margin-top:2px}
 .bday-countdown{margin-left:auto;text-align:right}
 .bday-days{font-size:16px;font-weight:800;color:var(--accent)}
-.countdown-badge{background:var(--pink-light);color:var(--pink);font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--radius-full);display:inline-flex;align-items:center;gap:4px}
+.countdown-badge{background:var(--pink-soft);color:var(--pink);font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--radius-full);display:inline-flex;align-items:center;gap:4px}
 
 /* ===== PROGRESS BAR ===== */
 .progress-bar{height:6px;background:var(--border-light);border-radius:var(--radius-full);overflow:hidden;margin-top:8px}
@@ -295,6 +322,8 @@ textarea.fi{height:auto;padding:12px var(--space-4);resize:vertical;line-height:
 
 /* ===== ANIMATIONS ===== */
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+
 
 </style>
 
