@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
-const CACHE_NAME = 'rodinny-dashboard-v15';
+const CACHE_NAME = 'rodinny-dashboard-v16';
 
 self.addEventListener('install', function(event) { self.skipWaiting(); });
 self.addEventListener('activate', function(event) { event.waitUntil(clients.claim()); });
@@ -79,8 +79,117 @@ self.addEventListener('fetch', function(event) {
       if (!html.includes('id="mobile-mic-nav-fix"')) html = html.replace('</head>', micCss + '</head>');
 
       // ===== CÍLE — FÁZE 1 (robustní) =====
-      // Vkládáme běžný inline script do HTML. Není závislý na přesném formátování původního JS.
-      const goalScript = `<script id="goals-phase1-native-fix">\n(function(){\n  function initGoalsPhase1(){\n    var pv=document.getElementById('c-pv');\n    if(!pv) return;\n    var progressFg=pv.closest('.fg');\n    if(!progressFg || document.getElementById('c-price')) return;\n    var wrap=document.createElement('div');\n    wrap.className='fr';\n    wrap.innerHTML='<div class="fg"><label class="fl">Cena cíle (Kč)</label><input type="number" class="fi" id="c-price" placeholder="např. 50000" min="0" step="1"></div><div class="fg"><label class="fl">Termín splnění</label><input type="date" class="fi" id="c-deadline"></div>';\n    progressFg.parentNode.insertBefore(wrap,progressFg);\n\n    var oldSave=window.saveC;\n    var oldEdit=window.editC;\n    var oldLoad=window.loadC;\n    function decorateGoals(){\n      try{\n        var goals=(window.D&&Array.isArray(D.cile))?D.cile:[];\n        var cards=document.querySelectorAll('.cil');\n        cards.forEach(function(card,i){\n          var c=goals[i]; if(!c) return;\n          var head=card.querySelector('.cil-hdr>div'); if(!head) return;\n          var meta=head.querySelector('.goals-phase1-meta');\n          if(!meta){ meta=document.createElement('div'); meta.className='goals-phase1-meta'; head.appendChild(meta); }\n          var bits=[];\n          if(Number(c.cena)>0) bits.push('Cíl: '+(typeof kc==='function'?kc(c.cena):Number(c.cena).toLocaleString('cs-CZ')+' Kč'));\n          if(c.termin){ var dt=new Date(c.termin+'T00:00:00'); bits.push('Termín: '+dt.toLocaleDateString('cs-CZ')); }\n          meta.textContent=bits.join('  ·  '); meta.style.display=bits.length?'block':'none';\n        });\n        var total=goals.reduce(function(sum,c){return sum+(Number(c.cena)||0)},0);\n        var stat=document.getElementById('s-cile');\n        if(stat && total){\n          var value=document.getElementById('s-cile-hodnota');\n          if(!value){ value=document.createElement('div'); value.id='s-cile-hodnota'; value.style.cssText='font-size:11px;color:var(--text-3);margin-top:2px'; stat.parentNode.appendChild(value); }\n          value.textContent=typeof kc==='function'?kc(total):total.toLocaleString('cs-CZ')+' Kč';\n        }\n      }catch(e){ console.warn('[Goals] decorate',e); }\n    }\n    if(typeof oldLoad==='function' && !oldLoad.__goalsPhase1){\n      var load=function(){ return oldLoad.apply(this,arguments).then(function(r){ decorateGoals(); return r; }); };\n      load.__goalsPhase1=true; window.loadC=load;\n    }\n    if(typeof oldEdit==='function' && !oldEdit.__goalsPhase1){\n      var edit=function(id){ var r=oldEdit.apply(this,arguments); setTimeout(function(){ var c=(window.D&&D.cile||[]).find(function(x){return x.id===id}); if(c){ var p=document.getElementById('c-price'),d=document.getElementById('c-deadline'); if(p)p.value=c.cena||''; if(d)d.value=c.termin||''; } },0); return r; };\n      edit.__goalsPhase1=true; window.editC=edit;\n    }\n    if(typeof oldSave==='function' && !oldSave.__goalsPhase1){\n      var save=function(){\n        var price=document.getElementById('c-price');\n        var deadline=document.getElementById('c-deadline');\n        var eid=document.getElementById('ce-id')?.value||'';\n        if(!price && !deadline) return oldSave();\n        var p=price ? (parseFloat(price.value)||0) : 0;\n        var d=deadline ? (deadline.value||'') : '';\n        if(eid){\n          return updateDoc(famDoc('cile',eid),{cena:p,termin:d}).then(function(){ return oldSave(); });\n        }\n        return oldSave().then(function(){\n          try{ var c=D.cile[D.cile.length-1]; if(c&&c.id){ return updateDoc(famDoc('cile',c.id),{cena:p,termin:d}); } }catch(e){ console.warn('[Goals] metadata save',e); }\n        });\n      };\n      save.__goalsPhase1=true;\n      window.saveC=save;\n    }\n    decorateGoals();\n  }\n  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initGoalsPhase1); else initGoalsPhase1();\n  setTimeout(initGoalsPhase1,500);\n  setTimeout(initGoalsPhase1,1500);\n  setTimeout(initGoalsPhase1,2500);\n})();\n</script>`;
+      const goalScript = `<script id="goals-phase1-native-fix">
+(function(){
+  function initGoalsPhase1(){
+    var pv=document.getElementById('c-pv');
+    if(!pv) return;
+    var progressFg=pv.closest('.fg');
+    if(!progressFg) return;
+    if(!document.getElementById('c-price')){
+      var wrap=document.createElement('div');
+      wrap.className='fr';
+      wrap.innerHTML='<div class="fg"><label class="fl">Cena cíle (Kč)</label><input type="number" class="fi" id="c-price" placeholder="např. 50000" min="0" step="1"></div><div class="fg"><label class="fl">Termín splnění</label><input type="date" class="fi" id="c-deadline"></div>';
+      progressFg.parentNode.insertBefore(wrap,progressFg);
+    }
+
+    var oldSave=window.saveC;
+    var oldEdit=window.editC;
+    var oldLoad=window.loadC;
+
+    function decorateGoals(){
+      try{
+        var goals=(window.D&&Array.isArray(D.cile))?D.cile:[];
+        var cards=document.querySelectorAll('.cil');
+        cards.forEach(function(card,i){
+          var c=goals[i]; if(!c) return;
+          var head=card.querySelector('.cil-hdr>div'); if(!head) return;
+          var meta=head.querySelector('.goals-phase1-meta');
+          if(!meta){ meta=document.createElement('div'); meta.className='goals-phase1-meta'; head.appendChild(meta); }
+          var bits=[];
+          if(Number(c.cena)>0) bits.push('Cíl: '+(typeof kc==='function'?kc(c.cena):Number(c.cena).toLocaleString('cs-CZ')+' Kč'));
+          if(c.termin){ var dt=new Date(c.termin+'T00:00:00'); bits.push('Termín: '+dt.toLocaleDateString('cs-CZ')); }
+          meta.textContent=bits.join('  ·  '); meta.style.display=bits.length?'block':'none';
+        });
+        var total=goals.reduce(function(sum,c){return sum+(Number(c.cena)||0)},0);
+        var stat=document.getElementById('s-cile');
+        if(stat && total){
+          var value=document.getElementById('s-cile-hodnota');
+          if(!value){ value=document.createElement('div'); value.id='s-cile-hodnota'; value.style.cssText='font-size:11px;color:var(--text-3);margin-top:2px'; stat.parentNode.appendChild(value); }
+          value.textContent=typeof kc==='function'?kc(total):total.toLocaleString('cs-CZ')+' Kč';
+        }
+      }catch(e){ console.warn('[Goals] decorate',e); }
+    }
+
+    if(typeof oldLoad==='function' && !oldLoad.__goalsPhase1){
+      var load=function(){
+        try{return Promise.resolve(oldLoad.apply(this,arguments)).then(function(r){decorateGoals();return r;});}
+        catch(e){console.error('[Goals] load',e);throw e;}
+      };
+      load.__goalsPhase1=true; window.loadC=load;
+    }
+
+    if(typeof oldEdit==='function' && !oldEdit.__goalsPhase1){
+      var edit=function(id){
+        var r=oldEdit.apply(this,arguments);
+        setTimeout(function(){
+          try{var c=(window.D&&D.cile||[]).find(function(x){return x.id===id});if(c){var p=document.getElementById('c-price'),d=document.getElementById('c-deadline');if(p)p.value=c.cena||'';if(d)d.value=c.termin||'';}}catch(e){console.warn('[Goals] edit',e);}
+        },0);
+        return r;
+      };
+      edit.__goalsPhase1=true; window.editC=edit;
+    }
+
+    if(typeof oldSave==='function' && !oldSave.__goalsPhase1){
+      var save=async function(){
+        var price=document.getElementById('c-price');
+        var deadline=document.getElementById('c-deadline');
+        if(!price && !deadline) return oldSave();
+        var p=price ? (parseFloat(price.value)||0) : 0;
+        var d=deadline ? (deadline.value||'') : '';
+        var eid=(document.getElementById('ce-id')||{}).value||'';
+        var name=((document.getElementById('c-name')||{}).value||'').trim();
+        try{
+          await Promise.resolve(oldSave());
+          if(eid){
+            await updateDoc(famDoc('cile',eid),{cena:p,termin:d});
+          }else{
+            var goals=(window.D&&Array.isArray(D.cile))?D.cile:[];
+            var matches=goals.filter(function(c){return c.nazev===name});
+            var c=matches.length?matches[matches.length-1]:null;
+            if(c&&c.id) await updateDoc(famDoc('cile',c.id),{cena:p,termin:d});
+          }
+          if(typeof loadC==='function') await Promise.resolve(loadC());
+          decorateGoals();
+        }catch(e){
+          console.error('[Goals] save failed',e);
+          try{toast('Cíl se nepodařilo uložit: '+(e.code||e.message||'chyba'),'error');}catch(_){ }
+        }
+      };
+      save.__goalsPhase1=true;
+      window.saveC=save;
+    }
+
+    function bindGoalSaveButton(){
+      var modal=document.getElementById('m-cil');
+      if(!modal) return;
+      var buttons=modal.querySelectorAll('button');
+      buttons.forEach(function(btn){
+        if((btn.textContent||'').trim().toLowerCase().includes('uložit') && !btn.__goalsSaveBound){
+          btn.__goalsSaveBound=true;
+          btn.type='button';
+          btn.onclick=function(e){e.preventDefault();e.stopPropagation();try{window.saveC();}catch(err){console.error('[Goals] button',err);try{toast('Cíl se nepodařilo uložit','error');}catch(_){}}};
+        }
+      });
+    }
+
+    decorateGoals();
+    bindGoalSaveButton();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initGoalsPhase1); else initGoalsPhase1();
+  [500,1000,1500,2500].forEach(function(ms){setTimeout(initGoalsPhase1,ms);});
+})();
+</script>`;
       if (!html.includes('id="goals-phase1-native-fix"')) html = html.replace('</body>', goalScript + '</body>');
 
       const goalCss = `<style id="goals-phase1-css">.goals-phase1-meta{font-size:11px;color:var(--text-2);margin-top:3px}.goals-phase1-price{font-size:12px;font-weight:700;color:var(--text);margin-top:4px}</style>`;
