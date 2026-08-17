@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
-const CACHE_NAME = 'rodinny-dashboard-v16';
+const CACHE_NAME = 'rodinny-dashboard-v17';
 
 self.addEventListener('install', function(event) { self.skipWaiting(); });
 self.addEventListener('activate', function(event) { event.waitUntil(clients.claim()); });
@@ -33,6 +33,7 @@ self.addEventListener('fetch', function(event) {
       if (!type.includes('text/html')) return response;
       let html = await response.text();
 
+      // Modal overlay musí být při startu skrytý.
       html = html.replace(
         '.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:flex;',
         '.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:none;'
@@ -46,21 +47,23 @@ self.addEventListener('fetch', function(event) {
         '.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,0.6);display:none;'
       );
 
+      // Oprava prvního přepnutí na Přehled.
       const navMarker = "window.switchTab('prehled');\n  loadAll();";
       const navFix = "window.switchTab('prehled');\n  requestAnimationFrame(()=>window.switchTab('prehled'));\n  loadAll();";
       if (html.includes(navMarker) && !html.includes('requestAnimationFrame(()=>window.switchTab(\'prehled\'))')) html = html.replace(navMarker, navFix);
 
+      // Nákupní seznam — bezpečnější zápis s merge.
       const oldAdd = "window.addSzItem=async()=>{const text=document.getElementById('sz-input').value.trim(),qty=document.getElementById('sz-qty').value.trim();if(!text)return;const sz=D.seznamy.find(s=>s.id===D.currentSz);if(!sz)return;const items=[...(sz.items||[]),{text,qty,done:false}];await updateDoc(famDoc('seznamy',D.currentSz),{items});sz.items=items;document.getElementById('sz-input').value='';document.getElementById('sz-qty').value='';renderSzDetail();renderSzGrid();stats()};";
       const newAdd = "window.addSzItem=async()=>{const text=document.getElementById('sz-input').value.trim(),qty=document.getElementById('sz-qty').value.trim();if(!text){toast('Zadej položku','error');return}const sz=D.seznamy.find(s=>s.id===D.currentSz);if(!sz){toast('Seznam není načten','error');return}const items=[...(sz.items||[]),{text,qty,done:false}];try{await setDoc(famDoc('seznamy',D.currentSz),{items},{merge:true});sz.items=items;document.getElementById('sz-input').value='';document.getElementById('sz-qty').value='';renderSzDetail();renderSzGrid();stats();toast('Položka přidána','success')}catch(e){console.error('[Seznam] addSzItem',e);toast('Položku se nepodařilo uložit: '+(e.code||e.message||'chyba'),'error')}};";
       if (html.includes(oldAdd)) html = html.replace(oldAdd, newAdd);
 
+      // Mobilní mikrofon.
       const micMarker = `  <button class="mob-nav-btn" data-tab="seznamy" onclick="window.switchTab('seznamy')">`;
       const micButton = `  <button class="mob-nav-btn mob-nav-mic" type="button" onclick="toggleMic('todo-input-dash')" aria-label="Hlasové zadání úkolu" title="Hlasové zadání úkolu">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
     Hlasem
   </button>\n`;
       if (html.includes(micMarker) && !html.includes('class="mob-nav-btn mob-nav-mic"')) html = html.replace(micMarker, micButton + micMarker);
-
       html = html.replace(/(<nav class="mobile-nav">[\s\S]*?)  <button class="mob-nav-btn" data-tab="nastaveni"[\s\S]*?<\/button>/, '$1');
 
       const css = `<style id="shopping-list-fix">
@@ -78,7 +81,23 @@ self.addEventListener('fetch', function(event) {
 </style>`;
       if (!html.includes('id="mobile-mic-nav-fix"')) html = html.replace('</head>', micCss + '</head>');
 
-      // ===== CÍLE — FÁZE 1 (robustní) =====
+      // ============================================================
+      // CÍLE — FÁZE 1
+      // Důležitá oprava proti v16:
+      // cena/termín se zapisují přímo v nativním saveC(), tedy uvnitř
+      // module scriptu, kde jsou dostupné famDoc/updateDoc. Neměníme
+      // datový model ani Firebase cestu.
+      // ============================================================
+      const oldSaveC = "window.saveC=async()=>{const n=document.getElementById('c-name').value.trim(),per=document.getElementById('c-period').value,k=document.getElementById('c-kdo').value,kt=document.getElementById('c-kat').value,p=parseInt(document.getElementById('c-prog-r').value)||0,d=document.getElementById('c-desc').value.trim(),eid=document.getElementById('ce-id').value;if(!n){toast('Vyplňte název','error');return}const data={nazev:n,period:per,kdo:k,kategorie:kt,progress:p,popis:d};if(eid){await updateDoc(famDoc('cile',eid),data);toast('Aktualizováno','success')}else{await addDoc(famCol('cile'),{...data,created:serverTimestamp()});toast('Cíl přidán','success')}closeM('m-cil');resetF(['ce-id','c-name','c-desc']);document.getElementById('c-prog-r').value=0;document.getElementById('c-pv').textContent='0';await loadC()};";
+      const newSaveC = "window.saveC=async()=>{const n=document.getElementById('c-name').value.trim(),per=document.getElementById('c-period').value,k=document.getElementById('c-kdo').value,kt=document.getElementById('c-kat').value,p=parseInt(document.getElementById('c-prog-r').value)||0,d=document.getElementById('c-desc').value.trim(),eid=document.getElementById('ce-id').value,cena=parseFloat(document.getElementById('c-price')?.value)||0,termin=document.getElementById('c-deadline')?.value||'';if(!n){toast('Vyplňte název','error');return}const data={nazev:n,period:per,kdo:k,kategorie:kt,progress:p,popis:d,cena,termin};try{if(eid){await updateDoc(famDoc('cile',eid),data);toast('Aktualizováno','success')}else{await addDoc(famCol('cile'),{...data,created:serverTimestamp()});toast('Cíl přidán','success')}closeM('m-cil');resetF(['ce-id','c-name','c-desc']);const price=document.getElementById('c-price'),deadline=document.getElementById('c-deadline');if(price)price.value='';if(deadline)deadline.value='';document.getElementById('c-prog-r').value=0;document.getElementById('c-pv').textContent='0';await loadC()}catch(e){console.error('[Goals] saveC',e);toast('Cíl se nepodařilo uložit: '+(e.code||e.message||'chyba'),'error')}};";
+      if (html.includes(oldSaveC)) html = html.replace(oldSaveC, newSaveC);
+      else console.warn('[SW] native saveC marker not found');
+
+      const oldEditC = "window.editC=id=>{const c=D.cile.find(x=>x.id===id);if(!c)return;document.getElementById('ce-id').value=id;document.getElementById('c-name').value=c.nazev;document.getElementById('c-period').value=c.period||'mesicni';document.getElementById('c-kdo').value=c.kdo||'Společný';document.getElementById('c-kat').value=c.kategorie||'Ostatní';document.getElementById('c-prog-r').value=c.progress||0;document.getElementById('c-pv').textContent=c.progress||0;document.getElementById('c-desc').value=c.popis||'';openM('m-cil')};";
+      const newEditC = "window.editC=id=>{const c=D.cile.find(x=>x.id===id);if(!c)return;document.getElementById('ce-id').value=id;document.getElementById('c-name').value=c.nazev;document.getElementById('c-period').value=c.period||'mesicni';document.getElementById('c-kdo').value=c.kdo||'Společný';document.getElementById('c-kat').value=c.kategorie||'Ostatní';document.getElementById('c-prog-r').value=c.progress||0;document.getElementById('c-pv').textContent=c.progress||0;document.getElementById('c-desc').value=c.popis||'';const price=document.getElementById('c-price'),deadline=document.getElementById('c-deadline');if(price)price.value=c.cena||'';if(deadline)deadline.value=c.termin||'';openM('m-cil')};";
+      if (html.includes(oldEditC)) html = html.replace(oldEditC, newEditC);
+      else console.warn('[SW] native editC marker not found');
+
       const goalScript = `<script id="goals-phase1-native-fix">
 (function(){
   function initGoalsPhase1(){
@@ -93,101 +112,34 @@ self.addEventListener('fetch', function(event) {
       progressFg.parentNode.insertBefore(wrap,progressFg);
     }
 
-    var oldSave=window.saveC;
-    var oldEdit=window.editC;
-    var oldLoad=window.loadC;
-
     function decorateGoals(){
       try{
         var goals=(window.D&&Array.isArray(D.cile))?D.cile:[];
-        var cards=document.querySelectorAll('.cil');
-        cards.forEach(function(card,i){
+        document.querySelectorAll('.cil').forEach(function(card,i){
           var c=goals[i]; if(!c) return;
           var head=card.querySelector('.cil-hdr>div'); if(!head) return;
           var meta=head.querySelector('.goals-phase1-meta');
-          if(!meta){ meta=document.createElement('div'); meta.className='goals-phase1-meta'; head.appendChild(meta); }
+          if(!meta){meta=document.createElement('div');meta.className='goals-phase1-meta';head.appendChild(meta);}
           var bits=[];
           if(Number(c.cena)>0) bits.push('Cíl: '+(typeof kc==='function'?kc(c.cena):Number(c.cena).toLocaleString('cs-CZ')+' Kč'));
-          if(c.termin){ var dt=new Date(c.termin+'T00:00:00'); bits.push('Termín: '+dt.toLocaleDateString('cs-CZ')); }
-          meta.textContent=bits.join('  ·  '); meta.style.display=bits.length?'block':'none';
+          if(c.termin){var dt=new Date(c.termin+'T00:00:00');bits.push('Termín: '+dt.toLocaleDateString('cs-CZ'));}
+          meta.textContent=bits.join('  ·  ');meta.style.display=bits.length?'block':'none';
         });
         var total=goals.reduce(function(sum,c){return sum+(Number(c.cena)||0)},0);
         var stat=document.getElementById('s-cile');
-        if(stat && total){
-          var value=document.getElementById('s-cile-hodnota');
-          if(!value){ value=document.createElement('div'); value.id='s-cile-hodnota'; value.style.cssText='font-size:11px;color:var(--text-3);margin-top:2px'; stat.parentNode.appendChild(value); }
-          value.textContent=typeof kc==='function'?kc(total):total.toLocaleString('cs-CZ')+' Kč';
-        }
-      }catch(e){ console.warn('[Goals] decorate',e); }
+        if(stat){var value=document.getElementById('s-cile-hodnota');if(!value){value=document.createElement('div');value.id='s-cile-hodnota';value.style.cssText='font-size:11px;color:var(--text-3);margin-top:2px';stat.parentNode.appendChild(value);}value.textContent=total?((typeof kc==='function'?kc(total):Number(total).toLocaleString('cs-CZ')+' Kč')):'';}
+      }catch(e){console.warn('[Goals] decorate',e);}
     }
 
-    if(typeof oldLoad==='function' && !oldLoad.__goalsPhase1){
-      var load=function(){
-        try{return Promise.resolve(oldLoad.apply(this,arguments)).then(function(r){decorateGoals();return r;});}
-        catch(e){console.error('[Goals] load',e);throw e;}
-      };
-      load.__goalsPhase1=true; window.loadC=load;
+    if(typeof window.loadC==='function' && !window.loadC.__goalsPhase1){
+      var oldLoad=window.loadC;
+      var wrapped=function(){return Promise.resolve(oldLoad.apply(this,arguments)).then(function(r){decorateGoals();return r;});};
+      wrapped.__goalsPhase1=true;window.loadC=wrapped;
     }
-
-    if(typeof oldEdit==='function' && !oldEdit.__goalsPhase1){
-      var edit=function(id){
-        var r=oldEdit.apply(this,arguments);
-        setTimeout(function(){
-          try{var c=(window.D&&D.cile||[]).find(function(x){return x.id===id});if(c){var p=document.getElementById('c-price'),d=document.getElementById('c-deadline');if(p)p.value=c.cena||'';if(d)d.value=c.termin||'';}}catch(e){console.warn('[Goals] edit',e);}
-        },0);
-        return r;
-      };
-      edit.__goalsPhase1=true; window.editC=edit;
-    }
-
-    if(typeof oldSave==='function' && !oldSave.__goalsPhase1){
-      var save=async function(){
-        var price=document.getElementById('c-price');
-        var deadline=document.getElementById('c-deadline');
-        if(!price && !deadline) return oldSave();
-        var p=price ? (parseFloat(price.value)||0) : 0;
-        var d=deadline ? (deadline.value||'') : '';
-        var eid=(document.getElementById('ce-id')||{}).value||'';
-        var name=((document.getElementById('c-name')||{}).value||'').trim();
-        try{
-          await Promise.resolve(oldSave());
-          if(eid){
-            await updateDoc(famDoc('cile',eid),{cena:p,termin:d});
-          }else{
-            var goals=(window.D&&Array.isArray(D.cile))?D.cile:[];
-            var matches=goals.filter(function(c){return c.nazev===name});
-            var c=matches.length?matches[matches.length-1]:null;
-            if(c&&c.id) await updateDoc(famDoc('cile',c.id),{cena:p,termin:d});
-          }
-          if(typeof loadC==='function') await Promise.resolve(loadC());
-          decorateGoals();
-        }catch(e){
-          console.error('[Goals] save failed',e);
-          try{toast('Cíl se nepodařilo uložit: '+(e.code||e.message||'chyba'),'error');}catch(_){ }
-        }
-      };
-      save.__goalsPhase1=true;
-      window.saveC=save;
-    }
-
-    function bindGoalSaveButton(){
-      var modal=document.getElementById('m-cil');
-      if(!modal) return;
-      var buttons=modal.querySelectorAll('button');
-      buttons.forEach(function(btn){
-        if((btn.textContent||'').trim().toLowerCase().includes('uložit') && !btn.__goalsSaveBound){
-          btn.__goalsSaveBound=true;
-          btn.type='button';
-          btn.onclick=function(e){e.preventDefault();e.stopPropagation();try{window.saveC();}catch(err){console.error('[Goals] button',err);try{toast('Cíl se nepodařilo uložit','error');}catch(_){}}};
-        }
-      });
-    }
-
     decorateGoals();
-    bindGoalSaveButton();
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initGoalsPhase1); else initGoalsPhase1();
-  [500,1000,1500,2500].forEach(function(ms){setTimeout(initGoalsPhase1,ms);});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initGoalsPhase1);else initGoalsPhase1();
+  [300,800,1500,3000].forEach(function(ms){setTimeout(initGoalsPhase1,ms);});
 })();
 </script>`;
       if (!html.includes('id="goals-phase1-native-fix"')) html = html.replace('</body>', goalScript + '</body>');
