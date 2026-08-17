@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
-const CACHE_NAME = 'rodinny-dashboard-v13';
+const CACHE_NAME = 'rodinny-dashboard-v14';
 
 self.addEventListener('install', function(event) {
   self.skipWaiting();
@@ -61,7 +61,6 @@ self.addEventListener('fetch', function(event) {
       const newAdd = "window.addSzItem=async()=>{const text=document.getElementById('sz-input').value.trim(),qty=document.getElementById('sz-qty').value.trim();if(!text){toast('Zadej položku','error');return}const sz=D.seznamy.find(s=>s.id===D.currentSz);if(!sz){toast('Seznam není načten','error');return}const items=[...(sz.items||[]),{text,qty,done:false}];try{await setDoc(famDoc('seznamy',D.currentSz),{items},{merge:true});sz.items=items;document.getElementById('sz-input').value='';document.getElementById('sz-qty').value='';renderSzDetail();renderSzGrid();stats();toast('Položka přidána','success')}catch(e){console.error('[Seznam] addSzItem',e);toast('Položku se nepodařilo uložit: '+(e.code||e.message||'chyba'),'error')}};";
       if (html.includes(oldAdd)) html = html.replace(oldAdd, newAdd);
 
-      // Mobilní navigace: mikrofon je prostřední a zvýrazněné tlačítko.
       const micMarker = `  <button class="mob-nav-btn" data-tab="seznamy" onclick="window.switchTab('seznamy')">`;
       const micButton = `  <button class="mob-nav-btn mob-nav-mic" type="button" onclick="toggleMic('todo-input-dash')" aria-label="Hlasové zadání úkolu" title="Hlasové zadání úkolu">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -72,7 +71,6 @@ self.addEventListener('fetch', function(event) {
         html = html.replace(micMarker, micButton + micMarker);
       }
 
-      // Nastavení zůstává v hamburger menu, proto ho ze spodní mobilní lišty odstraníme.
       const mobileNavSettings = /(<nav class="mobile-nav">[\s\S]*?)  <button class="mob-nav-btn" data-tab="nastaveni"[\s\S]*?<\/button>/;
       html = html.replace(mobileNavSettings, '$1');
 
@@ -96,6 +94,35 @@ self.addEventListener('fetch', function(event) {
 }
 </style>`;
       if (!html.includes('id="mobile-mic-nav-fix"')) html = html.replace('</head>', micCss + '</head>');
+
+      // ===== CÍLE — FÁZE 1 =====
+      // Pouze doplnění volitelné ceny a termínu. Staré cíle bez těchto polí zůstávají plně funkční.
+      const goalFieldsMarker = '<div class="fg"><label class="fl">Postup – <span id="c-pv">0</span>%</label>';
+      const goalFields = `<div class="fr">
+<div class="fg"><label class="fl">Cena cíle (Kč)</label><input type="number" class="fi" id="c-price" placeholder="např. 50000" min="0" step="1"></div>
+<div class="fg"><label class="fl">Termín splnění</label><input type="date" class="fi" id="c-deadline"></div>
+</div>` + goalFieldsMarker;
+      if (html.includes(goalFieldsMarker) && !html.includes('id="c-price"')) html = html.replace(goalFieldsMarker, goalFields);
+
+      const oldSaveC = "window.saveC=async()=>{const n=document.getElementById('c-name').value.trim(),per=document.getElementById('c-period').value,k=document.getElementById('c-kdo').value,kt=document.getElementById('c-kat').value,p=parseInt(document.getElementById('c-prog-r').value)||0,d=document.getElementById('c-desc').value.trim(),eid=document.getElementById('ce-id').value;if(!n){toast('Vyplňte název','error');return}const data={nazev:n,period:per,kdo:k,kategorie:kt,progress:p,popis:d};if(eid){await updateDoc(famDoc('cile',eid),data);toast('Aktualizováno','success')}else{await addDoc(famCol('cile'),{...data,created:serverTimestamp()});toast('Cíl přidán','success')}closeM('m-cil');resetF(['ce-id','c-name','c-desc']);document.getElementById('c-prog-r').value=0;document.getElementById('c-pv').textContent='0';await loadC()};";
+      const newSaveC = "window.saveC=async()=>{const n=document.getElementById('c-name').value.trim(),per=document.getElementById('c-period').value,k=document.getElementById('c-kdo').value,kt=document.getElementById('c-kat').value,p=parseInt(document.getElementById('c-prog-r').value)||0,d=document.getElementById('c-desc').value.trim(),price=parseFloat(document.getElementById('c-price')?.value)||0,deadline=document.getElementById('c-deadline')?.value||'',eid=document.getElementById('ce-id').value;if(!n){toast('Vyplňte název','error');return}const data={nazev:n,period:per,kdo:k,kategorie:kt,progress:p,popis:d,cena:price,termin:deadline};if(eid){await updateDoc(famDoc('cile',eid),data);toast('Aktualizováno','success')}else{await addDoc(famCol('cile'),{...data,created:serverTimestamp()});toast('Cíl přidán','success')}closeM('m-cil');resetF(['ce-id','c-name','c-desc']);if(document.getElementById('c-price'))document.getElementById('c-price').value='';if(document.getElementById('c-deadline'))document.getElementById('c-deadline').value='';document.getElementById('c-prog-r').value=0;document.getElementById('c-pv').textContent='0';await loadC()};";
+      if (html.includes(oldSaveC)) html = html.replace(oldSaveC, newSaveC);
+
+      const oldEditC = "window.editC=id=>{const c=D.cile.find(x=>x.id===id);if(!c)return;document.getElementById('ce-id').value=id;document.getElementById('c-name').value=c.nazev;document.getElementById('c-period').value=c.period||'mesicni';document.getElementById('c-kdo').value=c.kdo||'Společný';document.getElementById('c-kat').value=c.kategorie||'Ostatní';document.getElementById('c-prog-r').value=c.progress||0;document.getElementById('c-pv').textContent=c.progress||0;document.getElementById('c-desc').value=c.popis||'';openM('m-cil')};";
+      const newEditC = "window.editC=id=>{const c=D.cile.find(x=>x.id===id);if(!c)return;document.getElementById('ce-id').value=id;document.getElementById('c-name').value=c.nazev;document.getElementById('c-period').value=c.period||'mesicni';document.getElementById('c-kdo').value=c.kdo||'Společný';document.getElementById('c-kat').value=c.kategorie||'Ostatní';document.getElementById('c-prog-r').value=c.progress||0;document.getElementById('c-pv').textContent=c.progress||0;document.getElementById('c-desc').value=c.popis||'';if(document.getElementById('c-price'))document.getElementById('c-price').value=c.cena||'';if(document.getElementById('c-deadline'))document.getElementById('c-deadline').value=c.termin||'';openM('m-cil')};";
+      if (html.includes(oldEditC)) html = html.replace(oldEditC, newEditC);
+
+      const oldStats = "const totalV=vyd.reduce((s,v)=>s+(v.castka||0),0);const totalI=inv.reduce((s,i)=>s+(i.hodnota||0),0);const cileDone=cile.filter(c=>c.progress>=100).length;document.getElementById('s-vydaje').textContent=kc(totalV);document.getElementById('s-invest').textContent=kc(totalI);document.getElementById('s-cile').textContent=cileDone+'/'+cile.length;";
+      const newStats = "const totalV=vyd.reduce((s,v)=>s+(v.castka||0),0);const totalI=inv.reduce((s,i)=>s+(i.hodnota||0),0);const totalCile=cile.reduce((s,c)=>s+(Number(c.cena)||0),0);const cileDone=cile.filter(c=>c.progress>=100).length;document.getElementById('s-vydaje').textContent=kc(totalV);document.getElementById('s-invest').textContent=kc(totalI);document.getElementById('s-cile').textContent=cileDone+'/'+cile.length;const sCileHodnota=document.getElementById('s-cile-hodnota');if(sCileHodnota)sCileHodnota.textContent=totalCile?kc(totalCile):'';";
+      if (html.includes(oldStats)) html = html.replace(oldStats, newStats);
+
+      const oldGoalStat = '<div class="stat orange"><div class="stat-ico orange"><i data-lucide="target" class="ico"></i></div><div class="stat-lbl">Cíle</div><div class="stat-val" id="s-cile">0/0</div></div>';
+      const newGoalStat = '<div class="stat orange"><div class="stat-ico orange"><i data-lucide="target" class="ico"></i></div><div class="stat-lbl">Cíle</div><div class="stat-val" id="s-cile">0/0</div><div id="s-cile-hodnota" style="font-size:11px;color:var(--text-3);margin-top:2px"></div></div>';
+      if (html.includes(oldGoalStat)) html = html.replace(oldGoalStat, newGoalStat);
+
+      const oldGoalHtml = "const html=c=>'<div class=\"cil\"><div class=\"cil-hdr\"><div><div class=\"cil-name\">'+c.nazev+'</div><div class=\"cil-tag\">'+c.kdo+' · '+(c.kategorie||'')+'</div>'+(c.popis?'<div style=\"font-size:11px;color:var(--text-2);margin-top:3px\">'+c.popis+'</div>':'')+'</div><div style=\"display:flex;gap:4px\"><button class=\"btn btn-g btn-s\" onclick=\"editC(\\''+c.id+'\\')\"><i data-lucide=\"pencil\" class=\"ico\"></i></button><button class=\"btn btn-d btn-s\" onclick=\"delC(\\''+c.id+'\\')\"><i data-lucide=\"trash-2\" class=\"ico\"></i></button></div></div><div class=\"prog\"><div class=\"prog-fill '+(c.progress>=100?'green':c.progress>=50?'purple':'orange')+'\" style=\"width:'+(c.progress||0)+'%\"></div></div><div class=\"cil-pct\"><span>'+(c.progress>=100?'Splněno!':'V průběhu')+'</span><span>'+(c.progress||0)+'%</span></div></div>';";
+      const newGoalHtml = "const html=c=>'<div class=\"cil\"><div class=\"cil-hdr\"><div><div class=\"cil-name\">'+c.nazev+'</div><div class=\"cil-tag\">'+c.kdo+' · '+(c.kategorie||'')+'</div>'+(c.cena?'<div style=\"font-size:12px;font-weight:700;color:var(--text);margin-top:4px\">Cíl: '+kc(c.cena)+'</div>':'')+(c.termin?'<div style=\"font-size:11px;color:var(--text-2);margin-top:2px\">Termín: '+new Date(c.termin+'T00:00:00').toLocaleDateString(\'cs-CZ\')+'</div>':'')+(c.popis?'<div style=\"font-size:11px;color:var(--text-2);margin-top:3px\">'+c.popis+'</div>':'')+'</div><div style=\"display:flex;gap:4px\"><button class=\"btn btn-g btn-s\" onclick=\"editC(\\''+c.id+'\\')\"><i data-lucide=\"pencil\" class=\"ico\"></i></button><button class=\"btn btn-d btn-s\" onclick=\"delC(\\''+c.id+'\\')\"><i data-lucide=\"trash-2\" class=\"ico\"></i></button></div></div><div class=\"prog\"><div class=\"prog-fill '+(c.progress>=100?'green':c.progress>=50?'purple':'orange')+'\" style=\"width:'+(c.progress||0)+'%\"></div></div><div class=\"cil-pct\"><span>'+(c.progress>=100?'Splněno!':'V průběhu')+'</span><span>'+(c.progress||0)+'%</span></div></div>';";
+      if (html.includes(oldGoalHtml)) html = html.replace(oldGoalHtml, newGoalHtml);
 
       const headers = new Headers(response.headers);
       headers.set('content-type', 'text/html; charset=utf-8');
