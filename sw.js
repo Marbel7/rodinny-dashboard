@@ -1,6 +1,7 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
-const CACHE_NAME = 'rodinny-dashboard-v17';
+// Cíle jsou nyní řešeny přímo v index.html; SW už do formuláře nic nepřidává.
+const CACHE_NAME = 'rodinny-dashboard-v18';
 
 self.addEventListener('install', function(event) { self.skipWaiting(); });
 self.addEventListener('activate', function(event) { event.waitUntil(clients.claim()); });
@@ -10,7 +11,10 @@ self.addEventListener('push', function(event) {
   try {
     const data = event.data.json();
     event.waitUntil(self.registration.showNotification(data.title || 'Rodinný Dashboard', {
-      body: data.body || '', icon: data.icon || '/icon-192.png', tag: data.tag || 'rodina', data: data.url || '/'
+      body: data.body || '',
+      icon: data.icon || '/icon-192.png',
+      tag: data.tag || 'rodina',
+      data: data.url || '/'
     }));
   } catch (e) { console.warn('[SW] Push error:', e); }
 });
@@ -23,6 +27,8 @@ self.addEventListener('notificationclick', function(event) {
 self.addEventListener('fetch', function(event) {
   const request = event.request;
   const url = new URL(request.url);
+
+  // Firebase/Google requests musí projít přímo.
   if (url.hostname.includes('firebase') || url.hostname.includes('googleapis.com') || url.hostname.includes('gstatic.com')) return;
   if (request.mode !== 'navigate') return;
 
@@ -50,7 +56,9 @@ self.addEventListener('fetch', function(event) {
       // Oprava prvního přepnutí na Přehled.
       const navMarker = "window.switchTab('prehled');\n  loadAll();";
       const navFix = "window.switchTab('prehled');\n  requestAnimationFrame(()=>window.switchTab('prehled'));\n  loadAll();";
-      if (html.includes(navMarker) && !html.includes('requestAnimationFrame(()=>window.switchTab(\'prehled\'))')) html = html.replace(navMarker, navFix);
+      if (html.includes(navMarker) && !html.includes("requestAnimationFrame(()=>window.switchTab('prehled'))")) {
+        html = html.replace(navMarker, navFix);
+      }
 
       // Nákupní seznam — bezpečnější zápis s merge.
       const oldAdd = "window.addSzItem=async()=>{const text=document.getElementById('sz-input').value.trim(),qty=document.getElementById('sz-qty').value.trim();if(!text)return;const sz=D.seznamy.find(s=>s.id===D.currentSz);if(!sz)return;const items=[...(sz.items||[]),{text,qty,done:false}];await updateDoc(famDoc('seznamy',D.currentSz),{items});sz.items=items;document.getElementById('sz-input').value='';document.getElementById('sz-qty').value='';renderSzDetail();renderSzGrid();stats()};";
@@ -63,7 +71,9 @@ self.addEventListener('fetch', function(event) {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
     Hlasem
   </button>\n`;
-      if (html.includes(micMarker) && !html.includes('class="mob-nav-btn mob-nav-mic"')) html = html.replace(micMarker, micButton + micMarker);
+      if (html.includes(micMarker) && !html.includes('class="mob-nav-btn mob-nav-mic"')) {
+        html = html.replace(micMarker, micButton + micMarker);
+      }
       html = html.replace(/(<nav class="mobile-nav">[\s\S]*?)  <button class="mob-nav-btn" data-tab="nastaveni"[\s\S]*?<\/button>/, '$1');
 
       const css = `<style id="shopping-list-fix">
@@ -81,71 +91,10 @@ self.addEventListener('fetch', function(event) {
 </style>`;
       if (!html.includes('id="mobile-mic-nav-fix"')) html = html.replace('</head>', micCss + '</head>');
 
-      // ============================================================
-      // CÍLE — FÁZE 1
-      // Důležitá oprava proti v16:
-      // cena/termín se zapisují přímo v nativním saveC(), tedy uvnitř
-      // module scriptu, kde jsou dostupné famDoc/updateDoc. Neměníme
-      // datový model ani Firebase cestu.
-      // ============================================================
-      const oldSaveC = "window.saveC=async()=>{const n=document.getElementById('c-name').value.trim(),per=document.getElementById('c-period').value,k=document.getElementById('c-kdo').value,kt=document.getElementById('c-kat').value,p=parseInt(document.getElementById('c-prog-r').value)||0,d=document.getElementById('c-desc').value.trim(),eid=document.getElementById('ce-id').value;if(!n){toast('Vyplňte název','error');return}const data={nazev:n,period:per,kdo:k,kategorie:kt,progress:p,popis:d};if(eid){await updateDoc(famDoc('cile',eid),data);toast('Aktualizováno','success')}else{await addDoc(famCol('cile'),{...data,created:serverTimestamp()});toast('Cíl přidán','success')}closeM('m-cil');resetF(['ce-id','c-name','c-desc']);document.getElementById('c-prog-r').value=0;document.getElementById('c-pv').textContent='0';await loadC()};";
-      const newSaveC = "window.saveC=async()=>{const n=document.getElementById('c-name').value.trim(),per=document.getElementById('c-period').value,k=document.getElementById('c-kdo').value,kt=document.getElementById('c-kat').value,p=parseInt(document.getElementById('c-prog-r').value)||0,d=document.getElementById('c-desc').value.trim(),eid=document.getElementById('ce-id').value,cena=parseFloat(document.getElementById('c-price')?.value)||0,termin=document.getElementById('c-deadline')?.value||'';if(!n){toast('Vyplňte název','error');return}const data={nazev:n,period:per,kdo:k,kategorie:kt,progress:p,popis:d,cena,termin};try{if(eid){await updateDoc(famDoc('cile',eid),data);toast('Aktualizováno','success')}else{await addDoc(famCol('cile'),{...data,created:serverTimestamp()});toast('Cíl přidán','success')}closeM('m-cil');resetF(['ce-id','c-name','c-desc']);const price=document.getElementById('c-price'),deadline=document.getElementById('c-deadline');if(price)price.value='';if(deadline)deadline.value='';document.getElementById('c-prog-r').value=0;document.getElementById('c-pv').textContent='0';await loadC()}catch(e){console.error('[Goals] saveC',e);toast('Cíl se nepodařilo uložit: '+(e.code||e.message||'chyba'),'error')}};";
-      if (html.includes(oldSaveC)) html = html.replace(oldSaveC, newSaveC);
-      else console.warn('[SW] native saveC marker not found');
-
-      const oldEditC = "window.editC=id=>{const c=D.cile.find(x=>x.id===id);if(!c)return;document.getElementById('ce-id').value=id;document.getElementById('c-name').value=c.nazev;document.getElementById('c-period').value=c.period||'mesicni';document.getElementById('c-kdo').value=c.kdo||'Společný';document.getElementById('c-kat').value=c.kategorie||'Ostatní';document.getElementById('c-prog-r').value=c.progress||0;document.getElementById('c-pv').textContent=c.progress||0;document.getElementById('c-desc').value=c.popis||'';openM('m-cil')};";
-      const newEditC = "window.editC=id=>{const c=D.cile.find(x=>x.id===id);if(!c)return;document.getElementById('ce-id').value=id;document.getElementById('c-name').value=c.nazev;document.getElementById('c-period').value=c.period||'mesicni';document.getElementById('c-kdo').value=c.kdo||'Společný';document.getElementById('c-kat').value=c.kategorie||'Ostatní';document.getElementById('c-prog-r').value=c.progress||0;document.getElementById('c-pv').textContent=c.progress||0;document.getElementById('c-desc').value=c.popis||'';const price=document.getElementById('c-price'),deadline=document.getElementById('c-deadline');if(price)price.value=c.cena||'';if(deadline)deadline.value=c.termin||'';openM('m-cil')};";
-      if (html.includes(oldEditC)) html = html.replace(oldEditC, newEditC);
-      else console.warn('[SW] native editC marker not found');
-
-      const goalScript = `<script id="goals-phase1-native-fix">
-(function(){
-  function initGoalsPhase1(){
-    var pv=document.getElementById('c-pv');
-    if(!pv) return;
-    var progressFg=pv.closest('.fg');
-    if(!progressFg) return;
-    if(!document.getElementById('c-price')){
-      var wrap=document.createElement('div');
-      wrap.className='fr';
-      wrap.innerHTML='<div class="fg"><label class="fl">Cena cíle (Kč)</label><input type="number" class="fi" id="c-price" placeholder="např. 50000" min="0" step="1"></div><div class="fg"><label class="fl">Termín splnění</label><input type="date" class="fi" id="c-deadline"></div>';
-      progressFg.parentNode.insertBefore(wrap,progressFg);
-    }
-
-    function decorateGoals(){
-      try{
-        var goals=(window.D&&Array.isArray(D.cile))?D.cile:[];
-        document.querySelectorAll('.cil').forEach(function(card,i){
-          var c=goals[i]; if(!c) return;
-          var head=card.querySelector('.cil-hdr>div'); if(!head) return;
-          var meta=head.querySelector('.goals-phase1-meta');
-          if(!meta){meta=document.createElement('div');meta.className='goals-phase1-meta';head.appendChild(meta);}
-          var bits=[];
-          if(Number(c.cena)>0) bits.push('Cíl: '+(typeof kc==='function'?kc(c.cena):Number(c.cena).toLocaleString('cs-CZ')+' Kč'));
-          if(c.termin){var dt=new Date(c.termin+'T00:00:00');bits.push('Termín: '+dt.toLocaleDateString('cs-CZ'));}
-          meta.textContent=bits.join('  ·  ');meta.style.display=bits.length?'block':'none';
-        });
-        var total=goals.reduce(function(sum,c){return sum+(Number(c.cena)||0)},0);
-        var stat=document.getElementById('s-cile');
-        if(stat){var value=document.getElementById('s-cile-hodnota');if(!value){value=document.createElement('div');value.id='s-cile-hodnota';value.style.cssText='font-size:11px;color:var(--text-3);margin-top:2px';stat.parentNode.appendChild(value);}value.textContent=total?((typeof kc==='function'?kc(total):Number(total).toLocaleString('cs-CZ')+' Kč')):'';}
-      }catch(e){console.warn('[Goals] decorate',e);}
-    }
-
-    if(typeof window.loadC==='function' && !window.loadC.__goalsPhase1){
-      var oldLoad=window.loadC;
-      var wrapped=function(){return Promise.resolve(oldLoad.apply(this,arguments)).then(function(r){decorateGoals();return r;});};
-      wrapped.__goalsPhase1=true;window.loadC=wrapped;
-    }
-    decorateGoals();
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initGoalsPhase1);else initGoalsPhase1();
-  [300,800,1500,3000].forEach(function(ms){setTimeout(initGoalsPhase1,ms);});
-})();
-</script>`;
-      if (!html.includes('id="goals-phase1-native-fix"')) html = html.replace('</body>', goalScript + '</body>');
-
-      const goalCss = `<style id="goals-phase1-css">.goals-phase1-meta{font-size:11px;color:var(--text-2);margin-top:3px}.goals-phase1-price{font-size:12px;font-weight:700;color:var(--text);margin-top:4px}</style>`;
-      if (!html.includes('id="goals-phase1-css"')) html = html.replace('</head>', goalCss + '</head>');
+      // DŮLEŽITÉ: formulář Cílů zde záměrně NEUPRAVUJEME.
+      // Cena/termín jsou součástí aktuálního index.html a mají existovat právě jednou.
+      // Starší v17 patch zde dříve přidával druhou dvojici c-price/c-deadline;
+      // tento kód byl odstraněn, aby nedocházelo k duplicitám ani k přepisování saveC().
 
       const headers = new Headers(response.headers);
       headers.set('content-type', 'text/html; charset=utf-8');
