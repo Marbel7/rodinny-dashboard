@@ -816,24 +816,24 @@ input, select, textarea {
 }
 
 /* ===== CÍLE REDESIGN v3 — accordion + SVG icons ===== */
-.cil-v3{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s,border-color .15s;display:flex;gap:14px;align-items:flex-start}
+.cil-v3{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:8px;cursor:pointer;transition:box-shadow .15s,border-color .15s;display:flex;gap:12px;align-items:flex-start}
 .cil-v3:hover{box-shadow:var(--shadow);border-color:var(--accent-soft)}
 .cil-v3:last-child{margin-bottom:0}
-.cil-v3-icon{width:42px;height:42px;min-width:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.cil-v3-icon svg{width:20px;height:20px;stroke-width:1.8}
+.cil-v3-icon{width:48px;height:48px;min-width:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cil-v3-icon svg{width:22px;height:22px;stroke-width:1.8}
 .cil-v3-body{flex:1;min-width:0}
-.cil-v3-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px}
-.cil-v3-name{font-size:15px;font-weight:700;color:var(--text);line-height:1.3}
+.cil-v3-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:2px}
+.cil-v3-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+.cil-v3-price-top{font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;margin-left:auto;flex-shrink:0}
 .cil-v3-arrow{color:var(--text-4);flex-shrink:0;margin-top:2px}
 .cil-v3-arrow svg{width:16px;height:16px}
 .cil-v3-meta{font-size:11px;color:var(--text-3);margin-bottom:6px}
-.cil-v3-price{font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px}
-.cil-v3-prog{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-.cil-v3-prog .prog{flex:1;height:8px}
-.cil-v3-pct{font-size:13px;font-weight:700;min-width:36px;color:var(--accent)}
+.cil-v3-prog{display:flex;align-items:center;gap:10px;margin-bottom:3px}
+.cil-v3-prog .prog{flex:1;height:7px}
+.cil-v3-pct{font-size:12px;font-weight:700;min-width:32px;color:var(--accent)}
 .cil-v3-pct.done{color:var(--green)}
-.cil-v3-termin{font-size:12px;color:var(--text-3);margin-top:4px;display:flex;align-items:center;gap:4px}
-.cil-v3-termin svg{width:13px;height:13px}
+.cil-v3-termin{font-size:11px;color:var(--text-3);margin-top:2px;display:flex;align-items:center;gap:4px}
+.cil-v3-termin svg{width:12px;height:12px}
 .cil-v3-termin.soon{color:var(--orange);font-weight:600}
 .cil-v3-termin.overdue{color:var(--red);font-weight:600}
 .cil-v3-ico-cestovani{background:#FEF3C7;color:#D97706}
@@ -868,6 +868,14 @@ input, select, textarea {
 .cil-v3-summary-stat-lbl{font-size:10px;color:var(--text-3);text-transform:uppercase;font-weight:600;letter-spacing:.04em}
 .cil-v3-summary-pct{width:48px;height:48px;border-radius:50%;border:3px solid var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--accent)}
 @media(max-width:560px){.cil-v3-summary{flex-wrap:wrap;gap:14px}.cil-v3-summary-stats{margin-left:0;width:100%;justify-content:space-around}}
+/* Mobile compact stats for Cíle */
+.cil-v3-stats-mobile{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px}
+.cil-v3-sm-row{display:flex;justify-content:space-between;align-items:center}
+.cil-v3-sm-item{text-align:center;flex:1}
+.cil-v3-sm-val{font-size:16px;font-weight:800;color:var(--text)}
+.cil-v3-sm-lbl{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.cil-v3-sm-div{width:1px;height:28px;background:var(--border)}
+@media(max-width:600px){.g4-cile{display:none}.cil-v3-stats-mobile{display:block}}
 
 </style>
 
@@ -1146,6 +1154,7 @@ input, select, textarea {
 <div class="page-hdr"><div><div class="page-title"><i data-lucide="target" style="width:22px;height:22px;color:var(--accent)"></i> Cíle</div><div class="page-sub">Měsíční a roční cíle</div></div><button class="btn btn-p" onclick="openM('m-cil')"><i data-lucide="plus" class="ico"></i> Přidat cíl</button></div>
 <div class="seg"><button class="seg-btn active" data-period="mesicni" onclick="setCilPeriod('mesicni')">Měsíční</button><button class="seg-btn" data-period="rocni" onclick="setCilPeriod('rocni')">Roční</button></div>
 <div class="g4-cile"><div class="stat-card"><div class="stat-lbl">Celkem cílů</div><div class="stat-val" id="c-total">0</div><i data-lucide="target" class="ico" style="color:var(--accent);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">Splněno</div><div class="stat-val" id="c-done">0</div><i data-lucide="check-circle" class="ico" style="color:var(--green);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">V průběhu</div><div class="stat-val" id="c-prog">0</div><i data-lucide="clock" class="ico" style="color:var(--orange);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">Celková hodnota</div><div class="stat-val" id="c-totalval">0 Kč</div><i data-lucide="banknote" class="ico" style="color:var(--accent);margin-top:4px"></i></div></div>
+<div class="cil-v3-stats-mobile"><div class="cil-v3-sm-row"><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-total-m">0</div><div class="cil-v3-sm-lbl">Cílů</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-done-m">0</div><div class="cil-v3-sm-lbl">Splněno</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-prog-m">0</div><div class="cil-v3-sm-lbl">V průběhu</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-totalval-m">0 Kč</div><div class="cil-v3-sm-lbl">Hodnota</div></div></div></div>
 <div id="cile-months"></div>
 <div class="cil-v3-summary" id="cile-summary" style="display:none"><div class="cil-v3-summary-icon"><i data-lucide="wallet" style="width:22px;height:22px"></i></div><div><div class="cil-v3-summary-label">Celková hodnota cílů</div><div class="cil-v3-summary-val" id="c-sum-val">0 Kč</div></div><div class="cil-v3-summary-stats"><div class="cil-v3-summary-stat"><div class="cil-v3-summary-stat-val" id="c-sum-cnt">0</div><div class="cil-v3-summary-stat-lbl">Cílů</div></div><div class="cil-v3-summary-stat"><div class="cil-v3-summary-stat-val" id="c-sum-done">0</div><div class="cil-v3-summary-stat-lbl">Splněno</div></div><div class="cil-v3-summary-pct" id="c-sum-pct">0 %</div></div></div>
 </div>
@@ -1596,7 +1605,8 @@ document.getElementById('c-total').textContent=cile.length;
 document.getElementById('c-done').textContent=done;
 document.getElementById('c-prog').textContent=cile.length-done;
 document.getElementById('c-totalval').textContent=kc(totalCena);
-function terminFmt(t){if(!t)return{text:'Bez termínu',cls:''};const d=new Date(t),now=new Date();now.setHours(0,0,0,0);const diff=Math.ceil((d-now)/(864e5));const fmt=d.toLocaleDateString('cs-CZ',{day:'numeric',month:'numeric',year:'numeric'});if(diff<0)return{text:fmt+' (po termínu)',cls:'overdue'};if(diff===0)return{text:'Dnes!',cls:'soon'};if(diff<=14)return{text:fmt+' (za '+diff+' dní)',cls:'soon'};return{text:fmt,cls:''};}
+var cm=document.getElementById('c-total-m');if(cm){cm.textContent=cile.length;document.getElementById('c-done-m').textContent=done;document.getElementById('c-prog-m').textContent=cile.length-done;document.getElementById('c-totalval-m').textContent=kc(totalCena);}
+function terminFmt(t){if(!t)return{text:'Bez termínu',cls:''};const d=new Date(t),now=new Date();now.setHours(0,0,0,0);const diff=Math.ceil((d-now)/(864e5));const fmt=d.toLocaleDateString('cs-CZ',{day:'numeric',month:'numeric',year:'numeric'});if(diff<0)return{text:fmt+' · po termínu',cls:'overdue'};if(diff===0)return{text:fmt+' · dnes!',cls:'soon'};if(diff===1)return{text:fmt+' · zítra',cls:'soon'};if(diff<=30)return{text:fmt+' · za '+diff+' dní',cls:diff<=7?'soon':''};return{text:fmt,cls:''};}
 const cardHtml=c=>{
 const p=c.progress||0,cena=c.cena||0;
 const ti=terminFmt(c.termin);const svg=CIL_SVG[c.kategorie]||CIL_SVG.Ostatní;const cls=CIL_CLS[c.kategorie]||'ostatni';
@@ -1604,9 +1614,8 @@ const progCls=p>=100?'green':p>=50?'purple':'orange';
 return '<div class="cil-v3" onclick="editC(\''+c.id+'\')">'
 +'<div class="cil-v3-icon cil-v3-ico-'+cls+'">'+svg+'</div>'
 +'<div class="cil-v3-body">'
-+'<div class="cil-v3-top"><div class="cil-v3-name">'+c.nazev+'</div><div class="cil-v3-arrow">'+CHEV_RIGHT+'</div></div>'
++'<div class="cil-v3-top"><div class="cil-v3-name">'+c.nazev+'</div>'+(cena?'<div class="cil-v3-price-top">'+kc(cena)+'</div>':'')+'<div class="cil-v3-arrow">'+CHEV_RIGHT+'</div></div>'
 +'<div class="cil-v3-meta">'+c.kdo+' · '+(c.kategorie||'')+'</div>'
-+(cena?'<div class="cil-v3-price">'+kc(cena)+'</div>':'')
 +'<div class="cil-v3-prog"><div class="prog"><div class="prog-fill '+progCls+'" style="width:'+p+'%"></div></div><span class="cil-v3-pct'+(p>=100?' done':'')+'">'+p+' %</span></div>'
 +'<div class="cil-v3-termin '+ti.cls+'">'+CAL_SVG+' '+ti.text+'</div>'
 +'</div></div>';};
