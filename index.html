@@ -1053,75 +1053,34 @@ input, select, textarea {
 <div class="panel active" id="panel-prehled">
 
 <!-- UVÍTÁNÍ -->
-<div style="margin-bottom:14px">
-  <div id="greeting" class="greeting-desktop" style="font-size:22px;font-weight:800;color:var(--text)">Ahoj!</div>
+<div style="margin-bottom:16px">
+  <div id="greeting" style="font-size:22px;font-weight:800;color:var(--text)">Ahoj!</div>
   <div id="today-date" style="font-size:13px;color:var(--text-3);margin-top:2px"></div>
 </div>
 
-<!-- DNEŠNÍ AGENDA BANNER -->
-<div id="dnes-agenda" style="background:linear-gradient(135deg,#4338CA,#6366F1);border-radius:14px;padding:14px 18px;margin-bottom:14px;color:white;display:none">
-  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.8;margin-bottom:6px">Co tě dnes čeká</div>
-  <div id="dnes-content" style="font-size:13px;line-height:1.9"></div>
-</div>
-
-<!-- ÚKOLY NA HLAVNÍ STRÁNCE -->
+<!-- ÚKOLY – KOMPAKTNÍ SOUHRN -->
 <div class="card" style="margin-bottom:14px">
-  <div class="card-title">
-    <span style="display:flex;align-items:center;gap:8px">
-      <i data-lucide="check-square" class="ico"></i> Co je potřeba udělat
-    </span>
-    <span id="todo-dash-count" style="font-size:12px;color:var(--text-3);font-weight:600"></span>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <span style="display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:var(--text)"><i data-lucide="check-square" class="ico" style="color:var(--accent)"></i> Co je potřeba udělat</span>
     <button class="btn btn-g btn-s" onclick="switchTab('ukoly')" style="font-size:12px">Vše →</button>
   </div>
-
-  <!-- Rychlé přidání - jednoduché -->
-  <div style="display:flex;gap:8px;margin-bottom:4px">
+  <div id="todo-dash-summary" style="font-size:13px;color:var(--text-2);margin-bottom:10px;min-height:18px"></div>
+  <div style="display:flex;gap:8px">
     <div style="position:relative;flex:1">
       <input type="text" class="fi" id="todo-input-dash"
         placeholder="Přidat úkol..."
         onkeypress="if(event.key==='Enter')quickAddTodo()"
         style="width:100%;padding-right:44px;font-size:16px">
       <button id="mic-btn-todo-input-dash" onclick="toggleMic('todo-input-dash')"
-        style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px;border-radius:8px"
-        title="Hlasové zadání">🎤</button>
+        style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:8px">
+        <i data-lucide="mic" style="width:18px;height:18px;color:var(--text-3)"></i>
+      </button>
     </div>
-    <button class="btn btn-p" onclick="quickAddTodo()" style="padding:10px 16px;font-size:20px;line-height:1">+</button>
-  </div>
-
-  <!-- Více možností - rozbalovací -->
-  <div id="todo-more-opts" style="display:none;margin-bottom:10px;padding:10px;background:var(--border-light);border-radius:10px">
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <input type="date" class="fi" id="todo-date-dash" style="flex:1;min-width:130px;font-size:14px">
-      <select class="fi" id="todo-who-dash" style="flex:1;min-width:100px;font-size:14px">
-        <option value="">👥 Všichni</option>
-        <option value="Táta">👨 Táta</option>
-        <option value="Máma">👩 Máma</option>
-        <option value="Děti">👶 Děti</option>
-      </select>
-      <select class="fi" id="todo-pri-dash" style="flex:1;min-width:100px;font-size:14px">
-        <option value="med">🟡 Střední</option>
-        <option value="high">🔴 Vysoká</option>
-        <option value="low">🟢 Nízká</option>
-      </select>
-    </div>
-  </div>
-  <button onclick="document.getElementById('todo-more-opts').style.display=document.getElementById('todo-more-opts').style.display==='none'?'block':'none'"
-    style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-3);margin-bottom:10px;padding:0">
-    ⚙️ Více možností
-  </button>
-
-  <!-- Zobrazit/skrýt seznam -->
-  <button id="todo-dash-toggle" onclick="(function(){var c=document.getElementById('todo-dash-content');var b=document.getElementById('todo-dash-toggle');var open=c.style.display!=='none';c.style.display=open?'none':'block';b.innerHTML=open?'Zobrazit úkoly ↓':'Skrýt ↑';})()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;padding:4px 0;margin-bottom:4px;font-family:inherit">Zobrazit úkoly ↓</button>
-  <!-- Skupiny úkolů -->
-  <div id="todo-dash-content" style="display:none">
-    <div id="todo-group-dnes" style="margin-bottom:4px"></div>
-    <div id="todo-group-tyden" style="margin-bottom:4px"></div>
-    <div id="todo-group-ostatni" style="margin-bottom:4px"></div>
-    <div id="todo-list-dash"></div>
+    <button class="btn btn-p" onclick="quickAddTodo()" style="padding:10px 18px;font-size:18px;line-height:1">+</button>
   </div>
 </div>
 
-<!-- RYCHLÉ AKCE - kompaktní -->
+<!-- RYCHLÉ AKCE -->
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
   <button class="qa-btn" onclick="document.getElementById('todo-input-dash').focus()">
     <i data-lucide="plus-circle" class="ico"></i><span>Úkol</span>
@@ -1165,30 +1124,23 @@ input, select, textarea {
   <div id="next-pay-widget" style="font-size:14px;color:var(--text)">—</div>
 </div>
 
-<!-- VÝDAJE TENTO MĚSÍC -->
-<div class="card" style="margin-bottom:14px">
-  <div class="card-title">
-    <span style="display:flex;align-items:center;gap:8px"><i data-lucide="bar-chart-2" class="ico"></i> Výdaje tento měsíc</span>
-    <span id="mesic-badge" style="font-size:12px;color:var(--text-2)"></span>
+<!-- FINANCE – JEDNA KARTA -->
+<div class="card" style="margin-bottom:14px" id="finance-prehled-card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-2)">Výdaje tento měsíc</span>
+    <button class="btn btn-g btn-s" onclick="switchTab('vydaje')" style="font-size:12px">Výdaje →</button>
   </div>
-  <div id="mesic-prehled-widget"></div>
+  <div style="font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px;margin-bottom:4px" id="fp-total">0 Kč</div>
+  <div style="font-size:12px;color:var(--text-3)" id="fp-detail">Žádné výdaje</div>
 </div>
 
-<!-- STATISTIKY -->
-<div class="g4" style="margin-bottom:14px">
-  <div class="stat purple"><div class="stat-ico purple"><i data-lucide="wallet" class="ico"></i></div><div class="stat-lbl">Výdaje celkem</div><div class="stat-val" id="s-vydaje">0 Kč</div></div>
-  <div class="stat green"><div class="stat-ico green"><i data-lucide="piggy-bank" class="ico"></i></div><div class="stat-lbl">Investováno</div><div class="stat-val" id="s-invest">0 Kč</div></div>
-  <div class="stat orange"><div class="stat-ico orange"><i data-lucide="target" class="ico"></i></div><div class="stat-lbl">Cíle</div><div class="stat-val" id="s-cile">0/0</div></div>
-  <div class="stat blue"><div class="stat-ico blue"><i data-lucide="list-checks" class="ico"></i></div><div class="stat-lbl">Seznamy</div><div class="stat-val" id="s-seznamy">0</div></div>
-</div>
-
-<!-- PRAVIDELNÉ VÝDAJE -->
-<div class="balance-card" id="pravidel-card">
-  <div class="balance-label">Pravidelné výdaje měsíčně</div>
-  <div class="balance-val" id="p-total">0 Kč</div>
-  <div class="balance-sub">Hypotéka, energie, pojištění a další</div>
-  <div class="balance-list" id="p-list"></div>
-</div>
+<!-- HIDDEN IDs for stats() function compatibility -->
+<span id="s-vydaje" style="display:none"></span>
+<span id="s-invest" style="display:none"></span>
+<span id="s-cile" style="display:none"></span>
+<span id="s-seznamy" style="display:none"></span>
+<span id="p-total" style="display:none"></span>
+<div id="p-list" style="display:none"></div>
 
 </div>
 
@@ -1651,8 +1603,21 @@ out+=groupHtml('Později',grPozdeji,'var(--text-3)','<circle cx="12" cy="12" r="
 out+=groupHtml('Bez termínu',grBez,'var(--text-3)','<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>');
 if(done.length){out+='<div class="todo-v2-done-toggle" id="todo-done-toggle-'+el.id+'" onclick="var b=this.nextElementSibling;b.style.display=b.style.display===\'none\'?\'block\':\'none\';this.classList.toggle(\'open\')">'+CHEV+' Hotovo · '+done.length+'</div><div style="display:none">'+done.map(itemHtml).join('')+'</div>';}
 el.innerHTML=out;}
-renderInto(document.getElementById('todo-list-dash'));renderInto(document.getElementById('todo-list'));
-var countEl=document.getElementById('todo-dash-count');if(countEl){var uc=undone.length;countEl.textContent=uc>0?uc+' otevřených':'';}
+renderInto(document.getElementById('todo-list'));
+// Compact summary for dashboard
+var sumEl=document.getElementById('todo-dash-summary');
+if(sumEl){
+  var total=undone.length;
+  if(!total){sumEl.innerHTML='<span style="color:var(--green);font-weight:600">✓ Vše splněno</span>';}
+  else{
+    var parts=[];
+    if(grPT.length)parts.push('<span style="color:var(--red);font-weight:700">'+grPT.length+' po termínu</span>');
+    if(grDnes.length)parts.push('<span style="color:var(--orange);font-weight:700">'+grDnes.length+' dnes</span>');
+    var rest=total-grPT.length-grDnes.length;
+    if(rest>0)parts.push('<span style="color:var(--text-2)">'+rest+' dalších</span>');
+    sumEl.innerHTML=parts.join(' · ');
+  }
+}
 _ci()}
 window._todoEditDate='';window._todoEditWho='';
 window.setTodoEditDate=function(el,val){window._todoEditDate=val;el.closest('.fg').querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('t-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
@@ -1801,15 +1766,16 @@ window.delBday=async id=>{if(!confirm('Smazat osobu?'))return;await deleteDoc(fa
 
 // STATS
 function stats(){updateDnesAgenda();if(typeof renderOblibeneNakup==='function')renderOblibeneNakup();if(typeof renderMesicPrehled==='function')renderMesicPrehled();
-const vyd=D.vydaje,inv=D.investice,cile=D.cile,sz=D.seznamy;const prav=vyd.filter(v=>v.typ==='pravidel');const pravTotal=prav.reduce((s,v)=>s+(v.castka||0),0);const totalV=vyd.reduce((s,v)=>s+(v.castka||0),0);const totalI=inv.reduce((s,i)=>s+(i.hodnota||0),0);const cileDone=cile.filter(c=>c.progress>=100).length;document.getElementById('s-vydaje').textContent=kc(totalV);document.getElementById('s-invest').textContent=kc(totalI);document.getElementById('s-cile').textContent=cileDone+'/'+cile.length;document.getElementById('s-seznamy').textContent=sz.length;document.getElementById('p-total').textContent=kc(pravTotal);const pl=document.getElementById('p-list');
-  // Nejbližší splatnost
-  const dnes=new Date().getDate();
-  const pravSorted=prav.filter(v=>v.denSplatnosti).sort((a,b)=>{const da=a.denSplatnosti>=dnes?a.denSplatnosti:a.denSplatnosti+31;const db=b.denSplatnosti>=dnes?b.denSplatnosti:b.denSplatnosti+31;return da-db});
-  const nextPay=pravSorted[0];
-  const nextPayEl=document.getElementById('next-pay-widget');
-  if(nextPayEl){if(nextPay){const daysLeft=nextPay.denSplatnosti>=dnes?nextPay.denSplatnosti-dnes:nextPay.denSplatnosti+31-dnes;nextPayEl.innerHTML='<span style="font-weight:700">'+nextPay.nazev+'</span> <span style="color:var(--text-2)">— '+kc(nextPay.castka)+'</span> <span style="font-size:11px;background:#EEF2FF;color:#6366F1;padding:2px 8px;border-radius:20px;margin-left:4px">'+(daysLeft===0?'Dnes':daysLeft===1?'Zítra':'Za '+daysLeft+' dní')+'</span>'}else{nextPayEl.innerHTML='<span style="color:var(--text-3)">Přidej výdaje se dnem splatnosti</span>'}}
-  if(!prav.length){pl.innerHTML='<div style="opacity:.7;font-size:13px;padding:8px 0">Zatím žádné pravidelné výdaje. Přidej je v sekci Výdaje.</div>'}else{pl.innerHTML=prav.sort((a,b)=>(b.castka||0)-(a.castka||0)).map(v=>'<div class="balance-li"><span class="bn">'+v.nazev+(v.denSplatnosti?' <span style="font-size:10px;opacity:.6">'+v.denSplatnosti+'. v měsíci</span>':'')+'</span><span class="ba">'+kc(v.castka)+'</span></div>').join('')}_ci()}
-
+const vyd=D.vydaje,inv=D.investice,cile=D.cile,sz=D.seznamy;const prav=vyd.filter(v=>v.typ==='pravidel');const pravTotal=prav.reduce((s,v)=>s+(v.castka||0),0);const jedTotal=vyd.filter(v=>v.typ==='jednor').reduce((s,v)=>s+(v.castka||0),0);const totalV=vyd.reduce((s,v)=>s+(v.castka||0),0);const totalI=inv.reduce((s,i)=>s+(i.hodnota||0),0);const cileDone=cile.filter(c=>c.progress>=100).length;
+const sv=document.getElementById('s-vydaje');if(sv)sv.textContent=kc(totalV);const si=document.getElementById('s-invest');if(si)si.textContent=kc(totalI);const sc=document.getElementById('s-cile');if(sc)sc.textContent=cileDone+'/'+cile.length;const ss=document.getElementById('s-seznamy');if(ss)ss.textContent=sz.length;const pt=document.getElementById('p-total');if(pt)pt.textContent=kc(pravTotal);
+const fpTotal=document.getElementById('fp-total');const fpDetail=document.getElementById('fp-detail');
+if(fpTotal)fpTotal.textContent=totalV?kc(totalV):'0 Kč';
+if(fpDetail){if(!vyd.length){fpDetail.textContent='Žádné výdaje tento měsíc';}else{var fparts=[];if(pravTotal)fparts.push('Pravidelné '+kc(pravTotal));if(jedTotal)fparts.push('Jednorázové '+kc(jedTotal));fpDetail.textContent=fparts.join(' · ');}}
+const dnes=new Date().getDate();const pravSorted=prav.filter(v=>v.denSplatnosti).sort((a,b)=>{const da=a.denSplatnosti>=dnes?a.denSplatnosti:a.denSplatnosti+31;const db=b.denSplatnosti>=dnes?b.denSplatnosti:b.denSplatnosti+31;return da-db});
+const nextPay=pravSorted[0];const nextPayEl=document.getElementById('next-pay-widget');
+if(nextPayEl){if(nextPay){const daysLeft=nextPay.denSplatnosti>=dnes?nextPay.denSplatnosti-dnes:nextPay.denSplatnosti+31-dnes;nextPayEl.innerHTML='<span style="font-weight:700">'+nextPay.nazev+'</span> <span style="color:var(--text-2)">— '+kc(nextPay.castka)+'</span><span style="font-size:11px;background:#EEF2FF;color:#6366F1;padding:2px 8px;border-radius:20px;margin-left:6px">'+(daysLeft===0?'Dnes':daysLeft===1?'Zítra':'Za '+daysLeft+' dní')+'</span>';}else{nextPayEl.innerHTML='<span style="color:var(--text-3);font-size:13px">Žádná blížící se platba</span>';}}
+const pl=document.getElementById('p-list');if(pl){if(!prav.length){pl.innerHTML='';}else{pl.innerHTML=prav.sort((a,b)=>(b.castka||0)-(a.castka||0)).map(v=>'<div class="balance-li"><span class="bn">'+v.nazev+(v.denSplatnosti?' <span style="font-size:10px;opacity:.6">'+v.denSplatnosti+'. v měsíci</span>':'')+'</span><span class="ba">'+kc(v.castka)+'</span></div>').join('');}}
+_ci()}
 function updateDnesAgenda(){
   const today=new Date();today.setHours(0,0,0,0);
   const todayStr=today.toISOString().slice(0,10);
