@@ -878,7 +878,17 @@ input, select, textarea {
 .cil-v3-sm-div{width:1px;height:28px;background:var(--border)}
 @media(max-width:600px){.g4-cile{display:none}.cil-v3-stats-mobile{display:block}}
 
-/* ===== VÝDAJE v2 ===== */
+/* ===== RYCHLÉ AKCE v2 ===== */
+.qa-btn-v2{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2);transition:all .15s;font-family:inherit;width:100%;-webkit-tap-highlight-color:transparent}
+.qa-btn-v2:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);border-color:var(--border)}
+.qa-btn-v2:active{transform:translateY(0)}
+.qa-btn-v2-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+/* ===== PŘED ODCHODEM v2 ===== */
+.odchod-check-v2{width:24px;height:24px;min-width:24px;border-radius:7px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.odchod-check-v2.done{background:var(--accent);border-color:var(--accent);color:white}
+.odchod-check-v2.done svg{stroke:white}
+.odchod-prog-bar{background:var(--border-light);border-radius:999px;height:5px;overflow:hidden;margin:6px 0 12px}
+.odchod-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),#818CF8);border-radius:999px;transition:width .4s}
 .vyd-stats{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;align-items:center}
 .vyd-stats-item{flex:1;text-align:center}
 .vyd-stats-val{font-size:15px;font-weight:800;color:var(--text)}
@@ -1121,20 +1131,27 @@ input, select, textarea {
   </div>
 </div>
 
-<!-- RYCHLÉ AKCE - kompaktní -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
-  <button class="qa-btn" onclick="document.getElementById('todo-input-dash').focus()">
-    <i data-lucide="plus-circle" class="ico"></i><span>Úkol</span>
-  </button>
-  <button class="qa-btn" onclick="switchTab('vydaje');setTimeout(()=>openM('m-vydaj'),100)">
-    <i data-lucide="wallet" class="ico"></i><span>Výdaj</span>
-  </button>
-  <button class="qa-btn" onclick="switchTab('cile');setTimeout(()=>openM('m-cil'),100)">
-    <i data-lucide="target" class="ico"></i><span>Cíl</span>
-  </button>
-  <button class="qa-btn" onclick="switchTab('oslavy');setTimeout(()=>openM('m-bday'),100)">
-    <i data-lucide="cake" class="ico"></i><span>Oslava</span>
-  </button>
+<!-- RYCHLÉ AKCE -->
+<div style="margin-bottom:14px">
+  <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">Rychlé přidání</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+    <button class="qa-btn-v2" onclick="document.getElementById('todo-input-dash').focus()" style="--qa-bg:#EEF2FF;--qa-color:#6366F1">
+      <div class="qa-btn-v2-icon" style="background:#EEF2FF"><i data-lucide="check-square" style="width:26px;height:26px;color:#6366F1"></i></div>
+      <span>Úkol</span>
+    </button>
+    <button class="qa-btn-v2" onclick="switchTab('vydaje');setTimeout(()=>openM('m-vydaj'),100)" style="--qa-bg:#ECFDF5;--qa-color:#10B981">
+      <div class="qa-btn-v2-icon" style="background:#ECFDF5"><i data-lucide="wallet" style="width:26px;height:26px;color:#10B981"></i></div>
+      <span>Výdaj</span>
+    </button>
+    <button class="qa-btn-v2" onclick="switchTab('oslavy');setTimeout(()=>openM('m-bday'),100)" style="--qa-bg:#FDF2F8;--qa-color:#EC4899">
+      <div class="qa-btn-v2-icon" style="background:#FDF2F8"><i data-lucide="cake" style="width:26px;height:26px;color:#EC4899"></i></div>
+      <span>Oslava</span>
+    </button>
+    <button class="qa-btn-v2" onclick="switchTab('cile');setTimeout(()=>openM('m-cil'),100)" style="--qa-bg:#FFF7ED;--qa-color:#F59E0B">
+      <div class="qa-btn-v2-icon" style="background:#FFF7ED"><i data-lucide="target" style="width:26px;height:26px;color:#F59E0B"></i></div>
+      <span>Cíl</span>
+    </button>
+  </div>
 </div>
 
 <!-- NEJBLIŽŠÍ OSLAVA -->
@@ -1142,19 +1159,21 @@ input, select, textarea {
 
 <!-- PŘED ODCHODEM -->
 <div class="card" style="margin-bottom:14px">
-  <div class="card-title">
-    <span style="display:flex;align-items:center;gap:8px"><i data-lucide="door-open" class="ico"></i> Před odchodem</span>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <span style="font-size:15px;font-weight:700;color:var(--text)">Před odchodem</span>
     <div style="display:flex;gap:6px;align-items:center">
-      <span id="odchod-progress" style="font-size:12px;color:var(--text-2)"></span>
-      <button class="btn btn-g btn-s" onclick="window.resetOdchod()" title="Reset" style="padding:6px 10px"><i data-lucide="refresh-cw" class="ico"></i></button>
-      <button class="btn btn-p btn-s" onclick="window.switchTab('odchod');window.openM('m-odchod-item')" style="padding:6px 10px">+</button>
+      <button class="btn btn-g btn-s" onclick="window.resetOdchod()" title="Reset" style="padding:5px 9px"><i data-lucide="refresh-cw" class="ico"></i></button>
+      <button class="btn btn-p btn-s" onclick="window.switchTab('odchod');window.openM('m-odchod-item')" style="padding:5px 9px">+</button>
     </div>
   </div>
-  <button id="odchod-dash-toggle" onclick="(function(){var c=document.getElementById('odchod-widget-list');var b=document.getElementById('odchod-dash-toggle');var open=c.style.display!=='none';c.style.display=open?'none':'block';b.innerHTML=open?'Zobrazit seznam ↓':'Skrýt ↑';})()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;padding:4px 0;margin-bottom:4px;font-family:inherit">Zobrazit seznam ↓</button>
-  <div id="odchod-widget-list" style="display:none">
+  <div id="odchod-progress" style="font-size:13px;color:var(--text-3);margin-bottom:4px"></div>
+  <div class="odchod-prog-bar"><div class="odchod-prog-fill" id="odchod-prog-fill" style="width:0%"></div></div>
+  <div id="odchod-widget-list">
     <div style="text-align:center;padding:12px;color:var(--text-3);font-size:13px">Přidej věci → klikni na <b>+</b></div>
   </div>
+  <button onclick="switchTab('odchod')" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--accent);font-weight:600;padding:8px 0 0;font-family:inherit">Upravit seznam</button>
 </div>
+
 
 <!-- NEJBLIŽŠÍ PLATBA -->
 <div class="card" style="margin-bottom:14px">
@@ -2077,19 +2096,21 @@ window.resetOdchod=async()=>{const items=window.D.odchod||[];await Promise.all(i
 function renderOdchod(){
   const items=window.D.odchod||[];
   const doneCount=items.filter(i=>i.done).length;
-  const prog=document.getElementById('odchod-progress');if(prog)prog.textContent=doneCount+'/'+items.length;
-  const emptyHtml='<div class="empty" style="padding:20px"><i data-lucide="door-open" class="empty-ico" style="width:24px;height:24px"></i><p>Přidej věci které nesmíš zapomenout</p></div>';
+  const prog=document.getElementById('odchod-progress');
+  if(prog)prog.textContent=items.length?doneCount+'/'+items.length+' hotovo':'';
+  const fill=document.getElementById('odchod-prog-fill');
+  if(fill)fill.style.width=(items.length?Math.round(doneCount/items.length*100):0)+'%';
+  const CHECK_SVG='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="20 6 9 17 4 12"/></svg>';
+  const emptyHtml='<div class="empty" style="padding:16px"><p style="color:var(--text-3);font-size:13px">Přidej věci které nesmíš zapomenout</p></div>';
   function buildList(el){
     if(!el)return;
     if(!items.length){el.innerHTML=emptyHtml;_ci();return}
     el.innerHTML=items.map(i=>{
-      const doneClass=i.done?' done':'';
       const doneStyle=i.done?'text-decoration:line-through;color:var(--text-3)':'';
-      const txt=i.done?i.text:i.icon+' '+i.text;
       return '<div class="odchod-item">'
-        +'<div class="odchod-check'+doneClass+'" data-toggle="'+i.id+'" data-done="'+i.done+'">'+(i.done?'✓':i.icon)+'</div>'
-        +'<div style="flex:1;font-size:14px;'+doneStyle+'">'+i.text+'</div>'
-        +'<button class="btn btn-d btn-s" data-del-odchod="'+i.id+'" style="padding:4px 6px"><i data-lucide="x" class="ico" style="width:12px;height:12px"></i></button>'
+        +'<div class="odchod-check-v2'+(i.done?' done':'')+'" data-toggle="'+i.id+'" data-done="'+i.done+'">'+(i.done?CHECK_SVG:'')+'</div>'
+        +'<div style="flex:1;font-size:14px;font-weight:500;'+doneStyle+'">'+i.text+'</div>'
+        +'<button class="btn btn-d btn-s" data-del-odchod="'+i.id+'" style="padding:4px 6px;opacity:.5"><i data-lucide="x" class="ico" style="width:12px;height:12px"></i></button>'
         +'</div>';
     }).join('');
     el.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>window.toggleOdchod(b.dataset.toggle,b.dataset.done==='true'));
