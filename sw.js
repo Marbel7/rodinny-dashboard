@@ -1,7 +1,7 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
 // Cíle jsou nyní řešeny přímo v index.html; SW už do formuláře nic nepřidává.
-const CACHE_NAME = 'rodinny-dashboard-v18';
+const CACHE_NAME = 'rodinny-dashboard-v19';
 
 self.addEventListener('install', function(event) { self.skipWaiting(); });
 self.addEventListener('activate', function(event) { event.waitUntil(clients.claim()); });
@@ -90,6 +90,14 @@ self.addEventListener('fetch', function(event) {
 @media(max-width:768px){.mobile-nav{display:flex!important;justify-content:space-around!important;align-items:center!important}.mobile-nav .mob-nav-btn{flex:1 1 0!important;min-width:0!important;max-width:none!important}.mobile-nav .mob-nav-mic{flex:0 0 58px!important;width:58px!important;height:58px!important;min-height:58px!important;margin-top:-18px!important;padding:0!important;border-radius:50%!important;background:#6366F1!important;color:#fff!important;border:4px solid var(--sidebar-bg)!important;box-shadow:0 4px 14px rgba(99,102,241,.45)!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:2px!important}.mobile-nav .mob-nav-mic svg{width:25px!important;height:25px!important;stroke:#fff!important}.mobile-nav .mob-nav-mic{font-size:9px!important;font-weight:700!important}}
 </style>`;
       if (!html.includes('id="mobile-mic-nav-fix"')) html = html.replace('</head>', micCss + '</head>');
+
+      // Před odchodem — čistý checkbox místo původní ikonky.
+      const odchodCss = `<style id="odchod-checkbox-fix">
+.odchod-check{width:22px!important;height:22px!important;min-width:22px!important;border:2px solid var(--border)!important;border-radius:6px!important;background:var(--surface)!important;color:transparent!important;font-size:0!important;line-height:1!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;box-shadow:none!important;opacity:1!important}
+.odchod-check.done{border-color:var(--accent)!important;background:var(--accent)!important;color:#fff!important;font-size:13px!important;font-weight:800!important;opacity:1!important}
+.odchod-item:hover .odchod-check{border-color:var(--accent)!important}
+</style>`;
+      if (!html.includes('id="odchod-checkbox-fix"')) html = html.replace('</head>', odchodCss + '</head>');
 
       // DŮLEŽITÉ: formulář Cílů zde záměrně NEUPRAVUJEME.
       // Cena/termín jsou součástí aktuálního index.html a mají existovat právě jednou.
