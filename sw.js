@@ -1,7 +1,7 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
 // Cíle jsou nyní řešeny přímo v index.html; SW už do formuláře nic nepřidává.
-const CACHE_NAME = 'rodinny-dashboard-v20';
+const CACHE_NAME = 'rodinny-dashboard-v21';
 
 self.addEventListener('install', function(event) { self.skipWaiting(); });
 self.addEventListener('activate', function(event) { event.waitUntil(clients.claim()); });
@@ -113,6 +113,12 @@ self.addEventListener('fetch', function(event) {
       // Doplňkový JS: statistiky rychlých akcí + spolehlivější vazba mikrofonu.
       const quickScript = '<script src="/dashboard-enhancements.js"></script>';
       if (!html.includes('/dashboard-enhancements.js')) html = html.replace('</body>', quickScript + '</body>');
+
+      // Úkoly na Přehledu jsou po načtení sbalené. Uživatel je může ručně rozbalit.
+      const todoToggleMarker = '<button id="todo-dash-toggle" onclick="(function(){var c=document.getElementById(\'todo-dash-content\');var b=document.getElementById(\'todo-dash-toggle\');var open=c.style.display!==\'none\';c.style.display=open?\'none\':\'block\';b.innerHTML=open?\'Zobrazit úkoly ↓\':\'Skrýt ↑\';})()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;padding:4px 0;margin-bottom:4px;font-family:inherit">Skrýt ↑</button>';
+      const todoToggleClosed = '<button id="todo-dash-toggle" onclick="(function(){var c=document.getElementById(\'todo-dash-content\');var b=document.getElementById(\'todo-dash-toggle\');var open=c.style.display!==\'none\';c.style.display=open?\'none\':\'block\';b.innerHTML=open?\'Zobrazit úkoly ↓\':\'Skrýt ↑\';})()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;padding:4px 0;margin-bottom:4px;font-family:inherit">Zobrazit úkoly ↓</button>';
+      if (html.includes(todoToggleMarker)) html = html.replace(todoToggleMarker, todoToggleClosed);
+      html = html.replace('<div id="todo-dash-content" style="display:block">', '<div id="todo-dash-content" style="display:none">');
 
       // DŮLEŽITÉ: formulář Cílů zde záměrně NEUPRAVUJEME.
       // Cena/termín jsou součástí aktuálního index.html a mají existovat právě jednou.
