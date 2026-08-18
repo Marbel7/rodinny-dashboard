@@ -1,7 +1,7 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
 // Cíle jsou nyní řešeny přímo v index.html; SW už do formuláře nic nepřidává.
-const CACHE_NAME = 'rodinny-dashboard-v19';
+const CACHE_NAME = 'rodinny-dashboard-v20';
 
 self.addEventListener('install', function(event) { self.skipWaiting(); });
 self.addEventListener('activate', function(event) { event.waitUntil(clients.claim()); });
@@ -98,6 +98,21 @@ self.addEventListener('fetch', function(event) {
 .odchod-item:hover .odchod-check{border-color:var(--accent)!important}
 </style>`;
       if (!html.includes('id="odchod-checkbox-fix"')) html = html.replace('</head>', odchodCss + '</head>');
+
+      // Rychlé přidání — kompaktní karty se statistikou.
+      const quickCss = `<style id="quick-actions-v3">
+.qa-btn-v2.qa-v3{gap:4px!important;padding:10px 4px 9px!important;min-height:104px!important;justify-content:flex-start!important}
+.qa-btn-v2.qa-v3 .qa-btn-v2-icon{width:42px!important;height:42px!important;border-radius:12px!important}
+.qa-btn-v2.qa-v3 .qa-btn-v2-icon svg{width:22px!important;height:22px!important}
+.qa-btn-v2.qa-v3>span:not(.qa-stat){font-size:12px!important;font-weight:600!important;line-height:1.15!important;color:var(--text-2)!important}
+.qa-btn-v2.qa-v3 .qa-stat{display:block!important;min-height:14px!important;font-size:11px!important;line-height:1.1!important;font-weight:700!important;color:var(--text-3)!important;white-space:nowrap!important}
+@media(max-width:600px){.qa-btn-v2.qa-v3{min-height:98px!important}.qa-btn-v2.qa-v3 .qa-stat{font-size:10px!important}}
+</style>`;
+      if (!html.includes('id="quick-actions-v3"')) html = html.replace('</head>', quickCss + '</head>');
+
+      // Doplňkový JS: statistiky rychlých akcí + spolehlivější vazba mikrofonu.
+      const quickScript = '<script src="/dashboard-enhancements.js"></script>';
+      if (!html.includes('/dashboard-enhancements.js')) html = html.replace('</body>', quickScript + '</body>');
 
       // DŮLEŽITÉ: formulář Cílů zde záměrně NEUPRAVUJEME.
       // Cena/termín jsou součástí aktuálního index.html a mají existovat právě jednou.
