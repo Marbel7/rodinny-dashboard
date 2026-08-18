@@ -825,9 +825,9 @@ input, select, textarea {
 .cil-v3-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:2px}
 .cil-v3-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
 .cil-v3-price-top{font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;margin-left:auto;flex-shrink:0}
-.cil-v3-arrow{color:var(--text-4);flex-shrink:0;margin-top:2px}
-.cil-v3-arrow svg{width:16px;height:16px}
-.cil-v3-meta{font-size:11px;color:var(--text-3);margin-bottom:6px}
+.cil-v3-arrow{color:var(--text-3);flex-shrink:0;margin-top:2px}
+.cil-v3-arrow svg{width:20px;height:20px}
+.cil-v3-meta{font-size:11px;color:var(--text-2);margin-bottom:6px}
 .cil-v3-prog{display:flex;align-items:center;gap:10px;margin-bottom:3px}
 .cil-v3-prog .prog{flex:1;height:7px}
 .cil-v3-pct{font-size:12px;font-weight:700;min-width:32px;color:var(--accent)}
@@ -848,6 +848,7 @@ input, select, textarea {
 .cil-v3-month{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
 .cil-v3-month-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;user-select:none;transition:background .12s}
 .cil-v3-month-hdr:hover{background:var(--border-light)}
+.cil-v3-month-hdr.open{background:rgba(99,102,241,0.04);border-bottom:1px solid var(--border)}
 .cil-v3-month-title{font-size:14px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.03em}
 .cil-v3-month-info{display:flex;align-items:center;gap:10px}
 .cil-v3-month-badge{font-size:11px;font-weight:600;color:var(--text-2);background:var(--border-light);padding:3px 9px;border-radius:20px}
@@ -1627,7 +1628,7 @@ const now=new Date();const currentKey=now.getFullYear()*100+now.getMonth();
 let out='';
 sortedKeys.forEach(key=>{const g=groups[key];const isOpen=key===currentKey;const cnt=g.cile.length;
 out+='<div class="cil-v3-month">'
-+'<div class="cil-v3-month-hdr" onclick="this.nextElementSibling.classList.toggle(\'open\');this.querySelector(\'.cil-v3-month-chevron\').classList.toggle(\'open\')">'
++'<div class="cil-v3-month-hdr'+(isOpen?' open':'')+'" onclick="this.classList.toggle(\'open\');this.nextElementSibling.classList.toggle(\'open\');this.querySelector(\'.cil-v3-month-chevron\').classList.toggle(\'open\')">'
 +'<div class="cil-v3-month-title">'+g.label+'</div>'
 +'<div class="cil-v3-month-info">'
 +'<span class="cil-v3-month-badge">'+cnt+' '+(cnt===1?'cíl':cnt<5?'cíle':'cílů')+' · '+kc(g.cena)+'</span>'
@@ -1637,7 +1638,7 @@ out+='<div class="cil-v3-month">'
 +'</div>';});
 if(bezTerminu.length){const cnt=bezTerminu.length;const cena=bezTerminu.reduce((s,c)=>s+(c.cena||0),0);
 out+='<div class="cil-v3-month">'
-+'<div class="cil-v3-month-hdr" onclick="this.nextElementSibling.classList.toggle(\'open\');this.querySelector(\'.cil-v3-month-chevron\').classList.toggle(\'open\')">'
++'<div class="cil-v3-month-hdr" onclick="this.classList.toggle(\'open\');this.nextElementSibling.classList.toggle(\'open\');this.querySelector(\'.cil-v3-month-chevron\').classList.toggle(\'open\')">'
 +'<div class="cil-v3-month-title" style="color:var(--text-3)">Bez termínu</div>'
 +'<div class="cil-v3-month-info">'
 +'<span class="cil-v3-month-badge">'+cnt+' '+(cnt===1?'cíl':cnt<5?'cíle':'cílů')+(cena?' · '+kc(cena):'')+'</span>'
