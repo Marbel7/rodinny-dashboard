@@ -878,6 +878,44 @@ input, select, textarea {
 .cil-v3-sm-div{width:1px;height:28px;background:var(--border)}
 @media(max-width:600px){.g4-cile{display:none}.cil-v3-stats-mobile{display:block}}
 
+/* ===== VÝDAJE v2 ===== */
+.vyd-stats{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;align-items:center}
+.vyd-stats-item{flex:1;text-align:center}
+.vyd-stats-val{font-size:15px;font-weight:800;color:var(--text)}
+.vyd-stats-val.accent{font-size:18px;color:var(--accent)}
+.vyd-stats-lbl{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.vyd-stats-div{width:1px;height:32px;background:var(--border)}
+.vyd-donut-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px}
+.vyd-donut-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.vyd-donut-chart{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap}
+.vyd-donut-svg{position:relative;width:160px;height:160px;flex-shrink:0}
+.vyd-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.vyd-donut-center-lbl{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em}
+.vyd-donut-center-val{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.vyd-legend{flex:1;min-width:140px}
+.vyd-legend-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
+.vyd-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.vyd-legend-name{flex:1;color:var(--text-2);font-weight:500}
+.vyd-legend-val{font-weight:700;color:var(--text)}
+.vyd-legend-pct{font-size:11px;color:var(--text-3);min-width:32px;text-align:right}
+.vyd-seg{display:inline-flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:2px}
+.vyd-seg-btn{padding:5px 12px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:600;color:var(--text-3);border-radius:6px;font-family:inherit;transition:all .12s}
+.vyd-seg-btn.active{background:white;color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.vyd-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.vyd-filters select{padding:8px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-family:inherit;background:white;color:var(--text);outline:none;transition:border-color .15s;max-width:160px}
+.vyd-filters select:focus{border-color:var(--accent)}
+.vyd-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:center;cursor:pointer;transition:box-shadow .12s,border-color .12s}
+.vyd-card:hover{box-shadow:var(--shadow);border-color:var(--accent-soft)}
+.vyd-card-icon{width:42px;height:42px;min-width:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vyd-card-icon svg{width:20px;height:20px;stroke-width:1.8}
+.vyd-card-body{flex:1;min-width:0}
+.vyd-card-top{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px}
+.vyd-card-name{font-size:14px;font-weight:700;color:var(--text)}
+.vyd-card-price{font-size:15px;font-weight:800;color:var(--text);white-space:nowrap}
+.vyd-card-meta{font-size:11px;color:var(--text-2)}
+.vyd-card-arrow{color:var(--text-3);flex-shrink:0}
+.vyd-card-arrow svg{width:20px;height:20px}
+
 </style>
 
 </head>
@@ -1140,9 +1178,10 @@ input, select, textarea {
 
 <div class="panel" id="panel-vydaje">
 <div class="page-hdr"><div><div class="page-title"><i data-lucide="wallet" style="width:22px;height:22px;color:var(--accent)"></i> Výdaje</div><div class="page-sub">Pravidelné i jednorázové výdaje</div></div><button class="btn btn-p" onclick="openM('m-vydaj')"><i data-lucide="plus" class="ico"></i> Výdaj</button></div>
-<div class="g3"><div class="stat red"><div class="stat-lbl">Pravidelné</div><div class="stat-val" id="v-prav">0 Kč</div></div><div class="stat blue"><div class="stat-lbl">Jednorázové</div><div class="stat-val" id="v-jed">0 Kč</div></div><div class="stat orange"><div class="stat-lbl">Celkem</div><div class="stat-val" id="v-cel">0 Kč</div></div></div>
-<div class="card" style="margin-bottom:14px"><div style="display:flex;gap:8px;flex-wrap:wrap"><select class="fs" id="vf-typ" style="max-width:150px" onchange="renderV()"><option value="">Všechny typy</option><option value="pravidel">Pravidelné</option><option value="jednor">Jednorázové</option></select><select class="fs" id="vf-kat" style="max-width:150px" onchange="renderV()"><option value="">Všechny kategorie</option><option value="Bydlení">Bydlení</option><option value="Energie">Energie</option><option value="Pojištění">Pojištění</option><option value="Splátky">Splátky</option><option value="Jídlo">Jídlo</option><option value="Doprava">Doprava</option><option value="Zdraví">Zdraví</option><option value="Vzdělání">Vzdělání</option><option value="Zábava">Zábava</option><option value="Ostatní">Ostatní</option></select></div></div>
-<div class="card"><div class="card-title"><span style="display:flex;align-items:center;gap:6px"><i data-lucide="credit-card" class="ico"></i> Výdaje</span></div><div class="tw"><table><thead><tr><th>Název</th><th>Kategorie</th><th>Typ</th><th>Částka</th><th>Poznámka</th><th>Akce</th></tr></thead><tbody id="vydaje-tb"><tr><td colspan="6"><div class="empty"><i data-lucide="wallet" class="empty-ico" style="width:28px;height:28px"></i><h3>Žádné výdaje</h3></div></td></tr></tbody></table></div></div>
+<div class="vyd-stats"><div class="vyd-stats-item"><div class="vyd-stats-val" id="v-prav">0 Kč</div><div class="vyd-stats-lbl">Pravidelné</div></div><div class="vyd-stats-div"></div><div class="vyd-stats-item"><div class="vyd-stats-val" id="v-jed">0 Kč</div><div class="vyd-stats-lbl">Jednorázové</div></div><div class="vyd-stats-div"></div><div class="vyd-stats-item"><div class="vyd-stats-val accent" id="v-cel">0 Kč</div><div class="vyd-stats-lbl">Celkem</div></div></div>
+<div class="vyd-donut-wrap"><div class="vyd-donut-title"><span>Kam peníze jdou</span><div class="vyd-seg"><button class="vyd-seg-btn active" onclick="setVydChart('kat')">Kategorie</button><button class="vyd-seg-btn" onclick="setVydChart('typ')">Typ</button></div></div><div class="vyd-donut-chart" id="vyd-chart-area"><div class="empty"><i data-lucide="pie-chart" class="empty-ico" style="width:28px;height:28px"></i><p>Zatím žádné výdaje</p></div></div></div>
+<div class="vyd-filters"><select class="fs" id="vf-typ" style="max-width:150px" onchange="renderV()"><option value="">Všechny typy</option><option value="pravidel">Pravidelné</option><option value="jednor">Jednorázové</option></select><select class="fs" id="vf-kat" style="max-width:150px" onchange="renderV()"><option value="">Všechny kategorie</option><option value="Bydlení">Bydlení</option><option value="Energie">Energie</option><option value="Pojištění">Pojištění</option><option value="Splátky">Splátky</option><option value="Jídlo">Jídlo</option><option value="Doprava">Doprava</option><option value="Zdraví">Zdraví</option><option value="Vzdělání">Vzdělání</option><option value="Zábava">Zábava</option><option value="Ostatní">Ostatní</option></select></div>
+<div id="vydaje-list"></div>
 </div>
 
 <div class="panel" id="panel-investice">
@@ -1577,7 +1616,32 @@ window.clearDoneTodos=async()=>{const done=D.todos.filter(t=>t.done);if(!done.le
 
 // VÝDAJE
 async function loadV(){const s=await getDocs(query(famCol('vydaje'),orderBy('created','desc')));D.vydaje=s.docs.map(d=>({id:d.id,...d.data()}));renderV();stats()}
-window.renderV=()=>{let list=[...D.vydaje];const ft=document.getElementById('vf-typ').value,fk=document.getElementById('vf-kat').value;if(ft)list=list.filter(v=>v.typ===ft);if(fk)list=list.filter(v=>v.kategorie===fk);const prav=D.vydaje.filter(v=>v.typ==='pravidel').reduce((s,v)=>s+(v.castka||0),0),jed=D.vydaje.filter(v=>v.typ==='jednor').reduce((s,v)=>s+(v.castka||0),0);document.getElementById('v-prav').textContent=kc(prav);document.getElementById('v-jed').textContent=kc(jed);document.getElementById('v-cel').textContent=kc(prav+jed);const tb=document.getElementById('vydaje-tb');if(!list.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><i data-lucide="wallet" class="empty-ico" style="width:28px;height:28px"></i><h3>Žádné výdaje</h3></div></td></tr>';_ci();return}tb.innerHTML=list.map(v=>'<tr><td><strong>'+v.nazev+'</strong></td><td><span class="badge badge-gray">'+(v.kategorie||'')+'</span></td><td><span class="badge '+(v.typ==='pravidel'?'badge-r':'badge-b')+'">'+(v.typ==='pravidel'?'Pravidelný':'Jednorázový')+'</span></td><td><strong>'+kc(v.castka)+'</strong></td><td style="color:var(--text-2);font-size:12px">'+(v.poznamka||'–')+'</td><td style="white-space:nowrap"><button class="btn btn-g btn-s" onclick="editV(\''+v.id+'\')"><i data-lucide="pencil" class="ico"></i></button> <button class="btn btn-d btn-s" onclick="delV(\''+v.id+'\')"><i data-lucide="trash-2" class="ico"></i></button></td></tr>').join('');_ci()};
+window._vydChartMode='kat';
+window.setVydChart=mode=>{window._vydChartMode=mode;document.querySelectorAll('.vyd-seg-btn').forEach(b=>b.classList.toggle('active',b.textContent===(mode==='kat'?'Kategorie':'Typ')));renderV()};
+const VYD_SVG={Bydlení:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',Energie:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',Pojištění:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',Splátky:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>',Jídlo:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" x2="6" y1="1" y2="4"/><line x1="10" x2="10" y1="1" y2="4"/><line x1="14" x2="14" y1="1" y2="4"/></svg>',Doprava:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18 10l-2.8-3.4A2 2 0 0 0 13.6 6H5c-1.1 0-2 .9-2 2v8c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>',Zdraví:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',Vzdělání:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>',Zábava:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',Ostatní:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>'};
+const VYD_CLS={Bydlení:['#FEF3C7','#D97706'],Energie:['#FEF9C3','#CA8A04'],Pojištění:['var(--blue-soft)','var(--blue)'],Splátky:['var(--red-soft)','var(--red)'],Jídlo:['var(--green-soft)','var(--green)'],Doprava:['var(--orange-soft)','var(--orange)'],Zdraví:['var(--pink-soft)','var(--pink)'],Vzdělání:['var(--accent-soft)','var(--accent)'],Zábava:['#EDE9FE','#7C3AED'],Ostatní:['var(--border-light)','var(--text-3)']};
+const DONUT_COLORS=['#6366F1','#10B981','#F59E0B','#EF4444','#3B82F6','#EC4899','#8B5CF6','#14B8A6','#F97316','#64748B'];
+window.renderV=()=>{let list=[...D.vydaje];const ft=document.getElementById('vf-typ').value,fk=document.getElementById('vf-kat').value;if(ft)list=list.filter(v=>v.typ===ft);if(fk)list=list.filter(v=>v.kategorie===fk);const prav=D.vydaje.filter(v=>v.typ==='pravidel').reduce((s,v)=>s+(v.castka||0),0),jed=D.vydaje.filter(v=>v.typ==='jednor').reduce((s,v)=>s+(v.castka||0),0);document.getElementById('v-prav').textContent=kc(prav);document.getElementById('v-jed').textContent=kc(jed);document.getElementById('v-cel').textContent=kc(prav+jed);
+// DONUT
+const ca=document.getElementById('vyd-chart-area');const total=D.vydaje.reduce((s,v)=>s+(v.castka||0),0);
+if(!D.vydaje.length){ca.innerHTML='<div class="empty"><i data-lucide="pie-chart" class="empty-ico" style="width:28px;height:28px"></i><p>Zatím žádné výdaje</p></div>';_ci();}
+else{const grp={};if(window._vydChartMode==='kat'){D.vydaje.forEach(v=>{const k=v.kategorie||'Ostatní';grp[k]=(grp[k]||0)+(v.castka||0)});}else{D.vydaje.forEach(v=>{const k=v.typ==='pravidel'?'Pravidelné':'Jednorázové';grp[k]=(grp[k]||0)+(v.castka||0)});}
+const sorted=Object.entries(grp).sort((a,b)=>b[1]-a[1]);let items=sorted.slice(0,6);if(sorted.length>6){const rest=sorted.slice(6).reduce((s,e)=>s+e[1],0);items.push(['Ostatní',rest]);}
+const r=70,cx=80,cy=80,sw=18;let cumPct=0;
+let arcs='';items.forEach((item,i)=>{const pct=total>0?item[1]/total:0;const start=cumPct*2*Math.PI-Math.PI/2;cumPct+=pct;const end=cumPct*2*Math.PI-Math.PI/2;const large=pct>0.5?1:0;const x1=cx+r*Math.cos(start),y1=cy+r*Math.sin(start),x2=cx+r*Math.cos(end),y2=cy+r*Math.sin(end);
+if(pct>0.001)arcs+='<path d="M'+x1+' '+y1+' A'+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+'" fill="none" stroke="'+DONUT_COLORS[i%DONUT_COLORS.length]+'" stroke-width="'+sw+'"/>';});
+const legend=items.map((item,i)=>'<div class="vyd-legend-item"><div class="vyd-legend-dot" style="background:'+DONUT_COLORS[i%DONUT_COLORS.length]+'"></div><div class="vyd-legend-name">'+item[0]+'</div><div class="vyd-legend-val">'+kc(item[1])+'</div><div class="vyd-legend-pct">'+(total>0?Math.round(item[1]/total*100):0)+' %</div></div>').join('');
+ca.innerHTML='<div class="vyd-donut-svg"><svg width="160" height="160" viewBox="0 0 160 160">'+arcs+(total===0?'<circle cx="80" cy="80" r="70" fill="none" stroke="var(--border)" stroke-width="18"/>':'')+'</svg><div class="vyd-donut-center"><div class="vyd-donut-center-lbl">Celkem</div><div class="vyd-donut-center-val">'+kc(total)+'</div></div></div><div class="vyd-legend">'+legend+'</div>';}
+// LIST
+const el=document.getElementById('vydaje-list');
+if(!list.length){el.innerHTML='<div class="card"><div class="empty"><i data-lucide="wallet" class="empty-ico" style="width:28px;height:28px"></i><h3>Žádné výdaje</h3><p>Přidej první výdaj</p></div></div>';_ci();return;}
+el.innerHTML=list.map(v=>{const svg=VYD_SVG[v.kategorie]||VYD_SVG.Ostatní;const cls=VYD_CLS[v.kategorie]||VYD_CLS.Ostatní;const typTxt=v.typ==='pravidel'?'Pravidelný':'Jednorázový';
+return '<div class="vyd-card" onclick="editV(\''+v.id+'\')">'
++'<div class="vyd-card-icon" style="background:'+cls[0]+';color:'+cls[1]+'">'+svg+'</div>'
++'<div class="vyd-card-body"><div class="vyd-card-top"><div class="vyd-card-name">'+v.nazev+'</div><div class="vyd-card-price">'+kc(v.castka)+'</div></div>'
++'<div class="vyd-card-meta">'+(v.kategorie||'')+ ' · '+typTxt+(v.poznamka?' · '+v.poznamka:'')+'</div></div>'
++'<div class="vyd-card-arrow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>';}).join('');
+_ci()};
 window.saveV=async()=>{const n=document.getElementById('v-name').value.trim(),a=parseFloat(document.getElementById('v-amt').value)||0,k=document.getElementById('v-kat').value,t=document.getElementById('v-typ').value,p=document.getElementById('v-note').value.trim(),den=parseInt(document.getElementById('v-den').value)||0,eid=document.getElementById('ve-id').value;if(!n||!a){toast('Vyplňte název a částku','error');return}const d={nazev:n,castka:a,kategorie:k,typ:t,poznamka:p,denSplatnosti:den};if(eid){await updateDoc(famDoc('vydaje',eid),d);toast('Aktualizováno','success')}else{await addDoc(famCol('vydaje'),{...d,created:serverTimestamp()});toast('Výdaj přidán','success')}closeM('m-vydaj');resetF(['ve-id','v-name','v-amt','v-note']);document.getElementById('v-den').value='';await loadV()};
 window.editV=id=>{const v=D.vydaje.find(x=>x.id===id);if(!v)return;document.getElementById('ve-id').value=id;document.getElementById('v-name').value=v.nazev;document.getElementById('v-amt').value=v.castka;document.getElementById('v-kat').value=v.kategorie||'Ostatní';document.getElementById('v-typ').value=v.typ||'pravidel';document.getElementById('v-note').value=v.poznamka||'';document.getElementById('v-den').value=v.denSplatnosti||'';openM('m-vydaj')};
 window.delV=async id=>{if(!confirm('Smazat výdaj?'))return;await deleteDoc(famDoc('vydaje',id));toast('Smazáno');await loadV()};
