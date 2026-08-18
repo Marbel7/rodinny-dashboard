@@ -1111,9 +1111,9 @@ input, select, textarea {
   </button>
 
   <!-- Zobrazit/skrýt seznam -->
-  <button id="todo-dash-toggle" onclick="(function(){var c=document.getElementById('todo-dash-content');var b=document.getElementById('todo-dash-toggle');var open=c.style.display!=='none';c.style.display=open?'none':'block';b.innerHTML=open?'Zobrazit úkoly ↓':'Skrýt ↑';})()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;padding:4px 0;margin-bottom:4px;font-family:inherit">Zobrazit úkoly ↓</button>
+  <button id="todo-dash-toggle" onclick="(function(){var c=document.getElementById('todo-dash-content');var b=document.getElementById('todo-dash-toggle');var open=c.style.display!=='none';c.style.display=open?'none':'block';b.innerHTML=open?'Zobrazit úkoly ↓':'Skrýt ↑';})()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;padding:4px 0;margin-bottom:4px;font-family:inherit">Skrýt ↑</button>
   <!-- Skupiny úkolů -->
-  <div id="todo-dash-content" style="display:none">
+  <div id="todo-dash-content" style="display:block">
     <div id="todo-group-dnes" style="margin-bottom:4px"></div>
     <div id="todo-group-tyden" style="margin-bottom:4px"></div>
     <div id="todo-group-ostatni" style="margin-bottom:4px"></div>
