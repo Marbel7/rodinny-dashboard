@@ -80,8 +80,23 @@
     };
   }
 
+  function hookRenderers(){
+    ['renderTodos','renderV','renderC','renderBdays'].forEach(function(name){
+      const fn=window[name];
+      if(typeof fn!=='function' || fn._qaWrapped) return;
+      const wrapped=function(){
+        const r=fn.apply(this,arguments);
+        setTimeout(updateQuickStats,0);
+        return r;
+      };
+      wrapped._qaWrapped=true;
+      window[name]=wrapped;
+    });
+  }
+
   function init(){
     setupQuickActions();
+    hookRenderers();
     fixQuickMic();
     updateQuickStats();
     setTimeout(updateQuickStats,300);
@@ -95,8 +110,9 @@
   let ticks=0;
   const timer=setInterval(function(){
     setupQuickActions();
+    hookRenderers();
     fixQuickMic();
     updateQuickStats();
-    if(++ticks>=20) clearInterval(timer);
+    if(++ticks>=40) clearInterval(timer);
   },500);
 })();
