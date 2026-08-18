@@ -869,7 +869,7 @@ input, select, textarea {
 .cil-v3-summary-pct{width:48px;height:48px;border-radius:50%;border:3px solid var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--accent)}
 @media(max-width:560px){.cil-v3-summary{flex-wrap:wrap;gap:14px}.cil-v3-summary-stats{margin-left:0;width:100%;justify-content:space-around}}
 /* Mobile compact stats for Cíle */
-.cil-v3-stats-mobile{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px}
+.cil-v3-stats-mobile{display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px}
 .cil-v3-sm-row{display:flex;justify-content:space-between;align-items:center}
 .cil-v3-sm-item{text-align:center;flex:1}
 .cil-v3-sm-val{font-size:16px;font-weight:800;color:var(--text)}
@@ -1153,10 +1153,9 @@ input, select, textarea {
 <div class="panel" id="panel-cile">
 <div class="page-hdr"><div><div class="page-title"><i data-lucide="target" style="width:22px;height:22px;color:var(--accent)"></i> Cíle</div><div class="page-sub">Měsíční a roční cíle</div></div><button class="btn btn-p" onclick="openM('m-cil')"><i data-lucide="plus" class="ico"></i> Přidat cíl</button></div>
 <div class="seg"><button class="seg-btn active" data-period="mesicni" onclick="setCilPeriod('mesicni')">Měsíční</button><button class="seg-btn" data-period="rocni" onclick="setCilPeriod('rocni')">Roční</button></div>
-<div class="g4-cile"><div class="stat-card"><div class="stat-lbl">Celkem cílů</div><div class="stat-val" id="c-total">0</div><i data-lucide="target" class="ico" style="color:var(--accent);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">Splněno</div><div class="stat-val" id="c-done">0</div><i data-lucide="check-circle" class="ico" style="color:var(--green);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">V průběhu</div><div class="stat-val" id="c-prog">0</div><i data-lucide="clock" class="ico" style="color:var(--orange);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">Celková hodnota</div><div class="stat-val" id="c-totalval">0 Kč</div><i data-lucide="banknote" class="ico" style="color:var(--accent);margin-top:4px"></i></div></div>
-<div class="cil-v3-stats-mobile"><div class="cil-v3-sm-row"><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-total-m">0</div><div class="cil-v3-sm-lbl">Cílů</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-done-m">0</div><div class="cil-v3-sm-lbl">Splněno</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-prog-m">0</div><div class="cil-v3-sm-lbl">V průběhu</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-totalval-m">0 Kč</div><div class="cil-v3-sm-lbl">Hodnota</div></div></div></div>
+<div class="g4-cile"><div class="stat-card"><div class="stat-lbl">Celkem cílů</div><div class="stat-val" id="c-total">0</div><i data-lucide="target" class="ico" style="color:var(--accent);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">Splněno</div><div class="stat-val" id="c-done">0</div><i data-lucide="check-circle" class="ico" style="color:var(--green);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">Aktivní</div><div class="stat-val" id="c-prog">0</div><i data-lucide="clock" class="ico" style="color:var(--orange);margin-top:4px"></i></div><div class="stat-card"><div class="stat-lbl">Celková hodnota</div><div class="stat-val" id="c-totalval">0 Kč</div><i data-lucide="banknote" class="ico" style="color:var(--accent);margin-top:4px"></i></div></div>
+<div class="cil-v3-stats-mobile"><div class="cil-v3-sm-row"><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-total-m">0</div><div class="cil-v3-sm-lbl">Cílů</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-done-m">0</div><div class="cil-v3-sm-lbl">Splněno</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-prog-m">0</div><div class="cil-v3-sm-lbl">Aktivní</div></div><div class="cil-v3-sm-div"></div><div class="cil-v3-sm-item"><div class="cil-v3-sm-val" id="c-totalval-m">0 Kč</div><div class="cil-v3-sm-lbl">Hodnota</div></div></div></div>
 <div id="cile-months"></div>
-<div class="cil-v3-summary" id="cile-summary" style="display:none"><div class="cil-v3-summary-icon"><i data-lucide="wallet" style="width:22px;height:22px"></i></div><div><div class="cil-v3-summary-label">Celková hodnota cílů</div><div class="cil-v3-summary-val" id="c-sum-val">0 Kč</div></div><div class="cil-v3-summary-stats"><div class="cil-v3-summary-stat"><div class="cil-v3-summary-stat-val" id="c-sum-cnt">0</div><div class="cil-v3-summary-stat-lbl">Cílů</div></div><div class="cil-v3-summary-stat"><div class="cil-v3-summary-stat-val" id="c-sum-done">0</div><div class="cil-v3-summary-stat-lbl">Splněno</div></div><div class="cil-v3-summary-pct" id="c-sum-pct">0 %</div></div></div>
 </div>
 
 <div class="panel" id="panel-seznamy">
@@ -1617,10 +1616,10 @@ return '<div class="cil-v3" onclick="editC(\''+c.id+'\')">'
 +'<div class="cil-v3-top"><div class="cil-v3-name">'+c.nazev+'</div>'+(cena?'<div class="cil-v3-price-top">'+kc(cena)+'</div>':'')+'<div class="cil-v3-arrow">'+CHEV_RIGHT+'</div></div>'
 +'<div class="cil-v3-meta">'+c.kdo+' · '+(c.kategorie||'')+'</div>'
 +'<div class="cil-v3-prog"><div class="prog"><div class="prog-fill '+progCls+'" style="width:'+p+'%"></div></div><span class="cil-v3-pct'+(p>=100?' done':'')+'">'+p+' %</span></div>'
-+'<div class="cil-v3-termin '+ti.cls+'">'+CAL_SVG+' '+ti.text+'</div>'
++(c.termin?'<div class="cil-v3-termin '+ti.cls+'">'+CAL_SVG+' '+ti.text+'</div>':'')
 +'</div></div>';};
 const container=document.getElementById('cile-months');
-if(!cile.length){container.innerHTML='<div class="card"><div class="empty"><i data-lucide="target" class="empty-ico" style="width:32px;height:32px"></i><h3>Žádné cíle</h3><p>Přidej první cíl tlačítkem výše</p></div></div>';_ci();document.getElementById('cile-summary').style.display='none';return;}
+if(!cile.length){container.innerHTML='<div class="card"><div class="empty"><i data-lucide="target" class="empty-ico" style="width:32px;height:32px"></i><h3>Žádné cíle</h3><p>Přidej první cíl tlačítkem výše</p></div></div>';_ci();return;}
 const groups={};const bezTerminu=[];
 cile.forEach(c=>{if(!c.termin){bezTerminu.push(c);return;}const d=new Date(c.termin);const key=d.getFullYear()*100+(d.getMonth());const label=MONTHS_CS[d.getMonth()]+' '+d.getFullYear();if(!groups[key])groups[key]={label,cile:[],cena:0};groups[key].cile.push(c);groups[key].cena+=(c.cena||0);});
 const sortedKeys=Object.keys(groups).map(Number).sort((a,b)=>a-b);
@@ -1647,13 +1646,6 @@ out+='<div class="cil-v3-month">'
 +'<div class="cil-v3-month-body">'+bezTerminu.map(cardHtml).join('')+'</div>'
 +'</div>';}
 container.innerHTML=out;
-const sumEl=document.getElementById('cile-summary');
-sumEl.style.display='flex';
-const avgProg=Math.round(cile.reduce((s,c)=>s+(c.progress||0),0)/cile.length);
-document.getElementById('c-sum-val').textContent=kc(totalCena);
-document.getElementById('c-sum-cnt').textContent=cile.length;
-document.getElementById('c-sum-done').textContent=done;
-document.getElementById('c-sum-pct').textContent=avgProg+' %';
 _ci()}
 window.saveC=async()=>{const n=document.getElementById('c-name').value.trim(),per=document.getElementById('c-period').value,k=document.getElementById('c-kdo').value,kt=document.getElementById('c-kat').value,p=parseInt(document.getElementById('c-prog-r').value)||0,d=document.getElementById('c-desc').value.trim(),cena=parseFloat(document.getElementById('c-cena').value)||0,termin=document.getElementById('c-termin').value||'',eid=document.getElementById('ce-id').value;if(!n){toast('Vyplňte název','error');return}const data={nazev:n,period:per,kdo:k,kategorie:kt,progress:p,popis:d,cena:cena,termin:termin};if(eid){await updateDoc(famDoc('cile',eid),data);toast('Aktualizováno','success')}else{await addDoc(famCol('cile'),{...data,created:serverTimestamp()});toast('Cíl přidán','success')}closeM('m-cil');resetF(['ce-id','c-name','c-desc','c-cena','c-termin']);document.getElementById('c-prog-r').value=0;document.getElementById('c-pv').textContent='0';await loadC()};
 window.editC=id=>{const c=D.cile.find(x=>x.id===id);if(!c)return;document.getElementById('ce-id').value=id;document.getElementById('c-name').value=c.nazev;document.getElementById('c-period').value=c.period||'mesicni';document.getElementById('c-kdo').value=c.kdo||'Společný';document.getElementById('c-kat').value=c.kategorie||'Ostatní';document.getElementById('c-prog-r').value=c.progress||0;document.getElementById('c-pv').textContent=c.progress||0;document.getElementById('c-desc').value=c.popis||'';document.getElementById('c-cena').value=c.cena||'';document.getElementById('c-termin').value=c.termin||'';openM('m-cil')};
