@@ -1,6 +1,7 @@
 // Service Worker pro Rodinný Dashboard
-const CACHE_NAME = 'rodinny-dashboard-v27';
-const TASKS_FIX = '<script src="./tasks-fix.js?v=27"></script>';
+const CACHE_NAME = 'rodinny-dashboard-v28';
+const AUTH_FIX = '<script src="./auth-fix.js?v=28"></script>';
+const TASKS_FIX = '<script src="./tasks-fix.js?v=28"></script>';
 
 self.addEventListener('install', function(event) {
   self.skipWaiting();
@@ -23,9 +24,11 @@ self.addEventListener('fetch', function(event) {
     if (!type.includes('text/html')) return response;
 
     const html = await response.text();
-    if (html.includes('tasks-fix.js')) return new Response(html, {status: response.status, statusText: response.statusText, headers: response.headers});
+    if (html.includes('auth-fix.js') || html.includes('tasks-fix.js')) {
+      return new Response(html, {status: response.status, statusText: response.statusText, headers: response.headers});
+    }
 
-    const patched = html.replace('</head>', TASKS_FIX + '</head>');
+    const patched = html.replace('</head>', AUTH_FIX + TASKS_FIX + '</head>');
     const headers = new Headers(response.headers);
     headers.delete('content-length');
     return new Response(patched, {status: response.status, statusText: response.statusText, headers: headers});
