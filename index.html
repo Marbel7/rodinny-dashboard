@@ -878,6 +878,20 @@ input, select, textarea {
 .cil-v3-sm-div{width:1px;height:28px;background:var(--border)}
 @media(max-width:600px){.g4-cile{display:none}.cil-v3-stats-mobile{display:block}}
 
+/* ===== TASK ACCORDION (te-fam) ===== */
+.te-fam-acc-btn{width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:0;margin:0 0 0;border:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.te-fam-acc-copy{display:flex;flex:1;min-width:0;flex-direction:column}
+.te-fam-acc-title{font-size:14px;font-weight:700;color:var(--text)}
+.te-fam-acc-val{font-size:12px;font-weight:600;color:var(--text-2);margin-top:3px}
+.te-fam-acc-prog{width:min(180px,100%);height:5px;margin-top:6px;border-radius:999px;background:var(--border-light);overflow:hidden}
+.te-fam-acc-prog>div{display:block;height:100%;border-radius:inherit;background:var(--accent);transition:width .3s}
+.te-fam-acc-meta{font-size:11px;color:var(--text-3);margin-top:4px}
+.te-fam-acc-right{display:flex;align-items:center;flex-shrink:0;gap:4px}
+.te-fam-chev{width:28px;height:28px;flex-shrink:0;display:grid;place-items:center;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);font-size:13px;color:var(--text-3);transition:transform .2s}
+.te-fam-chev::before{content:'↓'}
+.te-fam-body{overflow:hidden;max-height:0;opacity:0;transition:max-height .25s ease,opacity .2s ease,margin-top .2s}
+.te-fam-card.te-expanded .te-fam-body{max-height:800px;opacity:1;margin-top:14px}
+.te-fam-card.te-expanded .te-fam-chev{transform:rotate(180deg)}
 /* ===== RYCHLÉ AKCE v2 ===== */
 .qa-btn-v2{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2);transition:all .15s;font-family:inherit;width:100%;-webkit-tap-highlight-color:transparent}
 .qa-btn-v2:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);border-color:var(--border)}
@@ -1074,61 +1088,43 @@ input, select, textarea {
   <div id="dnes-content" style="font-size:13px;line-height:1.9"></div>
 </div>
 
-<!-- ÚKOLY NA HLAVNÍ STRÁNCE -->
-<div class="card" style="margin-bottom:14px">
-  <div class="card-title">
-    <span style="display:flex;align-items:center;gap:8px">
-      <i data-lucide="check-square" class="ico"></i> Co je potřeba udělat
-    </span>
-    <span id="todo-dash-count" style="font-size:12px;color:var(--text-3);font-weight:600"></span>
-    <button class="btn btn-g btn-s" onclick="switchTab('ukoly')" style="font-size:12px">Vše →</button>
-  </div>
+<!-- ÚKOLY NA HLAVNÍ STRÁNCE — accordion styl -->
+<div class="card te-fam-card" style="margin-bottom:14px">
 
-  <!-- Rychlé přidání - jednoduché -->
-  <div style="display:flex;gap:8px;margin-bottom:4px">
-    <div style="position:relative;flex:1">
-      <input type="text" class="fi" id="todo-input-dash"
-        placeholder="Přidat úkol..."
-        onkeypress="if(event.key==='Enter')quickAddTodo()"
-        style="width:100%;padding-right:44px;font-size:16px">
-      <button id="mic-btn-todo-input-dash" onclick="toggleMic('todo-input-dash')"
-        style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;padding:4px 6px;border-radius:8px"
-        title="Hlasové zadání">🎤</button>
+  <!-- Accordion header -->
+  <button class="te-fam-acc-btn" id="te-fam-toggle" onclick="(function(){var card=document.querySelector('.te-fam-card');var expanded=card.classList.toggle('te-expanded');document.getElementById('te-fam-toggle').setAttribute('aria-expanded',expanded);})()">
+    <div class="te-fam-acc-copy">
+      <div class="te-fam-acc-title">Úkoly</div>
+      <div class="te-fam-acc-val"><strong id="teFamDone">0</strong> / <span id="teFamTotal">0</span> splněno</div>
+      <div class="te-fam-acc-prog"><div id="teFamProg" style="width:0%"></div></div>
+      <div class="te-fam-acc-meta" id="teFamMeta">Zatím žádné úkoly</div>
     </div>
-    <button class="btn btn-p" onclick="quickAddTodo()" style="padding:10px 16px;font-size:20px;line-height:1">+</button>
-  </div>
-
-  <!-- Více možností - rozbalovací -->
-  <div id="todo-more-opts" style="display:none;margin-bottom:10px;padding:10px;background:var(--border-light);border-radius:10px">
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
-      <input type="date" class="fi" id="todo-date-dash" style="flex:1;min-width:130px;font-size:14px">
-      <select class="fi" id="todo-who-dash" style="flex:1;min-width:100px;font-size:14px">
-        <option value="">👥 Všichni</option>
-        <option value="Táta">👨 Táta</option>
-        <option value="Máma">👩 Máma</option>
-        <option value="Děti">👶 Děti</option>
-      </select>
-      <select class="fi" id="todo-pri-dash" style="flex:1;min-width:100px;font-size:14px">
-        <option value="med">🟡 Střední</option>
-        <option value="high">🔴 Vysoká</option>
-        <option value="low">🟢 Nízká</option>
-      </select>
+    <div class="te-fam-acc-right">
+      <span class="te-fam-chev" aria-hidden="true"></span>
+      <button class="btn btn-g btn-s" onclick="event.stopPropagation();switchTab('ukoly')" style="font-size:11px;padding:5px 10px;margin-left:4px">Vše →</button>
     </div>
-  </div>
-  <button onclick="document.getElementById('todo-more-opts').style.display=document.getElementById('todo-more-opts').style.display==='none'?'block':'none'"
-    style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--text-3);margin-bottom:10px;padding:0">
-    ⚙️ Více možností
   </button>
 
-  <!-- Zobrazit/skrýt seznam -->
-  <button id="todo-dash-toggle" onclick="(function(){var c=document.getElementById('todo-dash-content');var b=document.getElementById('todo-dash-toggle');var open=c.style.display!=='none';c.style.display=open?'none':'block';b.innerHTML=open?'Zobrazit úkoly ↓':'Skrýt ↑';})()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;padding:4px 0;margin-bottom:4px;font-family:inherit">Skrýt ↑</button>
-  <!-- Skupiny úkolů -->
-  <div id="todo-dash-content" style="display:block">
-    <div id="todo-group-dnes" style="margin-bottom:4px"></div>
-    <div id="todo-group-tyden" style="margin-bottom:4px"></div>
-    <div id="todo-group-ostatni" style="margin-bottom:4px"></div>
+  <!-- Expandable content -->
+  <div class="te-fam-body">
+    <!-- Input -->
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <div style="position:relative;flex:1">
+        <input type="text" class="fi" id="todo-input-dash"
+          placeholder="Přidat úkol..."
+          onkeypress="if(event.key==='Enter')quickAddTodo()"
+          style="width:100%;padding-right:44px;font-size:16px">
+        <button id="mic-btn-todo-input-dash" onclick="toggleMic('todo-input-dash')"
+          style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:8px">
+          <i data-lucide="mic" style="width:18px;height:18px;color:var(--text-3)"></i>
+        </button>
+      </div>
+      <button class="btn btn-p" onclick="quickAddTodo()" style="padding:10px 16px;font-size:20px;line-height:1">+</button>
+    </div>
+    <!-- Task list -->
     <div id="todo-list-dash"></div>
   </div>
+
 </div>
 
 <!-- RYCHLÉ AKCE -->
@@ -1672,6 +1668,11 @@ if(done.length){out+='<div class="todo-v2-done-toggle" id="todo-done-toggle-'+el
 el.innerHTML=out;}
 renderInto(document.getElementById('todo-list-dash'));renderInto(document.getElementById('todo-list'));
 var countEl=document.getElementById('todo-dash-count');if(countEl){var uc=undone.length;countEl.textContent=uc>0?uc+' otevřených':'';}
+var total=D.todos.length,doneAll=done.length;
+var d=document.getElementById('teFamDone');if(d)d.textContent=doneAll;
+var t2=document.getElementById('teFamTotal');if(t2)t2.textContent=total;
+var p=document.getElementById('teFamProg');if(p)p.style.width=(total?Math.round(doneAll/total*100):0)+'%';
+var m=document.getElementById('teFamMeta');if(m)m.textContent=total?(undone.length+' zbývá'):'Zatím žádné úkoly';
 _ci()}
 window._todoEditDate='';window._todoEditWho='';
 window.setTodoEditDate=function(el,val){window._todoEditDate=val;el.closest('.fg').querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('t-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
