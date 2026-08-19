@@ -77,22 +77,89 @@
         #panel-ukoly #todo-list .todo-v2-ghdr{font-size:12px!important;font-weight:800!important;letter-spacing:.02em!important;margin-bottom:5px!important}
         #panel-ukoly #todo-list .todo-v2-item{padding:11px 4px!important;min-height:48px!important}
 
+        /* ===== RYCHLÉ PŘIDÁNÍ NA STRÁNCE ÚKOLŮ ===== */
+        #panel-ukoly .tasks-quick-actions{margin:4px 0 16px!important}
+        #panel-ukoly .tasks-quick-actions-title{font-size:13px!important;font-weight:700!important;color:var(--text)!important;margin:0 0 10px!important}
+        #panel-ukoly .tasks-quick-actions-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important}
+        #panel-ukoly .tasks-qa-btn{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-width:0!important;height:82px!important;padding:9px 4px!important;background:var(--surface)!important;border:1px solid var(--border)!important;border-radius:14px!important;cursor:pointer!important;font-size:12px!important;font-weight:650!important;color:var(--text-2)!important;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease!important;font-family:inherit!important;-webkit-tap-highlight-color:transparent!important}
+        #panel-ukoly .tasks-qa-btn:active{transform:scale(.97)!important}
+        #panel-ukoly .tasks-qa-btn:hover{transform:translateY(-1px)!important;box-shadow:0 4px 12px rgba(16,24,40,.07)!important}
+        #panel-ukoly .tasks-qa-icon{width:42px!important;height:42px!important;border-radius:12px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 42px!important}
+        #panel-ukoly .tasks-qa-icon svg{width:22px!important;height:22px!important}
+
         @media(max-width:600px){
           #panel-ukoly > .card{padding:16px!important}
           #panel-ukoly .todo-add .fi{height:48px!important}
           #panel-ukoly .todo-add .btn-p{width:48px!important;min-width:48px!important;height:48px!important}
           #panel-ukoly .todo-date-row .todo-qd{height:35px!important;padding:0 11px!important}
           #panel-ukoly .todo-who-row .todo-qw{height:34px!important;padding:0 12px!important}
+          #panel-ukoly .tasks-quick-actions-grid{gap:7px!important}
+          #panel-ukoly .tasks-qa-btn{height:78px!important;border-radius:13px!important;font-size:11px!important}
+          #panel-ukoly .tasks-qa-icon{width:40px!important;height:40px!important;border-radius:11px!important;flex-basis:40px!important}
         }
       `;
       document.head.appendChild(style);
     }
   }
 
+  function addTaskQuickActions(){
+    const panel=document.getElementById('panel-ukoly');
+    const card=panel && panel.querySelector(':scope > .card');
+    if(!card || card.querySelector('.tasks-quick-actions')) return;
+
+    const add=card.querySelector('.todo-add');
+    if(!add) return;
+
+    const wrap=document.createElement('div');
+    wrap.className='tasks-quick-actions';
+    wrap.innerHTML=`
+      <div class="tasks-quick-actions-title">Rychlé přidání</div>
+      <div class="tasks-quick-actions-grid">
+        <button type="button" class="tasks-qa-btn" data-task-qa="todo" aria-label="Přidat úkol">
+          <span class="tasks-qa-icon" style="background:#EEF2FF;color:#6366F1"><i data-lucide="check-square"></i></span>
+          <span>Úkol</span>
+        </button>
+        <button type="button" class="tasks-qa-btn" data-task-qa="expense" aria-label="Přidat výdaj">
+          <span class="tasks-qa-icon" style="background:#ECFDF5;color:#10B981"><i data-lucide="wallet"></i></span>
+          <span>Výdaj</span>
+        </button>
+        <button type="button" class="tasks-qa-btn" data-task-qa="birthday" aria-label="Přidat oslavu">
+          <span class="tasks-qa-icon" style="background:#FDF2F8;color:#EC4899"><i data-lucide="cake"></i></span>
+          <span>Oslava</span>
+        </button>
+        <button type="button" class="tasks-qa-btn" data-task-qa="goal" aria-label="Přidat cíl">
+          <span class="tasks-qa-icon" style="background:#FFF7ED;color:#F59E0B"><i data-lucide="target"></i></span>
+          <span>Cíl</span>
+        </button>
+      </div>`;
+
+    add.insertAdjacentElement('afterend',wrap);
+
+    wrap.querySelector('[data-task-qa="todo"]').addEventListener('click',function(){
+      const input=document.getElementById('todo-input');
+      if(input){input.focus();input.scrollIntoView({behavior:'smooth',block:'center'});}
+    });
+    wrap.querySelector('[data-task-qa="expense"]').addEventListener('click',function(){
+      if(typeof window.switchTab==='function') window.switchTab('vydaje');
+      setTimeout(function(){if(typeof window.openM==='function') window.openM('m-vydaj');},100);
+    });
+    wrap.querySelector('[data-task-qa="birthday"]').addEventListener('click',function(){
+      if(typeof window.switchTab==='function') window.switchTab('oslavy');
+      setTimeout(function(){if(typeof window.openM==='function') window.openM('m-bday');},100);
+    });
+    wrap.querySelector('[data-task-qa="goal"]').addEventListener('click',function(){
+      if(typeof window.switchTab==='function') window.switchTab('cile');
+      setTimeout(function(){if(typeof window.openM==='function') window.openM('m-cil');},100);
+    });
+
+    if(window.lucide && typeof window.lucide.createIcons==='function') window.lucide.createIcons();
+  }
+
   function run(){
     polish();
-    setTimeout(polish,80);
-    setTimeout(polish,350);
+    addTaskQuickActions();
+    setTimeout(function(){polish();addTaskQuickActions();},80);
+    setTimeout(function(){polish();addTaskQuickActions();},350);
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run);
@@ -100,6 +167,6 @@
 
   document.addEventListener('click',function(e){
     const b=e.target.closest && e.target.closest('[data-tab="ukoly"]');
-    if(b) setTimeout(polish,30);
+    if(b) setTimeout(function(){polish();addTaskQuickActions();},30);
   });
 })();
