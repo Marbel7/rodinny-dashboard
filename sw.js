@@ -1,7 +1,8 @@
 // Service Worker pro Rodinný Dashboard
-const CACHE_NAME = 'rodinny-dashboard-v28';
-const AUTH_FIX = '<script src="./auth-fix.js?v=28"></script>';
-const TASKS_FIX = '<script src="./tasks-fix.js?v=28"></script>';
+// Auth oprava: Service Worker NESMÍ upravovat HTML ani vkládat auth-fix.js.
+// Přihlašování je kompletně řízené jediným auth flow v index.html.
+const CACHE_NAME = 'rodinny-dashboard-v29';
+const TASKS_FIX = '<script src="./tasks-fix.js?v=29"></script>';
 
 self.addEventListener('install', function(event) {
   self.skipWaiting();
@@ -23,12 +24,14 @@ self.addEventListener('fetch', function(event) {
     const type = response.headers.get('content-type') || '';
     if (!type.includes('text/html')) return response;
 
+    // Auth fix byl odstraněn. Zachováváme pouze existující tasks-fix,
+    // aby se nezměnilo chování záložky Úkoly.
     const html = await response.text();
-    if (html.includes('auth-fix.js') && html.includes('tasks-fix.js')) {
+    if (html.includes('tasks-fix.js')) {
       return new Response(html, {status: response.status, statusText: response.statusText, headers: response.headers});
     }
 
-    const patched = html.replace('</head>', AUTH_FIX + TASKS_FIX + '</head>');
+    const patched = html.replace('</head>', TASKS_FIX + '</head>');
     const headers = new Headers(response.headers);
     headers.delete('content-length');
     return new Response(patched, {status: response.status, statusText: response.statusText, headers: headers});
