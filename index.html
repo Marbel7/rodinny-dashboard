@@ -809,6 +809,39 @@ input, select, textarea {
   font-family: inherit;
 }
 
+/* ===== ÚKOLY TAB v3 ===== */
+.tu-filter-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tu-filter-lbl{font-size:11px;font-weight:700;color:var(--text-3);display:flex;align-items:center;gap:3px;white-space:nowrap;min-width:40px}
+.tu-group{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;overflow:hidden}
+.tu-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none;background:var(--surface);transition:background .1s}
+.tu-group-hdr:hover{background:var(--bg)}
+.tu-group-title{font-size:14px;font-weight:700;color:var(--text)}
+.tu-group-chev{font-size:12px;color:var(--text-3);transition:transform .18s}
+.tu-group-chev.open{transform:rotate(180deg)}
+.tu-group-body{display:none;border-top:1px solid var(--border-light)}
+.tu-group-body.open{display:block}
+.tu-item{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background .1s}
+.tu-item:last-child{border-bottom:none}
+.tu-item:hover{background:var(--bg)}
+.tu-check{width:24px;height:24px;min-width:24px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
+.tu-check.done{background:var(--accent);border-color:var(--accent)}
+.tu-check.done svg{display:block}
+.tu-check svg{display:none;width:13px;height:13px;stroke:white;stroke-width:3}
+.tu-body{flex:1;min-width:0}
+.tu-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
+.tu-name.done{text-decoration:line-through;color:var(--text-3);font-weight:400}
+.tu-meta{font-size:11px;color:var(--text-3);margin-top:1px}
+.tu-chip{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:20px;white-space:nowrap;margin-left:auto;flex-shrink:0}
+.tu-star{background:none;border:none;cursor:pointer;padding:4px;color:var(--text-4);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tu-star:hover{color:var(--orange)}
+.tu-star svg{width:15px;height:15px}
+.tu-done-section{background:#F5F3FF;border-radius:var(--radius);border:1px solid #DDD6FE;margin-top:8px}
+.tu-done-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none}
+.tu-done-title{font-size:13px;font-weight:700;color:var(--accent)}
+.tu-done-clear{font-size:11px;font-weight:700;color:var(--red);background:#FEE2E2;border:none;border-radius:8px;padding:4px 10px;cursor:pointer;font-family:inherit}
+.tu-done-body{display:none;border-top:1px solid #DDD6FE}
+.tu-done-body.open{display:block}
+
 @media (max-width: 768px) {
   input, select, textarea {
     font-size: 16px;
@@ -953,38 +986,6 @@ input, select, textarea {
 
 </style>
 
-<style id="tasks-direct-ui-v1">
-@media(max-width:768px){
-  #panel-ukoly .todo-qd{
-    display:inline-flex!important;align-items:center!important;justify-content:center!important;
-    min-height:38px!important;height:38px!important;padding:0 14px!important;
-    border-radius:999px!important;border:1px solid #E2E6EF!important;
-    background:#F8FAFC!important;color:#64748B!important;
-    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
-    flex:0 0 auto!important;box-shadow:none!important;
-  }
-  #panel-ukoly .todo-qd.active{
-    background:#6366F1!important;border-color:#6366F1!important;color:#fff!important;
-    box-shadow:0 4px 12px rgba(99,102,241,.18)!important;
-  }
-  #panel-ukoly .todo-qd[data-val="other"]{font-size:0!important;}
-  #panel-ukoly .todo-qd[data-val="other"]:after{content:'Více';font-size:12px!important;}
-  #panel-ukoly .todo-qw{
-    display:inline-flex!important;align-items:center!important;justify-content:center!important;
-    min-height:36px!important;height:36px!important;padding:0 14px!important;
-    border-radius:999px!important;border:1px solid #E2E6EF!important;
-    background:#fff!important;color:#64748B!important;
-    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
-    flex:0 0 auto!important;
-  }
-  #panel-ukoly .todo-qw.active{
-    background:#EEF2FF!important;border-color:#C7D2FE!important;color:#4F46E5!important;
-  }
-  #panel-ukoly .card{border-radius:18px!important;padding:16px!important;}
-  #panel-ukoly .todo-add .fi{height:48px!important;border-radius:14px!important;font-size:16px!important;}
-  #panel-ukoly .todo-add .btn-p{height:48px!important;width:48px!important;min-width:48px!important;border-radius:14px!important;padding:0!important;}
-}
-</style>
 </head>
 <body>
 
@@ -1231,11 +1232,10 @@ input, select, textarea {
 <div class="page-hdr"><div><div class="page-title"><i data-lucide="check-square" style="width:22px;height:22px;color:var(--accent)"></i> Úkoly</div><div class="page-sub">Rodinný to-do seznam</div></div></div>
 <div class="card">
 <div class="todo-add"><input type="text" class="fi" id="todo-input" placeholder="Napiš úkol..." onkeypress="if(event.key==='Enter')addTodoV2()" style="flex:1;min-width:180px"><button class="btn btn-p" onclick="addTodoV2()"><i data-lucide="plus" class="ico"></i></button></div>
-<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px"><span class="todo-qd active" data-val="" onclick="setTodoDate(this,'')">Bez termínu</span><span class="todo-qd" data-val="dnes" onclick="setTodoDate(this,'dnes')">Dnes</span><span class="todo-qd" data-val="zitra" onclick="setTodoDate(this,'zitra')">Zítra</span><span class="todo-qd" data-val="tyden" onclick="setTodoDate(this,'tyden')">Tento týden</span><span class="todo-qd" data-val="other" onclick="setTodoDate(this,'other')">Jiné</span><input type="date" class="fi" id="todo-date-custom" style="display:none;width:140px;padding:5px 8px;font-size:12px"></div>
-<div style="display:flex;gap:5px;margin-bottom:6px;align-items:center"><span style="font-size:11px;color:var(--text-3);font-weight:600">Kdo:</span><span class="todo-qw active" data-val="" onclick="setTodoWho(this,'')">Všichni</span><span class="todo-qw" data-val="Táta" onclick="setTodoWho(this,'Táta')">Táta</span><span class="todo-qw" data-val="Máma" onclick="setTodoWho(this,'Máma')">Máma</span></div>
+<div class="tu-filter-row"><span class="tu-filter-lbl"><i data-lucide="calendar" style="width:12px;height:12px"></i> Kdy</span><span class="todo-qd active" data-val="" onclick="setTodoDate(this,'')">Bez termínu</span><span class="todo-qd" data-val="dnes" onclick="setTodoDate(this,'dnes')">Dnes</span><span class="todo-qd" data-val="zitra" onclick="setTodoDate(this,'zitra')">Zítra</span><span class="todo-qd" data-val="tyden" onclick="setTodoDate(this,'tyden')">Tento týden</span><span class="todo-qd" data-val="other" onclick="setTodoDate(this,'other')">Více ∨</span><input type="date" class="fi" id="todo-date-custom" style="display:none;width:140px;padding:5px 8px;font-size:12px"></div>
+<div class="tu-filter-row"><span class="tu-filter-lbl"><i data-lucide="users" style="width:12px;height:12px"></i> Pro</span><span class="todo-qw active" data-val="" onclick="setTodoWho(this,'')">Všichni</span><span class="todo-qw" data-val="Táta" onclick="setTodoWho(this,'Táta')">Táta</span><span class="todo-qw" data-val="Máma" onclick="setTodoWho(this,'Máma')">Máma</span></div>
 </div>
 <div id="todo-list"></div>
-<div style="margin-top:12px"><button class="btn btn-g btn-s" onclick="clearDoneTodos()"><i data-lucide="trash" class="ico"></i> Smazat hotové</button></div>
 </div>
 <div class="panel" id="panel-vydaje">
 <div class="page-hdr"><div><div class="page-title"><i data-lucide="wallet" style="width:22px;height:22px;color:var(--accent)"></i> Výdaje</div><div class="page-sub">Pravidelné i jednorázové výdaje</div></div><button class="btn btn-p" onclick="openM('m-vydaj')"><i data-lucide="plus" class="ico"></i> Výdaj</button></div>
@@ -1686,8 +1686,27 @@ out+=groupHtml('Později',grPozdeji,'var(--text-3)','<circle cx="12" cy="12" r="
 out+=groupHtml('Bez termínu',grBez,'var(--text-3)','<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>');
 if(done.length){out+='<div class="todo-v2-done-toggle" id="todo-done-toggle-'+el.id+'" onclick="var b=this.nextElementSibling;b.style.display=b.style.display===\'none\'?\'block\':\'none\';this.classList.toggle(\'open\')">'+CHEV+' Hotovo · '+done.length+'</div><div style="display:none">'+done.map(itemHtml).join('')+'</div>';}
 el.innerHTML=out;}
-var _dashEl=document.getElementById('todo-list-dash');if(_dashEl){if(!undone.length){_dashEl.innerHTML='';}else{var _dOut='';_dOut+=groupHtml('Po termínu',grPT,'#EF4444','<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>');_dOut+=groupHtml('Dnes',grDnes,'#F59E0B','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');_dOut+=groupHtml('Zítra',grZitra,'#3B82F6','<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>');_dOut+=groupHtml('Tento týden',grTyden,'#6366F1','<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>');_dOut+=groupHtml('Později',grPozdeji,'var(--text-3)','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');_dOut+=groupHtml('Bez termínu',grBez,'var(--text-3)','<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>');_dashEl.innerHTML=_dOut;}}
-renderInto(document.getElementById('todo-list'));
+renderDashTodos(document.getElementById('todo-list-dash'));
+function renderDashTodos(el){if(!el)return;if(!undone.length){el.innerHTML='';return;}var _dOut='';_dOut+=groupHtml('Po termínu',grPT,'#EF4444','<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>');_dOut+=groupHtml('Dnes',grDnes,'#F59E0B','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');_dOut+=groupHtml('Zítra',grZitra,'#3B82F6','<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>');_dOut+=groupHtml('Tento týden',grTyden,'#6366F1','<rect width="18" height="18" x="3" y="4" rx="2"/>');_dOut+=groupHtml('Později',grPozdeji,'var(--text-3)','<circle cx="12" cy="12" r="10"/>');_dOut+=groupHtml('Bez termínu',grBez,'var(--text-3)','<line x1="8" x2="21" y1="6" y2="6"/>');el.innerHTML=_dOut;}
+function renderTodosTab(el){if(!el)return;
+var today=new Date();today.setHours(0,0,0,0);var todayStr=today.toISOString().slice(0,10);
+var tmrw=new Date(today);tmrw.setDate(tmrw.getDate()+1);var tmrwStr=tmrw.toISOString().slice(0,10);
+function chipLabel(dl){if(!dl)return'';var d=new Date(dl);var now=new Date();now.setHours(0,0,0,0);var diff=Math.round((d-now)/(864e5));if(diff<0)return'Po termínu';if(diff===0)return'Dnes';if(diff===1)return'Zítra';return d.toLocaleDateString('cs-CZ',{day:'numeric',month:'numeric'});}
+var CHECKSVG='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+var STARSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+function tuItem(t){var chip=chipLabel(t.deadline);var meta=(t.who||'');return'<div class="tu-item" onclick="openTodoEdit(\''+t.id+'\')">'+'<div class="tu-check'+(t.done?' done':'')+'" onclick="event.stopPropagation();toggleTodo(\''+t.id+'\','+(!t.done)+')">'+(t.done?CHECKSVG:'')+'</div>'+'<div class="tu-body"><div class="tu-name'+(t.done?' done':'')+'">'+t.text+'</div>'+(meta?'<div class="tu-meta">'+meta+'</div>':'')+'</div>'+(chip?'<span class="tu-chip">'+chip+'</span>':'')+'<button class="tu-star" onclick="event.stopPropagation()">'+STARSVG+'</button>'+'</div>';}
+function tuGroup(title,items,defaultOpen){if(!items.length)return'';var id='tugrp-'+title.replace(/\s/g,'');return'<div class="tu-group"><div class="tu-group-hdr" onclick="(function(){var b=document.getElementById(\''+id+'\');var c=this.querySelector(\'.tu-group-chev\');var open=b.classList.toggle(\'open\');c.classList.toggle(\'open\',open);}).call(this)"><span class="tu-group-title">'+title+' · '+items.length+'</span><span class="tu-group-chev'+(defaultOpen?' open':'')+'">∨</span></div><div id="'+id+'" class="tu-group-body'+(defaultOpen?' open':'')+'">'+items.map(tuItem).join('')+'</div></div>';}
+var hasDnes=grDnes.length>0||grPT.length>0;var out='';
+out+=tuGroup('Po termínu',grPT,true);
+out+=tuGroup('Dnes',grDnes,hasDnes);
+out+=tuGroup('Zítra',grZitra,!hasDnes&&grZitra.length>0);
+out+=tuGroup('Tento týden',grTyden,false);
+out+=tuGroup('Později',grPozdeji,false);
+out+=tuGroup('Bez termínu',grBez,!hasDnes&&grZitra.length===0);
+if(!undone.length&&!done.length){el.innerHTML='<div class="empty" style="padding:24px"><h3>Žádné úkoly 🎉</h3><p>Přidej první úkol výše</p></div>';return;}
+if(done.length){out+='<div class="tu-done-section"><div class="tu-done-hdr" onclick="(function(){var b=this.nextElementSibling;var open=b.classList.toggle(\'open\');}).call(this)"><span class="tu-done-title">Hotové · '+done.length+'</span><div style="display:flex;align-items:center;gap:8px"><button class="tu-done-clear" onclick="event.stopPropagation();clearDoneTodos()">Smazat hotové</button><span style="color:var(--accent);font-size:12px">∨</span></div></div><div class="tu-done-body">'+done.map(tuItem).join('')+'</div></div>';}
+el.innerHTML=out;}
+renderTodosTab(document.getElementById('todo-list'));
 var countEl=document.getElementById('todo-dash-count');if(countEl){var uc=undone.length;countEl.textContent=uc>0?uc+' otevřených':''}
 var _td=document.getElementById('teFamDone');if(_td)_td.textContent=done.length;
 var _tt=document.getElementById('teFamTotal');if(_tt)_tt.textContent=D.todos.length;
