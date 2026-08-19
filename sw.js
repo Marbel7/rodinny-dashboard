@@ -1,6 +1,6 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilní PWA: deterministické opravy zdrojového HTML.
-const CACHE_NAME = 'rodinny-dashboard-v22';
+const CACHE_NAME = 'rodinny-dashboard-v23';
 
 self.addEventListener('install', function(event) { self.skipWaiting(); });
 self.addEventListener('activate', function(event) { event.waitUntil(clients.claim()); });
@@ -65,7 +65,7 @@ self.addEventListener('fetch', function(event) {
       const quickCss = `<style id="quick-actions-v3">\n.qa-btn-v2.qa-v3{gap:4px!important;padding:10px 4px 9px!important;min-height:104px!important;justify-content:flex-start!important}\n.qa-btn-v2.qa-v3 .qa-btn-v2-icon{width:42px!important;height:42px!important;border-radius:12px!important}\n.qa-btn-v2.qa-v3 .qa-btn-v2-icon svg{width:22px!important;height:22px!important}\n.qa-btn-v2.qa-v3>span:not(.qa-stat){font-size:12px!important;font-weight:600!important;line-height:1.15!important;color:var(--text-2)!important}\n.qa-btn-v2.qa-v3 .qa-stat{display:block!important;min-height:14px!important;font-size:11px!important;line-height:1.1!important;font-weight:700!important;color:var(--text-3)!important;white-space:nowrap!important}\n@media(max-width:600px){.qa-btn-v2.qa-v3{min-height:98px!important}.qa-btn-v2.qa-v3 .qa-stat{font-size:10px!important}}\n</style>`;
       if (!html.includes('id="quick-actions-v3"')) html = html.replace('</head>', quickCss + '</head>');
 
-      const quickScript = '<script src="/dashboard-enhancements.js"></script>';
+      const quickScript = '<script src="/dashboard-enhancements.js?v=20260819-2"></script>';
       if (!html.includes('/dashboard-enhancements.js')) html = html.replace('</body>', quickScript + '</body>');
 
       const todoToggleMarker = '<button id="todo-dash-toggle" onclick="(function(){var c=document.getElementById(\'todo-dash-content\');var b=document.getElementById(\'todo-dash-toggle\');var open=c.style.display!==\'none\';c.style.display=open?\'none\':\'block\';b.innerHTML=open?\'Zobrazit úkoly ↓\':\'Skrýt ↑\';})()" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;padding:4px 0;margin-bottom:4px;font-family:inherit">Skrýt ↑</button>';
@@ -73,7 +73,6 @@ self.addEventListener('fetch', function(event) {
       if (html.includes(todoToggleMarker)) html = html.replace(todoToggleMarker, todoToggleClosed);
       html = html.replace('<div id="todo-dash-content" style="display:block">', '<div id="todo-dash-content" style="display:none">');
 
-      // Checkbox úkolů — sjednocení se stavem „splněno“ z referenčního projektu.
       const todoCheckCss = `<style id="todo-checkbox-v2">\n.todo-check{width:24px!important;height:24px!important;min-width:24px!important;border:2px solid #E2E5ED!important;border-radius:7px!important;background:#fff!important;color:transparent!important;font-size:0!important;line-height:1!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 24px!important;box-shadow:none!important;transition:background .15s,border-color .15s,transform .1s!important}\n.todo-check.done,.todo-check.checked,.todo-check.is-done,.todo-check[aria-checked="true"]{border-color:#6366F1!important;background:#6366F1!important;color:#fff!important;font-size:15px!important;font-weight:800!important}\n.todo-check.done::after,.todo-check.checked::after,.todo-check.is-done::after,.todo-check[aria-checked="true"]::after{content:'✓';color:#fff!important;font-size:15px!important;font-weight:800!important;line-height:1!important}\n.todo-check.done svg,.todo-check.checked svg,.todo-check.is-done svg,.todo-check[aria-checked="true"] svg{stroke:#fff!important;color:#fff!important}\n.todo-text.done,.todo-text.checked,.todo-text.is-done{text-decoration:line-through!important;color:#94A3B8!important}\n</style>`;
       if (!html.includes('id="todo-checkbox-v2"')) html = html.replace('</head>', todoCheckCss + '</head>');
 
