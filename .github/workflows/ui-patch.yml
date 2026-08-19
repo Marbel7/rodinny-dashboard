@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Repair auth syntax and task filters
+      - name: Repair auth syntax, mobile Google login and task filters
         shell: python
         run: |
           from pathlib import Path
@@ -31,6 +31,54 @@ jobs:
               s = s.replace(broken, fixed, 1)
               changed = True
               print('Repaired broken setTodoDate declaration')
+
+          # iOS Safari/private browsing can fail to complete Firebase's
+          # redirect flow at the firebaseapp.com auth handler. Prefer the
+          # user-gesture popup on mobile too; only fall back to redirect when
+          # Safari explicitly blocks/closes the popup.
+          old_login = """const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          setLoginStatus('Připojuji k Google…');
+          try{
+            if(isMobile){
+              setLoginStatus('Přesměrovávám na Google…');
+              await signInWithRedirect(auth,prov);
+            }else{
+              await signInWithPopup(auth,prov);
+              setLoginStatus('✓ Přihlášeno','#10B981');
+            }
+          }catch(e){
+            console.error('Auth error:',e.code,e.message);
+            if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
+              setLoginStatus('Popup blokován, přesměrovávám…');
+              try{await signInWithRedirect(auth,prov);}
+              catch(e2){setLoginStatus('Chyba: '+e2.message,'#EF4444');}
+            }else{
+              setLoginStatus('Chyba: '+e.code+' — '+e.message,'#EF4444');
+            }
+          }"""
+          new_login = """const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          setLoginStatus('Připojuji k Google…');
+          try{
+            // Popup is intentionally preferred on mobile/iOS. It avoids the
+            // firebaseapp.com redirect handler that can remain blank in
+            // Safari private browsing. The call is made directly from the
+            // button click so Safari can treat it as a user-initiated popup.
+            await signInWithPopup(auth,prov);
+            setLoginStatus('✓ Přihlášeno','#10B981');
+          }catch(e){
+            console.error('Auth error:',e.code,e.message);
+            if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
+              setLoginStatus('Popup blokován, přesměrovávám…');
+              try{await signInWithRedirect(auth,prov);}
+              catch(e2){setLoginStatus('Chyba: '+e2.message,'#EF4444');}
+            }else{
+              setLoginStatus('Chyba: '+e.code+' — '+e.message,'#EF4444');
+            }
+          }"""
+          if old_login in s:
+              s = s.replace(old_login, new_login, 1)
+              changed = True
+              print('Changed mobile auth from redirect-first to popup-first')
 
           # Keep the existing mobile task-filter styling patch.
           marker = 'id="tasks-direct-ui-v1"'
@@ -80,5 +128,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
-          git commit -m "fix: repair auth syntax directly in index"
+          git commit -m "fix: make mobile Google auth popup-first"
           git push
