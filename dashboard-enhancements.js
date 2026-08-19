@@ -71,7 +71,7 @@
     btn.setAttribute('aria-label','Hlasové zadání úkolu');
     btn.title='Hlasové zadání úkolu';
     btn.textContent='';
-    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10a7 7 0 0 0 14 0"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
+    btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10a7 7 0 0 0 14 0"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></svg>';
     btn.onclick=function(e){
       e.preventDefault();
       e.stopPropagation();
@@ -183,6 +183,285 @@
     }
   }
 
+  function polishTasksPage(){
+    const panel=document.getElementById('panel-ukoly');
+    if(!panel || document.getElementById('todo-page-polish-v1')) return;
+
+    const style=document.createElement('style');
+    style.id='todo-page-polish-v1';
+    style.textContent=`
+      /* Samostatná stránka Úkoly — mobile-first UX polish */
+      #panel-ukoly > .page-hdr{
+        margin-bottom:16px!important;
+      }
+      #panel-ukoly > .card{
+        padding:16px!important;
+        margin-bottom:16px!important;
+      }
+      #panel-ukoly .todo-add{
+        margin-bottom:14px!important;
+        gap:8px!important;
+      }
+      #panel-ukoly .todo-add .fi{
+        height:48px!important;
+        border-radius:14px!important;
+        font-size:16px!important;
+      }
+      #panel-ukoly .todo-add .btn-p{
+        width:48px!important;
+        min-width:48px!important;
+        height:48px!important;
+        border-radius:14px!important;
+        padding:0!important;
+      }
+      #panel-ukoly .todo-date-row,
+      #panel-ukoly .todo-who-row{
+        display:flex!important;
+        align-items:center!important;
+      }
+      #panel-ukoly .todo-date-row{
+        gap:6px!important;
+        flex-wrap:nowrap!important;
+        overflow-x:auto!important;
+        overflow-y:hidden!important;
+        margin:0 -2px 12px!important;
+        padding:2px 2px 4px!important;
+        scrollbar-width:none!important;
+        -webkit-overflow-scrolling:touch!important;
+      }
+      #panel-ukoly .todo-date-row::-webkit-scrollbar{display:none!important;}
+      #panel-ukoly .todo-date-row .todo-qd{
+        flex:0 0 auto!important;
+        height:36px!important;
+        padding:0 13px!important;
+        border-radius:999px!important;
+        font-size:12px!important;
+        font-weight:650!important;
+        display:inline-flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        white-space:nowrap!important;
+        background:var(--surface)!important;
+        color:var(--text-2)!important;
+        border:1px solid var(--border)!important;
+      }
+      #panel-ukoly .todo-date-row .todo-qd.active{
+        background:var(--accent)!important;
+        border-color:var(--accent)!important;
+        color:#fff!important;
+        box-shadow:0 3px 10px rgba(99,102,241,.18)!important;
+      }
+      #panel-ukoly .todo-who-row{
+        gap:7px!important;
+        flex-wrap:nowrap!important;
+        margin:0!important;
+      }
+      #panel-ukoly .todo-who-row .todo-who-label{
+        flex:0 0 auto!important;
+        font-size:11px!important;
+        font-weight:700!important;
+        color:var(--text-3)!important;
+        text-transform:uppercase!important;
+        letter-spacing:.05em!important;
+        margin-right:1px!important;
+      }
+      #panel-ukoly .todo-who-row .todo-qw{
+        flex:0 0 auto!important;
+        min-height:36px!important;
+        padding:0 12px!important;
+        border-radius:999px!important;
+        font-size:12px!important;
+        font-weight:650!important;
+        display:inline-flex!important;
+        align-items:center!important;
+        gap:6px!important;
+        background:var(--surface)!important;
+        color:var(--text-2)!important;
+        border:1px solid var(--border)!important;
+      }
+      #panel-ukoly .todo-who-row .todo-qw.active{
+        background:var(--accent-light)!important;
+        border-color:var(--accent-soft)!important;
+        color:var(--accent-hover)!important;
+      }
+      #panel-ukoly .todo-who-avatar{
+        width:20px!important;
+        height:20px!important;
+        border-radius:50%!important;
+        display:inline-flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        font-size:10px!important;
+        line-height:1!important;
+        background:var(--accent-soft)!important;
+        color:var(--accent-hover)!important;
+      }
+      #panel-ukoly .todo-qw.active .todo-who-avatar{
+        background:rgba(99,102,241,.14)!important;
+      }
+      #panel-ukoly #todo-date-custom{
+        flex:0 0 auto!important;
+        height:36px!important;
+        width:150px!important;
+        border-radius:999px!important;
+        padding:0 12px!important;
+      }
+      #panel-ukoly #todo-list{
+        margin-top:4px!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-group{
+        margin-bottom:16px!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-ghdr{
+        min-height:28px!important;
+        margin-bottom:2px!important;
+        padding:0 2px!important;
+        font-size:11px!important;
+        letter-spacing:.06em!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-ghdr svg{
+        width:15px!important;
+        height:15px!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-item{
+        min-height:58px!important;
+        padding:10px 2px!important;
+        gap:12px!important;
+        border-bottom:1px solid var(--border-light)!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-check{
+        width:26px!important;
+        height:26px!important;
+        min-width:26px!important;
+        flex:0 0 26px!important;
+        border-radius:8px!important;
+        border:2px solid #DDE2EC!important;
+        background:#fff!important;
+        color:transparent!important;
+        font-size:0!important;
+        display:flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-check.done{
+        background:var(--accent)!important;
+        border-color:var(--accent)!important;
+        color:#fff!important;
+        font-size:16px!important;
+        font-weight:800!important;
+        box-shadow:0 3px 8px rgba(99,102,241,.2)!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-check.done::after{
+        content:'✓'!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-body{
+        min-width:0!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-name{
+        font-size:15px!important;
+        font-weight:650!important;
+        line-height:1.35!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-name.done{
+        color:var(--text-3)!important;
+        font-weight:500!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-meta{
+        font-size:11px!important;
+        color:var(--text-3)!important;
+        margin-top:3px!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-del{
+        width:34px!important;
+        height:34px!important;
+        flex:0 0 34px!important;
+        padding:6px!important;
+        color:#C5CCD8!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-del svg{
+        width:17px!important;
+        height:17px!important;
+      }
+      #panel-ukoly #todo-list .todo-v2-done-toggle{
+        margin-top:10px!important;
+        padding:11px 2px!important;
+        border-top:1px solid var(--border)!important;
+        color:var(--text-3)!important;
+      }
+      #panel-ukoly > .btn-g{
+        margin-top:0!important;
+      }
+      #panel-ukoly .todo-clean-row{
+        display:flex!important;
+        justify-content:flex-end!important;
+        margin-top:4px!important;
+      }
+      #panel-ukoly .todo-clean-row .btn{
+        border:none!important;
+        background:transparent!important;
+        color:var(--text-3)!important;
+        padding:6px 2px!important;
+        height:auto!important;
+        font-size:12px!important;
+      }
+      #panel-ukoly .todo-clean-row .btn:hover{
+        color:var(--red)!important;
+        background:transparent!important;
+        box-shadow:none!important;
+        transform:none!important;
+      }
+      @media(max-width:768px){
+        #panel-ukoly > .page-hdr{margin-bottom:12px!important;}
+        #panel-ukoly > .card{padding:14px!important;}
+        #panel-ukoly .todo-date-row{margin-left:-4px!important;margin-right:-4px!important;}
+        #panel-ukoly #todo-list .todo-v2-item{min-height:56px!important;}
+      }
+    `;
+    document.head.appendChild(style);
+
+    const card=panel.querySelector(':scope > .card');
+    if(!card) return;
+
+    const add=card.querySelector('.todo-add');
+    const dateRow=add && add.nextElementSibling;
+    const whoRow=dateRow && dateRow.nextElementSibling;
+    if(dateRow){
+      dateRow.classList.add('todo-date-row');
+      const custom=dateRow.querySelector('#todo-date-custom');
+      const other=dateRow.querySelector('[data-val="other"]');
+      if(other) other.textContent='Více';
+      if(custom) custom.setAttribute('aria-label','Vybrat vlastní termín');
+    }
+    if(whoRow){
+      whoRow.classList.add('todo-who-row');
+      const label=whoRow.querySelector('span:not(.todo-qw)');
+      if(label){
+        label.classList.add('todo-who-label');
+        label.textContent='Pro koho';
+      }
+      const people=Array.from(whoRow.querySelectorAll('.todo-qw'));
+      const avatars={'':'👨‍👩‍👧','Táta':'👨','Máma':'👩'};
+      people.forEach(function(p){
+        if(p.querySelector('.todo-who-avatar')) return;
+        const val=p.dataset.val||'';
+        const text=p.textContent.trim();
+        p.innerHTML='<span class="todo-who-avatar" aria-hidden="true">'+(avatars[val]||'•')+'</span><span>'+text+'</span>';
+      });
+    }
+
+    const clean=card.nextElementSibling && card.nextElementSibling.nextElementSibling;
+    const clearBtn=panel.querySelector('button[onclick="clearDoneTodos()"]');
+    if(clearBtn && !clearBtn.closest('.todo-clean-row')){
+      const row=document.createElement('div');
+      row.className='todo-clean-row';
+      clearBtn.parentElement.classList.add('todo-clean-row');
+      clearBtn.parentElement.style.marginTop='4px';
+    }
+
+    // Udržuj „Více“ i po případném překreslení / návratu na panel.
+    panel.dataset.todoPolished='1';
+  }
+
   function hookRenderers(){
     ['renderTodos','renderV','renderC','renderBdays'].forEach(function(name){
       const fn=window[name];
@@ -190,6 +469,7 @@
       const wrapped=function(){
         const r=fn.apply(this,arguments);
         setTimeout(updateQuickStats,0);
+        setTimeout(polishTasksPage,0);
         return r;
       };
       wrapped._qaWrapped=true;
@@ -202,6 +482,7 @@
     hookRenderers();
     fixQuickMic();
     polishTodoDashboard();
+    polishTasksPage();
     updateQuickStats();
     setTimeout(updateQuickStats,300);
     setTimeout(updateQuickStats,1000);
@@ -217,6 +498,7 @@
     hookRenderers();
     fixQuickMic();
     polishTodoDashboard();
+    polishTasksPage();
     updateQuickStats();
     if(++ticks>=40) clearInterval(timer);
   },500);
