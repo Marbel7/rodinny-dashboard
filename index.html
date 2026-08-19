@@ -211,13 +211,10 @@ textarea.fi{height:auto;padding:12px var(--space-4);resize:vertical;line-height:
 .fl{display:block;font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
 
 /* ===== CHECKBOXES ===== */
-.todo-check{width:22px;height:22px;min-width:22px;border-radius:var(--radius-xs);border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:all .15s;flex-shrink:0}
-.todo-check.done{border-color:var(--accent);background:var(--accent);color:white}
+.todo-add { position: relative; display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
 
 /* ===== TODO ITEMS ===== */
-.todo-item{display:flex;align-items:flex-start;gap:10px;padding:10px 6px;border-radius:var(--radius-sm);transition:background .12s;border-bottom:1px solid var(--border-light)}
-.todo-item:hover{background:var(--bg)}
-.todo-item:last-child{border-bottom:none}
+/* todo-item replaced by tu-item */
 .todo-text{font-size:14px;font-weight:500;color:var(--text);line-height:1.45}
 .todo-text.done{text-decoration:line-through;color:var(--text-3)}
 
@@ -810,17 +807,19 @@ input, select, textarea {
 }
 
 /* ===== ÚKOLY TAB v3 ===== */
-.tu-filter-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-.tu-filter-lbl{font-size:11px;font-weight:700;color:var(--text-3);display:flex;align-items:center;gap:3px;white-space:nowrap;min-width:40px}
+/* ===== ÚKOLY TAB v3 — consolidated ===== */
+.tu-filter-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;margin-bottom:6px;padding-bottom:2px}
+.tu-filter-row::-webkit-scrollbar{display:none}
+.tu-filter-lbl{font-size:11px;font-weight:700;color:var(--text-3);display:flex;align-items:center;gap:3px;white-space:nowrap;min-width:44px;flex-shrink:0}
 .tu-group{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:8px;overflow:hidden}
-.tu-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none;background:var(--surface);transition:background .1s}
+.tu-group-hdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none;background:var(--surface);transition:background .1s;-webkit-tap-highlight-color:transparent}
 .tu-group-hdr:hover{background:var(--bg)}
 .tu-group-title{font-size:14px;font-weight:700;color:var(--text)}
-.tu-group-chev{font-size:12px;color:var(--text-3);transition:transform .18s}
+.tu-group-chev{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-3);transition:transform .18s;flex-shrink:0}
 .tu-group-chev.open{transform:rotate(180deg)}
 .tu-group-body{display:none;border-top:1px solid var(--border-light)}
 .tu-group-body.open{display:block}
-.tu-item{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background .1s}
+.tu-item{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background .1s;-webkit-tap-highlight-color:transparent}
 .tu-item:last-child{border-bottom:none}
 .tu-item:hover{background:var(--bg)}
 .tu-check{width:24px;height:24px;min-width:24px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;cursor:pointer}
@@ -830,17 +829,24 @@ input, select, textarea {
 .tu-body{flex:1;min-width:0}
 .tu-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
 .tu-name.done{text-decoration:line-through;color:var(--text-3);font-weight:400}
-.tu-meta{font-size:11px;color:var(--text-3);margin-top:1px}
-.tu-chip{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:20px;white-space:nowrap;margin-left:auto;flex-shrink:0}
-.tu-star{background:none;border:none;cursor:pointer;padding:4px;color:var(--text-4);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tu-meta{font-size:11px;color:var(--text-3);margin-top:2px}
+.tu-right{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto}
+.tu-chip{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:20px;white-space:nowrap}
+.tu-star{background:none;border:none;cursor:pointer;padding:4px;color:var(--text-4);display:flex;align-items:center}
 .tu-star:hover{color:var(--orange)}
 .tu-star svg{width:15px;height:15px}
 .tu-done-section{background:#F5F3FF;border-radius:var(--radius);border:1px solid #DDD6FE;margin-top:8px}
-.tu-done-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none}
+.tu-done-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
 .tu-done-title{font-size:13px;font-weight:700;color:var(--accent)}
 .tu-done-clear{font-size:11px;font-weight:700;color:var(--red);background:#FEE2E2;border:none;border-radius:8px;padding:4px 10px;cursor:pointer;font-family:inherit}
 .tu-done-body{display:none;border-top:1px solid #DDD6FE}
 .tu-done-body.open{display:block}
+/* Více dropdown */
+.tu-more-wrap{position:relative;flex-shrink:0}
+.tu-more-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:200;padding:6px;min-width:160px}
+.tu-more-menu.open{display:block}
+.tu-more-item{display:block;width:100%;text-align:left;padding:9px 14px;border:none;background:none;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;font-family:inherit;border-radius:8px;white-space:nowrap}
+.tu-more-item:hover{background:var(--bg);color:var(--text)}
 
 @media (max-width: 768px) {
   input, select, textarea {
@@ -986,38 +992,6 @@ input, select, textarea {
 
 </style>
 
-<style id="tasks-direct-ui-v1">
-@media(max-width:768px){
-  #panel-ukoly .todo-qd{
-    display:inline-flex!important;align-items:center!important;justify-content:center!important;
-    min-height:38px!important;height:38px!important;padding:0 14px!important;
-    border-radius:999px!important;border:1px solid #E2E6EF!important;
-    background:#F8FAFC!important;color:#64748B!important;
-    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
-    flex:0 0 auto!important;box-shadow:none!important;
-  }
-  #panel-ukoly .todo-qd.active{
-    background:#6366F1!important;border-color:#6366F1!important;color:#fff!important;
-    box-shadow:0 4px 12px rgba(99,102,241,.18)!important;
-  }
-  #panel-ukoly .todo-qd[data-val="other"]{font-size:0!important;}
-  #panel-ukoly .todo-qd[data-val="other"]:after{content:'Více';font-size:12px!important;}
-  #panel-ukoly .todo-qw{
-    display:inline-flex!important;align-items:center!important;justify-content:center!important;
-    min-height:36px!important;height:36px!important;padding:0 14px!important;
-    border-radius:999px!important;border:1px solid #E2E6EF!important;
-    background:#fff!important;color:#64748B!important;
-    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
-    flex:0 0 auto!important;
-  }
-  #panel-ukoly .todo-qw.active{
-    background:#EEF2FF!important;border-color:#C7D2FE!important;color:#4F46E5!important;
-  }
-  #panel-ukoly .card{border-radius:18px!important;padding:16px!important;}
-  #panel-ukoly .todo-add .fi{height:48px!important;border-radius:14px!important;font-size:16px!important;}
-  #panel-ukoly .todo-add .btn-p{height:48px!important;width:48px!important;min-width:48px!important;border-radius:14px!important;padding:0!important;}
-}
-</style>
 </head>
 <body>
 
@@ -1262,10 +1236,30 @@ input, select, textarea {
 
 <div class="panel" id="panel-ukoly">
 <div class="page-hdr"><div><div class="page-title"><i data-lucide="check-square" style="width:22px;height:22px;color:var(--accent)"></i> Úkoly</div><div class="page-sub">Rodinný to-do seznam</div></div></div>
-<div class="card">
-<div class="todo-add"><input type="text" class="fi" id="todo-input" placeholder="Napiš úkol..." onkeypress="if(event.key==='Enter')addTodoV2()" style="flex:1;min-width:180px"><button class="btn btn-p" onclick="addTodoV2()"><i data-lucide="plus" class="ico"></i></button></div>
-<div class="tu-filter-row"><span class="tu-filter-lbl"><i data-lucide="calendar" style="width:12px;height:12px"></i> Kdy</span><span class="todo-qd active" data-val="" onclick="setTodoDate(this,'')">Bez termínu</span><span class="todo-qd" data-val="dnes" onclick="setTodoDate(this,'dnes')">Dnes</span><span class="todo-qd" data-val="zitra" onclick="setTodoDate(this,'zitra')">Zítra</span><span class="todo-qd" data-val="tyden" onclick="setTodoDate(this,'tyden')">Tento týden</span><span class="todo-qd" data-val="other" onclick="setTodoDate(this,'other')">Více ∨</span><input type="date" class="fi" id="todo-date-custom" style="display:none;width:140px;padding:5px 8px;font-size:12px"></div>
-<div class="tu-filter-row"><span class="tu-filter-lbl"><i data-lucide="users" style="width:12px;height:12px"></i> Pro</span><span class="todo-qw active" data-val="" onclick="setTodoWho(this,'')">Všichni</span><span class="todo-qw" data-val="Táta" onclick="setTodoWho(this,'Táta')">Táta</span><span class="todo-qw" data-val="Máma" onclick="setTodoWho(this,'Máma')">Máma</span></div>
+<div class="card" style="padding:14px 16px">
+<div class="todo-add"><input type="text" class="fi" id="todo-input" placeholder="Napiš úkol..." onkeypress="if(event.key==='Enter')addTodoV2()" style="flex:1"><button class="btn btn-p" onclick="addTodoV2()" style="padding:0 16px;height:44px;font-size:20px">+</button></div>
+<div class="tu-filter-row">
+  <span class="tu-filter-lbl"><i data-lucide="calendar" style="width:11px;height:11px"></i> Kdy</span>
+  <span class="todo-qd" data-val="dnes" onclick="setTodoDate(this,'dnes')">Dnes</span>
+  <span class="todo-qd" data-val="zitra" onclick="setTodoDate(this,'zitra')">Zítra</span>
+  <span class="todo-qd" data-val="tyden" onclick="setTodoDate(this,'tyden')">Tento týden</span>
+  <span class="todo-qd active" data-val="" onclick="setTodoDate(this,'')">Bez termínu</span>
+  <div class="tu-more-wrap">
+    <span class="todo-qd" id="tu-vice-btn" onclick="tuToggleVice(event)">Více ∨</span>
+    <div class="tu-more-menu" id="tu-vice-menu">
+      <button class="tu-more-item" onclick="setTodoDate(document.querySelector('.todo-qd[data-val=other]'),'other');tuCloseVice();document.getElementById('todo-date-custom').style.display='inline-block'">📅 Vlastní datum</button>
+      <button class="tu-more-item" onclick="setTodoDateStr('pozdeji');tuCloseVice()">Později</button>
+      <button class="tu-more-item" onclick="setTodoDateStr('mes');tuCloseVice()">Tento měsíc</button>
+    </div>
+  </div>
+  <input type="date" class="fi" id="todo-date-custom" style="display:none;width:130px;padding:5px 8px;font-size:12px;flex-shrink:0">
+</div>
+<div class="tu-filter-row">
+  <span class="tu-filter-lbl"><i data-lucide="users" style="width:11px;height:11px"></i> Pro</span>
+  <span class="todo-qw active" data-val="" onclick="setTodoWho(this,'')">Všichni</span>
+  <span class="todo-qw" data-val="Táta" onclick="setTodoWho(this,'Táta')">Táta</span>
+  <span class="todo-qw" data-val="Máma" onclick="setTodoWho(this,'Máma')">Máma</span>
+</div>
 </div>
 <div id="todo-list"></div>
 </div>
@@ -1697,7 +1691,10 @@ async function loadAll(){
 async function loadTodos(){try{if(!familyId)return;const s=await getDocs(query(famCol('todos'),orderBy('created','desc')));D.todos=s.docs.map(d=>({id:d.id,...d.data()}));renderTodos()}catch(e){console.error('loadTodos error:',e);D.todos=[];renderTodos()}}
 
 window._todoDate='';window._todoWho='';
-window.setTodoDate=function(el,val){window._todoDate=val;document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('todo-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
+window.tuToggleVice=function(e){e.stopPropagation();var m=document.getElementById('tu-vice-menu');m.classList.toggle('open');};
+window.tuCloseVice=function(){var m=document.getElementById('tu-vice-menu');if(m)m.classList.remove('open');};
+window.setTodoDateStr=function(type){var today=new Date();today.setHours(0,0,0,0);var d=new Date(today);if(type==='pozdeji')d.setDate(d.getDate()+14);else if(type==='mes')d.setDate(d.getDate()+30);window._todoDate='other';var dc=document.getElementById('todo-date-custom');if(dc){dc.value=d.toISOString().slice(0,10);dc.style.display='inline-block';}document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.remove('active');});};
+document.addEventListener('click',function(){tuCloseVice();});window._todoDate=val;document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('todo-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
 window.setTodoWho=function(el,val){window._todoWho=val;document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});};
 window.addTodoV2=async function(){if(!familyId){toast('Nejsi přihlášen/a','error');return;}var el=document.getElementById('todo-input'),text=el.value.trim();if(!text)return;var today=new Date();today.setHours(0,0,0,0);var deadline='';if(window._todoDate==='dnes')deadline=today.toISOString().slice(0,10);else if(window._todoDate==='zitra'){var tm=new Date(today);tm.setDate(tm.getDate()+1);deadline=tm.toISOString().slice(0,10);}else if(window._todoDate==='tyden'){var we=new Date(today);we.setDate(we.getDate()+7);deadline=we.toISOString().slice(0,10);}else if(window._todoDate==='other'){var dc=document.getElementById('todo-date-custom');deadline=dc?dc.value:'';}var who=window._todoWho||(window.D._userName||'');await addDoc(famCol('todos'),{text:text,who:who,done:false,deadline:deadline,repeat:'',created:serverTimestamp()});el.value='';window._todoDate='';window._todoWho='';document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});var dc2=document.getElementById('todo-date-custom');if(dc2){dc2.value='';dc2.style.display='none';}await loadTodos();toast('Úkol přidán','success');};
 function renderTodos(){var today=new Date();today.setHours(0,0,0,0);var todayStr=today.toISOString().slice(0,10);var tmrw=new Date(today);tmrw.setDate(tmrw.getDate()+1);var tmrwStr=tmrw.toISOString().slice(0,10);var weekEnd=new Date(today);weekEnd.setDate(weekEnd.getDate()+7);var weekStr=weekEnd.toISOString().slice(0,10);
@@ -1726,7 +1723,7 @@ var tmrw=new Date(today);tmrw.setDate(tmrw.getDate()+1);var tmrwStr=tmrw.toISOSt
 function chipLabel(dl){if(!dl)return'';var d=new Date(dl);var now=new Date();now.setHours(0,0,0,0);var diff=Math.round((d-now)/(864e5));if(diff<0)return'Po termínu';if(diff===0)return'Dnes';if(diff===1)return'Zítra';return d.toLocaleDateString('cs-CZ',{day:'numeric',month:'numeric'});}
 var CHECKSVG='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 var STARSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
-function tuItem(t){var chip=chipLabel(t.deadline);var meta=(t.who||'');return'<div class="tu-item" onclick="openTodoEdit(\''+t.id+'\')">'+'<div class="tu-check'+(t.done?' done':'')+'" onclick="event.stopPropagation();toggleTodo(\''+t.id+'\','+(!t.done)+')">'+(t.done?CHECKSVG:'')+'</div>'+'<div class="tu-body"><div class="tu-name'+(t.done?' done':'')+'">'+t.text+'</div>'+(meta?'<div class="tu-meta">'+meta+'</div>':'')+'</div>'+(chip?'<span class="tu-chip">'+chip+'</span>':'')+'<button class="tu-star" onclick="event.stopPropagation()">'+STARSVG+'</button>'+'</div>';}
+function tuItem(t){var chip=chipLabel(t.deadline);var meta=(t.who||'');return'<div class="tu-item" onclick="openTodoEdit(\''+t.id+'\')">'+'<div class="tu-check'+(t.done?' done':'')+'" onclick="event.stopPropagation();toggleTodo(\''+t.id+'\','+(!t.done)+')">'+(t.done?CHECKSVG:'')+'</div>'+'<div class="tu-body"><div class="tu-name'+(t.done?' done':'')+'">'+t.text+'</div>'+(meta?'<div class="tu-meta">'+meta+'</div>':'')+'</div>'+'<div class="tu-right">'+(chip?'<span class="tu-chip">'+chip+'</span>':'')+'<button class="tu-star" onclick="event.stopPropagation()">'+STARSVG+'</button></div>'+'</div>';}
 function tuGroup(title,items,defaultOpen){if(!items.length)return'';var id='tugrp-'+title.replace(/\s/g,'');return'<div class="tu-group"><div class="tu-group-hdr" onclick="(function(){var b=document.getElementById(\''+id+'\');var c=this.querySelector(\'.tu-group-chev\');var open=b.classList.toggle(\'open\');c.classList.toggle(\'open\',open);}).call(this)"><span class="tu-group-title">'+title+' · '+items.length+'</span><span class="tu-group-chev'+(defaultOpen?' open':'')+'">∨</span></div><div id="'+id+'" class="tu-group-body'+(defaultOpen?' open':'')+'">'+items.map(tuItem).join('')+'</div></div>';}
 var hasDnes=grDnes.length>0||grPT.length>0;var out='';
 out+=tuGroup('Po termínu',grPT,true);
