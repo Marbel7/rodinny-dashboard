@@ -24,7 +24,7 @@ self.addEventListener('fetch', function(event) {
     if (!type.includes('text/html')) return response;
 
     const html = await response.text();
-    if (html.includes('auth-fix.js') || html.includes('tasks-fix.js')) {
+    if (html.includes('auth-fix.js') && html.includes('tasks-fix.js')) {
       return new Response(html, {status: response.status, statusText: response.statusText, headers: response.headers});
     }
 
