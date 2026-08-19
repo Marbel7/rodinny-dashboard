@@ -889,8 +889,8 @@ input, select, textarea {
 .te-fam-acc-right{display:flex;align-items:center;flex-shrink:0;gap:4px}
 .te-fam-chev{width:28px;height:28px;flex-shrink:0;display:grid;place-items:center;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);font-size:13px;color:var(--text-3);transition:transform .2s}
 .te-fam-chev::before{content:'↓'}
-.te-fam-body{overflow:hidden;max-height:0;opacity:0;transition:max-height .25s ease,opacity .2s ease,margin-top .2s}
-.te-fam-card.te-expanded .te-fam-body{max-height:800px;opacity:1;margin-top:14px}
+.te-fam-body{overflow:hidden;max-height:0;opacity:0;transition:max-height .25s ease,opacity .2s ease,margin-top .2s;pointer-events:none}
+.te-fam-card.te-expanded .te-fam-body{max-height:1200px;opacity:1;margin-top:14px;pointer-events:auto}
 .te-fam-card.te-expanded .te-fam-chev{transform:rotate(180deg)}
 /* ===== RYCHLÉ AKCE v2 ===== */
 .qa-btn-v2{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-2);transition:all .15s;font-family:inherit;width:100%;-webkit-tap-highlight-color:transparent}
@@ -1089,10 +1089,10 @@ input, select, textarea {
 </div>
 
 <!-- ÚKOLY NA HLAVNÍ STRÁNCE — accordion styl -->
-<div class="card te-fam-card" style="margin-bottom:14px">
+<div class="card te-fam-card te-expanded" style="margin-bottom:14px">
 
   <!-- Accordion header -->
-  <button class="te-fam-acc-btn" id="te-fam-toggle" onclick="(function(){var card=document.querySelector('.te-fam-card');var expanded=card.classList.toggle('te-expanded');document.getElementById('te-fam-toggle').setAttribute('aria-expanded',expanded);})()">
+  <button class="te-fam-acc-btn" id="te-fam-toggle" aria-expanded="true" onclick="(function(){var card=document.querySelector('.te-fam-card');var expanded=card.classList.toggle('te-expanded');document.getElementById('te-fam-toggle').setAttribute('aria-expanded',expanded);})()">
     <div class="te-fam-acc-copy">
       <div class="te-fam-acc-title">Úkoly</div>
       <div class="te-fam-acc-val"><strong id="teFamDone">0</strong> / <span id="teFamTotal">0</span> splněno</div>
