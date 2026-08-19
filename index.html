@@ -1077,21 +1077,26 @@ input, select, textarea {
 <!-- ÚKOLY NA HLAVNÍ STRÁNCE -->
 <div class="card" style="margin-bottom:14px;padding:0">
 
-  <!-- Hlavička – klik = rozbalit/sbalit. Žádné <div> uvnitř <button>. -->
-  <button onclick="(function(){var b=document.getElementById('te-fam-body');var c=document.getElementById('te-fam-chev');var open=b.style.display!=='none';b.style.display=open?'none':'block';c.textContent=open?'↓':'↑';})()" style="width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px;background:none;border:none;cursor:pointer;text-align:left;font-family:inherit;-webkit-tap-highlight-color:transparent">
-    <span style="display:flex;flex-direction:column;flex:1;min-width:0">
-      <span style="font-size:14px;font-weight:700;color:var(--text)">Úkoly</span>
-      <span style="font-size:12px;font-weight:600;color:var(--text-2);margin-top:3px"><strong id="teFamDone">0</strong> / <span id="teFamTotal">0</span> splněno</span>
-      <span style="display:block;width:min(180px,100%);height:5px;margin-top:6px;border-radius:999px;background:var(--border-light)"><span id="teFamProg" style="display:block;height:100%;border-radius:999px;background:var(--accent);width:0%;transition:width .3s"></span></span>
-      <span id="teFamMeta" style="font-size:11px;color:var(--text-3);margin-top:4px">Zatím žádné úkoly</span>
-    </span>
-    <span style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-top:2px">
-      <span id="te-fam-chev" style="width:26px;height:26px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-3);pointer-events:none">↓</span>
-      <button onclick="event.stopPropagation();switchTab('ukoly')" style="font-size:11px;padding:5px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit;color:var(--text-2)">Vše →</button>
-    </span>
-  </button>
+  <!-- Hlavička: flex row — NO nested buttons -->
+  <div style="display:flex;align-items:flex-start;padding:16px;gap:12px">
 
-  <!-- Tělo – sbaleno ve výchozím stavu, bez margin-top -->
+    <!-- Klikatelná část – expand/collapse (div, ne button) -->
+    <div onclick="(function(){var b=document.getElementById('te-fam-body');var c=document.getElementById('te-fam-chev');var open=b.style.display!=='none';b.style.display=open?'none':'block';c.textContent=open?'↓':'↑';if(!open)try{lucide.createIcons()}catch(e){};})()" style="flex:1;min-width:0;cursor:pointer">
+      <span style="display:block;font-size:14px;font-weight:700;color:var(--text)">Úkoly</span>
+      <span style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-top:3px"><strong id="teFamDone">0</strong> / <span id="teFamTotal">0</span> splněno</span>
+      <span style="display:block;width:min(180px,100%);height:5px;margin-top:6px;border-radius:999px;background:var(--border-light)"><span id="teFamProg" style="display:block;height:100%;border-radius:999px;background:var(--accent);width:0%;transition:width .3s"></span></span>
+      <span id="teFamMeta" style="display:block;font-size:11px;color:var(--text-3);margin-top:4px">Zatím žádné úkoly</span>
+    </div>
+
+    <!-- Pravá část: chevron + Vše → jako samostatné prvky -->
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-top:2px">
+      <span id="te-fam-chev" onclick="(function(){var b=document.getElementById('te-fam-body');var c=document.getElementById('te-fam-chev');var open=b.style.display!=='none';b.style.display=open?'none':'block';c.textContent=open?'↓':'↑';if(!open)try{lucide.createIcons()}catch(e){};})()" style="width:26px;height:26px;border:1.5px solid var(--border);border-radius:50%;background:var(--bg);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-3);cursor:pointer">↓</span>
+      <button onclick="switchTab('ukoly')" style="font-size:11px;padding:5px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit;color:var(--text-2)">Vše →</button>
+    </div>
+
+  </div>
+
+  <!-- Tělo – sbaleno ve výchozím stavu -->
   <div id="te-fam-body" style="display:none;border-top:1px solid var(--border-light);padding:12px 16px 16px">
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <div style="position:relative;flex:1">
@@ -1649,7 +1654,7 @@ out+=groupHtml('Později',grPozdeji,'var(--text-3)','<circle cx="12" cy="12" r="
 out+=groupHtml('Bez termínu',grBez,'var(--text-3)','<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>');
 if(done.length){out+='<div class="todo-v2-done-toggle" id="todo-done-toggle-'+el.id+'" onclick="var b=this.nextElementSibling;b.style.display=b.style.display===\'none\'?\'block\':\'none\';this.classList.toggle(\'open\')">'+CHEV+' Hotovo · '+done.length+'</div><div style="display:none">'+done.map(itemHtml).join('')+'</div>';}
 el.innerHTML=out;}
-var _dashEl=document.getElementById('todo-list-dash');if(_dashEl){if(!undone.length){_dashEl.innerHTML=D.todos.length>0?'<div style="padding:6px 0;font-size:13px;color:var(--green);font-weight:600">✓ Vše splněno</div>':'';}else{var _dOut='';_dOut+=groupHtml('Po termínu',grPT,'#EF4444','<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>');_dOut+=groupHtml('Dnes',grDnes,'#F59E0B','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');_dOut+=groupHtml('Zítra',grZitra,'#3B82F6','<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>');_dOut+=groupHtml('Tento týden',grTyden,'#6366F1','<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>');_dOut+=groupHtml('Později',grPozdeji,'var(--text-3)','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');_dOut+=groupHtml('Bez termínu',grBez,'var(--text-3)','<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>');_dashEl.innerHTML=_dOut;}}
+var _dashEl=document.getElementById('todo-list-dash');if(_dashEl){if(!undone.length){_dashEl.innerHTML='';}else{var _dOut='';_dOut+=groupHtml('Po termínu',grPT,'#EF4444','<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>');_dOut+=groupHtml('Dnes',grDnes,'#F59E0B','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');_dOut+=groupHtml('Zítra',grZitra,'#3B82F6','<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>');_dOut+=groupHtml('Tento týden',grTyden,'#6366F1','<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>');_dOut+=groupHtml('Později',grPozdeji,'var(--text-3)','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>');_dOut+=groupHtml('Bez termínu',grBez,'var(--text-3)','<line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/>');_dashEl.innerHTML=_dOut;}}
 renderInto(document.getElementById('todo-list'));
 var countEl=document.getElementById('todo-dash-count');if(countEl){var uc=undone.length;countEl.textContent=uc>0?uc+' otevřených':''}
 var _td=document.getElementById('teFamDone');if(_td)_td.textContent=done.length;
