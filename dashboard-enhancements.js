@@ -80,6 +80,109 @@
     };
   }
 
+  function polishTodoDashboard(){
+    if(document.getElementById('todo-dashboard-polish-js')) return;
+
+    const style=document.createElement('style');
+    style.id='todo-dashboard-polish-js';
+    style.textContent=`
+      /* Dashboard Úkoly: kompaktní, přirozeně rostoucí karta */
+      #te-fam-body{
+        border-top:1px solid var(--border-light)!important;
+        padding:10px 16px 14px!important;
+      }
+      #te-fam-body > div:first-child{
+        display:flex!important;
+        align-items:center!important;
+        gap:8px!important;
+        margin-bottom:10px!important;
+      }
+      #te-fam-body .fi{height:44px!important;}
+      #te-fam-body .btn-p{
+        height:44px!important;
+        min-width:48px!important;
+        padding:0 14px!important;
+      }
+      #todo-list-dash{margin:0!important;}
+      #todo-list-dash .todo-v2-group{
+        margin:0 0 10px!important;
+      }
+      #todo-list-dash .todo-v2-group:last-child{margin-bottom:0!important;}
+      #todo-list-dash .todo-v2-ghdr{
+        margin:2px 0 4px!important;
+        padding:0!important;
+        font-size:11px!important;
+        line-height:18px!important;
+      }
+      #todo-list-dash .todo-v2-item{
+        min-height:42px!important;
+        padding:9px 4px!important;
+      }
+      #todo-list-dash .todo-v2-check{
+        width:24px!important;
+        height:24px!important;
+        min-width:24px!important;
+        border:2px solid #E2E5ED!important;
+        border-radius:7px!important;
+        background:#fff!important;
+        color:transparent!important;
+        font-size:0!important;
+        line-height:1!important;
+        display:flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        flex:0 0 24px!important;
+        box-shadow:none!important;
+      }
+      #todo-list-dash .todo-v2-check.done{
+        background:#6366F1!important;
+        border-color:#6366F1!important;
+        color:#fff!important;
+        font-size:15px!important;
+        font-weight:800!important;
+      }
+      #todo-list-dash .todo-v2-check.done::after{
+        content:'✓';
+        color:#fff!important;
+        font-size:15px!important;
+        font-weight:800!important;
+        line-height:1!important;
+      }
+      #todo-list-dash .todo-v2-name.done{
+        color:#94A3B8!important;
+        text-decoration:line-through!important;
+      }
+      #todo-list-dash .todo-v2-del{
+        width:32px!important;
+        height:32px!important;
+        display:flex!important;
+        align-items:center!important;
+        justify-content:center!important;
+        padding:4px!important;
+      }
+      #todo-list-dash .todo-v2-del svg{width:17px!important;height:17px!important;}
+      #te-fam-body .todo-v2-done-toggle{
+        margin-top:6px!important;
+        padding:8px 0!important;
+      }
+      @media(max-width:768px){
+        #te-fam-body{padding-left:14px!important;padding-right:14px!important;}
+        #te-fam-body > div:first-child{gap:7px!important;}
+        #todo-list-dash .todo-v2-name{font-size:14px!important;}
+        #todo-list-dash .todo-v2-meta{font-size:11px!important;}
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Výchozí stav Dashboardu: sbaleno. Samostatná stránka Úkoly se tím nemění.
+    const body=document.getElementById('te-fam-body');
+    const chev=document.getElementById('te-fam-chev');
+    if(body){
+      body.style.display='none';
+      if(chev) chev.textContent='↓';
+    }
+  }
+
   function hookRenderers(){
     ['renderTodos','renderV','renderC','renderBdays'].forEach(function(name){
       const fn=window[name];
@@ -98,6 +201,7 @@
     setupQuickActions();
     hookRenderers();
     fixQuickMic();
+    polishTodoDashboard();
     updateQuickStats();
     setTimeout(updateQuickStats,300);
     setTimeout(updateQuickStats,1000);
@@ -112,6 +216,7 @@
     setupQuickActions();
     hookRenderers();
     fixQuickMic();
+    polishTodoDashboard();
     updateQuickStats();
     if(++ticks>=40) clearInterval(timer);
   },500);
