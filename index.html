@@ -992,6 +992,38 @@ input, select, textarea {
 
 </style>
 
+<style id="tasks-direct-ui-v1">
+@media(max-width:768px){
+  #panel-ukoly .todo-qd{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    min-height:38px!important;height:38px!important;padding:0 14px!important;
+    border-radius:999px!important;border:1px solid #E2E6EF!important;
+    background:#F8FAFC!important;color:#64748B!important;
+    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
+    flex:0 0 auto!important;box-shadow:none!important;
+  }
+  #panel-ukoly .todo-qd.active{
+    background:#6366F1!important;border-color:#6366F1!important;color:#fff!important;
+    box-shadow:0 4px 12px rgba(99,102,241,.18)!important;
+  }
+  #panel-ukoly .todo-qd[data-val="other"]{font-size:0!important;}
+  #panel-ukoly .todo-qd[data-val="other"]:after{content:'Více';font-size:12px!important;}
+  #panel-ukoly .todo-qw{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    min-height:36px!important;height:36px!important;padding:0 14px!important;
+    border-radius:999px!important;border:1px solid #E2E6EF!important;
+    background:#fff!important;color:#64748B!important;
+    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
+    flex:0 0 auto!important;
+  }
+  #panel-ukoly .todo-qw.active{
+    background:#EEF2FF!important;border-color:#C7D2FE!important;color:#4F46E5!important;
+  }
+  #panel-ukoly .card{border-radius:18px!important;padding:16px!important;}
+  #panel-ukoly .todo-add .fi{height:48px!important;border-radius:14px!important;font-size:16px!important;}
+  #panel-ukoly .todo-add .btn-p{height:48px!important;width:48px!important;min-width:48px!important;border-radius:14px!important;padding:0!important;}
+}
+</style>
 </head>
 <body>
 
