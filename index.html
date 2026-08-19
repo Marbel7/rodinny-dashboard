@@ -992,38 +992,6 @@ input, select, textarea {
 
 </style>
 
-<style id="tasks-direct-ui-v1">
-@media(max-width:768px){
-  #panel-ukoly .todo-qd{
-    display:inline-flex!important;align-items:center!important;justify-content:center!important;
-    min-height:38px!important;height:38px!important;padding:0 14px!important;
-    border-radius:999px!important;border:1px solid #E2E6EF!important;
-    background:#F8FAFC!important;color:#64748B!important;
-    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
-    flex:0 0 auto!important;box-shadow:none!important;
-  }
-  #panel-ukoly .todo-qd.active{
-    background:#6366F1!important;border-color:#6366F1!important;color:#fff!important;
-    box-shadow:0 4px 12px rgba(99,102,241,.18)!important;
-  }
-  #panel-ukoly .todo-qd[data-val="other"]{font-size:0!important;}
-  #panel-ukoly .todo-qd[data-val="other"]:after{content:'Více';font-size:12px!important;}
-  #panel-ukoly .todo-qw{
-    display:inline-flex!important;align-items:center!important;justify-content:center!important;
-    min-height:36px!important;height:36px!important;padding:0 14px!important;
-    border-radius:999px!important;border:1px solid #E2E6EF!important;
-    background:#fff!important;color:#64748B!important;
-    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
-    flex:0 0 auto!important;
-  }
-  #panel-ukoly .todo-qw.active{
-    background:#EEF2FF!important;border-color:#C7D2FE!important;color:#4F46E5!important;
-  }
-  #panel-ukoly .card{border-radius:18px!important;padding:16px!important;}
-  #panel-ukoly .todo-add .fi{height:48px!important;border-radius:14px!important;font-size:16px!important;}
-  #panel-ukoly .todo-add .btn-p{height:48px!important;width:48px!important;min-width:48px!important;border-radius:14px!important;padding:0!important;}
-}
-</style>
 </head>
 <body>
 
@@ -1508,6 +1476,10 @@ input, select, textarea {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
     Úkoly
   </button>
+  <button onclick="toggleMic('todo-input-dash')" style="background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:50%;width:52px;height:52px;min-width:52px;border:none;box-shadow:0 4px 16px rgba(99,102,241,0.5);color:white;margin-bottom:8px;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;-webkit-tap-highlight-color:transparent">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    <span style="font-size:9px;font-weight:700">Hlasem</span>
+  </button>
   <button class="mob-nav-btn" data-tab="seznamy" onclick="window.switchTab('seznamy')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
     Nákup
@@ -1515,10 +1487,6 @@ input, select, textarea {
   <button class="mob-nav-btn" data-tab="vydaje" onclick="window.switchTab('vydaje')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
     Výdaje
-  </button>
-  <button class="mob-nav-btn" data-tab="nastaveni" onclick="window.switchTab('nastaveni')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    Nastavení
   </button>
 </nav>
 
