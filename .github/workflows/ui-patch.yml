@@ -32,10 +32,53 @@ jobs:
               changed = True
               print('Repaired broken setTodoDate declaration')
 
-          # iOS Safari/private browsing can fail to complete Firebase's
-          # redirect flow at the firebaseapp.com auth handler. Prefer the
-          # user-gesture popup on mobile too; only fall back to redirect when
-          # Safari explicitly blocks/closes the popup.
+          # iOS Safari/private browsing: never fall back to Firebase's
+          # firebaseapp.com redirect handler. That handler is the source of
+          # the blank white page seen after Google authentication. Keep the
+          # login inside the original page using the user-gesture popup.
+          login_with_fallback = """const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          setLoginStatus('Připojuji k Google…');
+          try{
+            // Popup is intentionally preferred on mobile/iOS. It avoids the
+            // firebaseapp.com redirect handler that can remain blank in
+            // Safari private browsing. The call is made directly from the
+            // button click so Safari can treat it as a user-initiated popup.
+            await signInWithPopup(auth,prov);
+            setLoginStatus('✓ Přihlášeno','#10B981');
+          }catch(e){
+            console.error('Auth error:',e.code,e.message);
+            if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
+              setLoginStatus('Popup blokován, přesměrovávám…');
+              try{await signInWithRedirect(auth,prov);}
+              catch(e2){setLoginStatus('Chyba: '+e2.message,'#EF4444');}
+            }else{
+              setLoginStatus('Chyba: '+e.code+' — '+e.message,'#EF4444');
+            }
+          }"""
+          login_popup_only = """const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          setLoginStatus('Připojuji k Google…');
+          try{
+            // Always use popup. Do NOT redirect to firebaseapp.com: on iOS
+            // Safari/private browsing that handler can return a blank page.
+            // This call stays attached to the user's button gesture.
+            await signInWithPopup(auth,prov);
+            setLoginStatus('✓ Přihlášeno','#10B981');
+          }catch(e){
+            console.error('Auth error:',e.code,e.message);
+            if(e.code==='auth/popup-blocked'){
+              setLoginStatus('Safari zablokoval přihlášení. Povolte vyskakovací okno a zkuste to znovu.','#EF4444');
+            }else if(e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
+              setLoginStatus('Přihlášení bylo zrušeno. Zkuste to znovu.','#EF4444');
+            }else{
+              setLoginStatus('Chyba: '+e.code+' — '+e.message,'#EF4444');
+            }
+          }"""
+          if login_with_fallback in s:
+              s = s.replace(login_with_fallback, login_popup_only, 1)
+              changed = True
+              print('Removed Firebase redirect fallback from Google login')
+
+          # Also repair the older redirect-first version if it ever reappears.
           old_login = """const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
           setLoginStatus('Připojuji k Google…');
           try{
@@ -56,29 +99,10 @@ jobs:
               setLoginStatus('Chyba: '+e.code+' — '+e.message,'#EF4444');
             }
           }"""
-          new_login = """const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-          setLoginStatus('Připojuji k Google…');
-          try{
-            // Popup is intentionally preferred on mobile/iOS. It avoids the
-            // firebaseapp.com redirect handler that can remain blank in
-            // Safari private browsing. The call is made directly from the
-            // button click so Safari can treat it as a user-initiated popup.
-            await signInWithPopup(auth,prov);
-            setLoginStatus('✓ Přihlášeno','#10B981');
-          }catch(e){
-            console.error('Auth error:',e.code,e.message);
-            if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
-              setLoginStatus('Popup blokován, přesměrovávám…');
-              try{await signInWithRedirect(auth,prov);}
-              catch(e2){setLoginStatus('Chyba: '+e2.message,'#EF4444');}
-            }else{
-              setLoginStatus('Chyba: '+e.code+' — '+e.message,'#EF4444');
-            }
-          }"""
           if old_login in s:
-              s = s.replace(old_login, new_login, 1)
+              s = s.replace(old_login, login_popup_only, 1)
               changed = True
-              print('Changed mobile auth from redirect-first to popup-first')
+              print('Repaired redirect-first Google login')
 
           # Keep the existing mobile task-filter styling patch.
           marker = 'id="tasks-direct-ui-v1"'
@@ -128,5 +152,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
-          git commit -m "fix: make mobile Google auth popup-first"
+          git commit -m "fix: prevent Firebase redirect blank page"
           git push
