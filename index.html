@@ -848,6 +848,36 @@ input, select, textarea {
 .tu-more-item{display:block;width:100%;text-align:left;padding:9px 14px;border:none;background:none;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;font-family:inherit;border-radius:8px;white-space:nowrap}
 .tu-more-item:hover{background:var(--bg);color:var(--text)}
 
+/* ===== AKTIVNÍ TÝDEN ===== */
+.at-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-xs);padding:18px 16px;margin-bottom:14px}
+.at-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.at-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
+.at-week-chip{font-size:11px;font-weight:700;color:var(--text-3);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px 10px}
+.at-sub{font-size:12px;color:var(--text-3);margin-bottom:14px}
+.at-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.at-col{padding:0 8px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.at-col:first-child{border-right:1px solid var(--border-light);padding-left:0}
+.at-col:last-child{padding-right:0}
+.at-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;margin-bottom:8px}
+.at-avatar.ja{background:linear-gradient(135deg,#6366F1,#818CF8)}
+.at-avatar.zena{background:linear-gradient(135deg,#EC4899,#F472B6);font-size:20px}
+.at-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.at-label.ja{color:#6366F1}.at-label.zena{color:#EC4899}
+.at-count-big{font-size:28px;font-weight:800;color:var(--text);line-height:1}
+.at-count-sub{font-size:11px;color:var(--text-3);margin-bottom:10px}
+.at-dots{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;justify-content:center}
+.at-dot{width:28px;height:28px;border-radius:50%;border:2.5px solid;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.at-dot.ja-empty{border-color:#C7D2FE;background:transparent}
+.at-dot.ja-done{border-color:#6366F1;background:#6366F1}
+.at-dot.zena-empty{border-color:#FBCFE8;background:transparent}
+.at-dot.zena-done{border-color:#EC4899;background:#EC4899}
+.at-btn{width:100%;padding:11px;border:none;border-radius:12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;color:white;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
+.at-btn:active{opacity:.85}
+.at-btn.ja{background:linear-gradient(135deg,#6366F1,#818CF8)}
+.at-btn.zena{background:linear-gradient(135deg,#EC4899,#F472B6)}
+.at-motivation{text-align:center;font-size:12px;color:var(--text-3);margin-top:14px;padding-top:12px;border-top:1px solid var(--border-light)}
+.at-hist-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:13px}
+.at-hist-item:last-child{border-bottom:none}
 @media (max-width: 768px) {
   input, select, textarea {
     font-size: 16px;
@@ -992,38 +1022,6 @@ input, select, textarea {
 
 </style>
 
-<style id="tasks-direct-ui-v1">
-@media(max-width:768px){
-  #panel-ukoly .todo-qd{
-    display:inline-flex!important;align-items:center!important;justify-content:center!important;
-    min-height:38px!important;height:38px!important;padding:0 14px!important;
-    border-radius:999px!important;border:1px solid #E2E6EF!important;
-    background:#F8FAFC!important;color:#64748B!important;
-    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
-    flex:0 0 auto!important;box-shadow:none!important;
-  }
-  #panel-ukoly .todo-qd.active{
-    background:#6366F1!important;border-color:#6366F1!important;color:#fff!important;
-    box-shadow:0 4px 12px rgba(99,102,241,.18)!important;
-  }
-  #panel-ukoly .todo-qd[data-val="other"]{font-size:0!important;}
-  #panel-ukoly .todo-qd[data-val="other"]:after{content:'Více';font-size:12px!important;}
-  #panel-ukoly .todo-qw{
-    display:inline-flex!important;align-items:center!important;justify-content:center!important;
-    min-height:36px!important;height:36px!important;padding:0 14px!important;
-    border-radius:999px!important;border:1px solid #E2E6EF!important;
-    background:#fff!important;color:#64748B!important;
-    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
-    flex:0 0 auto!important;
-  }
-  #panel-ukoly .todo-qw.active{
-    background:#EEF2FF!important;border-color:#C7D2FE!important;color:#4F46E5!important;
-  }
-  #panel-ukoly .card{border-radius:18px!important;padding:16px!important;}
-  #panel-ukoly .todo-add .fi{height:48px!important;border-radius:14px!important;font-size:16px!important;}
-  #panel-ukoly .todo-add .btn-p{height:48px!important;width:48px!important;min-width:48px!important;border-radius:14px!important;padding:0!important;}
-}
-</style>
 </head>
 <body>
 
@@ -1091,6 +1089,7 @@ input, select, textarea {
     <button class="sb-item" data-tab="poznamky"><i data-lucide="sticky-note" class="ico"></i>Sdílené poznámky</button>
     <button class="sb-item" data-tab="dokumenty"><i data-lucide="file-text" class="ico"></i>Dokumenty & termíny</button>
     <button class="sb-item" data-tab="odchod"><i data-lucide="door-open" class="ico"></i>Před odchodem</button>
+    <button class="sb-item" data-tab="aktivni-tyden" style="color:#F59E0B"><svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Aktivní týden</button>
     <button class="sb-item" data-tab="dopisy"><i data-lucide="mail" class="ico"></i>Dopisy dětem</button>
 
     <div class="sb-sep"></div>
@@ -1277,6 +1276,9 @@ input, select, textarea {
   <div class="balance-sub">Hypotéka, energie, pojištění a další</div>
   <div class="balance-list" id="p-list"></div>
 </div>
+
+<!-- AKTIVNÍ TÝDEN KARTA -->
+<div id="at-dash-card"></div>
 
 </div>
 
@@ -1497,6 +1499,41 @@ input, select, textarea {
     </div>
     <button class="btn btn-d btn-s" onclick="handleLogout()"><i data-lucide="log-out" class="ico"></i> Odhlásit se</button>
   </div>
+</div>
+
+<!-- PANEL: AKTIVNÍ TÝDEN -->
+<div class="panel" id="panel-aktivni-tyden">
+<div class="page-hdr"><div><div class="page-title" style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 24 24" fill="#F59E0B" width="22" height="22"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Aktivní týden</div><div class="page-sub">Společně jsme silnější</div></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+  <div class="card" style="text-align:center;padding:20px 12px">
+    <div class="at-label ja" style="margin-bottom:8px">JÁ</div>
+    <div class="at-avatar ja" style="margin:0 auto 10px" id="at-full-ja-avatar">M</div>
+    <div style="font-size:13px;color:var(--text-3);margin-bottom:4px" id="at-full-ja-count">0 / 5 tréninků</div>
+    <div class="at-dots" style="justify-content:center;margin-bottom:14px" id="at-full-ja-dots"></div>
+    <button class="at-btn ja" onclick="logTrenink('ja')">Měl jsem trénink</button>
+  </div>
+  <div class="card" style="text-align:center;padding:20px 12px">
+    <div class="at-label zena" style="margin-bottom:8px">ŽENA</div>
+    <div class="at-avatar zena" style="margin:0 auto 10px">♡</div>
+    <div style="font-size:13px;color:var(--text-3);margin-bottom:4px" id="at-full-zena-count">0 / 5 tréninků</div>
+    <div class="at-dots" style="justify-content:center;margin-bottom:14px" id="at-full-zena-dots"></div>
+    <button class="at-btn zena" onclick="logTrenink('zena')">Měla jsem trénink</button>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title" style="display:flex;justify-content:space-between">
+    <span>Historie tréninků</span>
+    <span id="at-week-label-full" style="font-size:11px;color:var(--text-3);font-weight:600"></span>
+  </div>
+  <div id="at-history-list"><div class="empty" style="padding:16px"><p>Zatím žádná data</p></div></div>
+</div>
+<div class="card" style="margin-top:4px">
+  <div class="card-title">Cíl tréninků / týden</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="fg" style="margin:0"><label class="fl">Já (počet)</label><input type="number" class="fi" id="at-cil-ja" min="1" max="14" value="5" style="width:100%" onchange="saveATCil()"></div>
+    <div class="fg" style="margin:0"><label class="fl">Žena (počet)</label><input type="number" class="fi" id="at-cil-zena" min="1" max="14" value="5" style="width:100%" onchange="saveATCil()"></div>
+  </div>
+</div>
 </div>
 
 <!-- MODALS -->
@@ -1752,7 +1789,7 @@ document.getElementById('btn-join-family').onclick=async()=>{
 onAuthStateChanged(auth,async u=>{if(u){setLoginStatus('✓ Přihlášen jako '+u.displayName,'#10B981');document.getElementById('auth-screen').style.display='none';await checkOrSetupFamily(u)}else{familyId=null;document.getElementById('auth-screen').style.display='flex';document.getElementById('family-setup').style.display='none';document.getElementById('app').style.display='none'}});
 function setGreeting(n){const h=new Date().getHours(),g=h<12?'Dobré ráno':h<18?'Dobré odpoledne':'Dobrý večer';const ge=document.getElementById('greeting');if(ge)ge.textContent=g+', '+n+'!';const d=new Date(),dn=['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'],mn=['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];const de=document.getElementById('today-date');if(de)de.textContent=dn[d.getDay()]+' '+d.getDate()+'. '+mn[d.getMonth()]+' '+d.getFullYear()}
 async function loadAll(){
-  const fns = [loadTodos,loadV,loadI,loadC,loadSz,loadBdays,loadPoznamky,loadDokumenty,loadOdchod,loadJidelnicek,loadDopisy];
+  const fns = [loadTodos,loadV,loadI,loadC,loadSz,loadBdays,loadPoznamky,loadDokumenty,loadOdchod,loadJidelnicek,loadDopisy,loadAktivniTyden];
   const results = await Promise.allSettled(fns.map(fn => fn().catch(e => {
     console.error(fn.name + ' failed:', e);
     return null;
@@ -1771,7 +1808,7 @@ window._todoDate='';window._todoWho='';
 window.tuToggleVice=function(e){e.stopPropagation();var m=document.getElementById('tu-vice-menu');m.classList.toggle('open');};
 window.tuCloseVice=function(){var m=document.getElementById('tu-vice-menu');if(m)m.classList.remove('open');};
 window.setTodoDateStr=function(type){var today=new Date();today.setHours(0,0,0,0);var d=new Date(today);if(type==='pozdeji')d.setDate(d.getDate()+14);else if(type==='mes')d.setDate(d.getDate()+30);window._todoDate='other';var dc=document.getElementById('todo-date-custom');if(dc){dc.value=d.toISOString().slice(0,10);dc.style.display='inline-block';}document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.remove('active');});};
-document.addEventListener('click',function(){tuCloseVice();});window.setTodoDate=function(el,val){window._todoDate=val;document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('todo-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
+document.addEventListener('click',function(){tuCloseVice();});window._todoDate=val;document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('todo-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
 window.setTodoWho=function(el,val){window._todoWho=val;document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});};
 window.addTodoV2=async function(){if(!familyId){toast('Nejsi přihlášen/a','error');return;}var el=document.getElementById('todo-input'),text=el.value.trim();if(!text)return;var today=new Date();today.setHours(0,0,0,0);var deadline='';if(window._todoDate==='dnes')deadline=today.toISOString().slice(0,10);else if(window._todoDate==='zitra'){var tm=new Date(today);tm.setDate(tm.getDate()+1);deadline=tm.toISOString().slice(0,10);}else if(window._todoDate==='tyden'){var we=new Date(today);we.setDate(we.getDate()+7);deadline=we.toISOString().slice(0,10);}else if(window._todoDate==='other'){var dc=document.getElementById('todo-date-custom');deadline=dc?dc.value:'';}var who=window._todoWho||(window.D._userName||'');await addDoc(famCol('todos'),{text:text,who:who,done:false,deadline:deadline,repeat:'',created:serverTimestamp()});el.value='';window._todoDate='';window._todoWho='';document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});var dc2=document.getElementById('todo-date-custom');if(dc2){dc2.value='';dc2.style.display='none';}await loadTodos();toast('Úkol přidán','success');};
 function renderTodos(){var today=new Date();today.setHours(0,0,0,0);var todayStr=today.toISOString().slice(0,10);var tmrw=new Date(today);tmrw.setDate(tmrw.getDate()+1);var tmrwStr=tmrw.toISOString().slice(0,10);var weekEnd=new Date(today);weekEnd.setDate(weekEnd.getDate()+7);var weekStr=weekEnd.toISOString().slice(0,10);
@@ -1997,6 +2034,28 @@ function updateDnesAgenda(){
   if(items.length&&banner&&content){banner.style.display='block';content.innerHTML=items.join('<br>')}else if(banner){banner.style.display='none'}
 }
 function kc(v){return!v&&v!==0?'–':new Intl.NumberFormat('cs-CZ',{style:'currency',currency:'CZK',maximumFractionDigits:0}).format(v)}
+// ===== AKTIVNÍ TÝDEN =====
+function getWeekKey(){const now=new Date();const d=new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()));const day=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-day);const y=d.getUTCFullYear();const yearStart=new Date(Date.UTC(y,0,1));const wk=Math.ceil((((d-yearStart)/86400000)+1)/7);return y+'-W'+String(wk).padStart(2,'0');}
+function getWeekLabel(key){const m=key.match(/(\d+)-W(\d+)/);return m?'Týden '+m[2]+' / '+m[1]:key;}
+window.D.at={ja:0,zena:0,cilJa:5,cilZena:5,weekKey:''};
+async function loadAktivniTyden(){try{if(!familyId)return;const wk=getWeekKey();window.D.at.weekKey=wk;const ref=famDoc('aktivniTyden',wk);const snap=await getDoc(ref);if(snap.exists()){const d=snap.data();window.D.at.ja=d.ja||0;window.D.at.zena=d.zena||0;window.D.at.cilJa=d.cilJa||5;window.D.at.cilZena=d.cilZena||5;}else{window.D.at.ja=0;window.D.at.zena=0;}
+// Load settings from meta doc
+try{const metaSnap=await getDoc(famDoc('aktivniTyden','_meta'));if(metaSnap.exists()){const m=metaSnap.data();window.D.at.cilJa=m.cilJa||5;window.D.at.cilZena=m.cilZena||5;}}catch(e){}
+renderAktivniTyden();}catch(e){console.error('loadAktivniTyden:',e);}}
+function atDots(done,cil,type){const CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="20 6 9 17 4 12"/></svg>';let h='';for(let i=0;i<cil;i++){h+='<div class="at-dot '+(i<done?type+'-done':type+'-empty')+'">'+(i<done?CHECK:'')+'</div>';}return h;}
+function renderAktivniTyden(){const{ja,zena,cilJa,cilZena,weekKey}=window.D.at;const wkLabel=getWeekLabel(weekKey);const motivace=ja>=cilJa&&zena>=cilZena?'🔥 Dokonalý týden! Úžasní jste!':ja+zena>0?'📈 Každý trénink se počítá. Držíte se! 💪':'💪 Pojďte na to! Přidejte první trénink.';
+// Dashboard card
+const dash=document.getElementById('at-dash-card');if(dash){dash.innerHTML='<div class="at-card" onclick="switchTab(\'aktivni-tyden\')" style="cursor:pointer">'+'<div class="at-header"><div class="at-title">⚡ AKTIVNÍ TÝDEN</div><span class="at-week-chip">'+wkLabel+'</span></div>'+'<div class="at-sub">Společně jsme silnější</div>'+'<div class="at-grid">'+'<div class="at-col"><div class="at-label ja">JÁ</div><div class="at-avatar ja" style="margin:8px auto">'+(_atUserInitial())+'</div><div class="at-count-big">'+ja+'<span style="font-size:15px;font-weight:500;color:var(--text-3)"> / '+cilJa+'</span></div><div class="at-count-sub">tréninků</div><div class="at-dots">'+atDots(ja,cilJa,'ja')+'</div></div>'+'<div class="at-col"><div class="at-label zena">ŽENA</div><div class="at-avatar zena" style="margin:8px auto">♡</div><div class="at-count-big">'+zena+'<span style="font-size:15px;font-weight:500;color:var(--text-3)"> / '+cilZena+'</span></div><div class="at-count-sub">tréninků</div><div class="at-dots">'+atDots(zena,cilZena,'zena')+'</div></div>'+'</div><div class="at-motivation">'+motivace+'</div></div>';}
+// Full panel
+const jaCount=document.getElementById('at-full-ja-count');const zenaCount=document.getElementById('at-full-zena-count');const jaDots=document.getElementById('at-full-ja-dots');const zenaDots=document.getElementById('at-full-zena-dots');const wkFull=document.getElementById('at-week-label-full');if(jaCount)jaCount.textContent=ja+' / '+cilJa+' tréninků';if(zenaCount)zenaCount.textContent=zena+' / '+cilZena+' tréninků';if(jaDots)jaDots.innerHTML=atDots(ja,cilJa,'ja');if(zenaDots)zenaDots.innerHTML=atDots(zena,cilZena,'zena');if(wkFull)wkFull.textContent=wkLabel;const cilJaEl=document.getElementById('at-cil-ja');const cilZenaEl=document.getElementById('at-cil-zena');if(cilJaEl)cilJaEl.value=cilJa;if(cilZenaEl)cilZenaEl.value=cilZena;
+// History
+loadATHistory();}
+function _atUserInitial(){try{const av=document.getElementById('sb-av');return av?av.textContent:'M';}catch(e){return'M';}}
+async function logTrenink(who){if(!familyId)return;const wk=window.D.at.weekKey;const cil=who==='ja'?window.D.at.cilJa:window.D.at.cilZena;const cur=who==='ja'?window.D.at.ja:window.D.at.zena;const next=cur>=cil?Math.max(0,cur-1):cur+1;if(who==='ja')window.D.at.ja=next;else window.D.at.zena=next;try{await setDoc(famDoc('aktivniTyden',wk),{ja:window.D.at.ja,zena:window.D.at.zena,cilJa:window.D.at.cilJa,cilZena:window.D.at.cilZena,weekKey:wk},{merge:true});renderAktivniTyden();if(next===cil)toast('🔥 Splněno!','success');}catch(e){console.error('logTrenink:',e);toast('Chyba uložení','error');if(who==='ja')window.D.at.ja=cur;else window.D.at.zena=cur;renderAktivniTyden();}}
+window.logTrenink=logTrenink;
+async function saveATCil(){if(!familyId)return;const cilJa=parseInt(document.getElementById('at-cil-ja').value)||5;const cilZena=parseInt(document.getElementById('at-cil-zena').value)||5;window.D.at.cilJa=cilJa;window.D.at.cilZena=cilZena;try{await setDoc(famDoc('aktivniTyden','_meta'),{cilJa,cilZena},{merge:true});await setDoc(famDoc('aktivniTyden',window.D.at.weekKey),{cilJa,cilZena},{merge:true});renderAktivniTyden();toast('Cíl uložen','success');}catch(e){console.error('saveATCil:',e);}}
+window.saveATCil=saveATCil;
+async function loadATHistory(){const el=document.getElementById('at-history-list');if(!el)return;try{if(!familyId)return;const snap=await getDocs(query(famCol('aktivniTyden'),orderBy('weekKey','desc')));const items=snap.docs.filter(d=>d.id!=='_meta').slice(0,20);if(!items.length){el.innerHTML='<div class="empty" style="padding:16px"><p>Zatím žádná data</p></div>';return;}el.innerHTML=items.map(d=>{const w=d.data();const wl=getWeekLabel(d.id);const j=w.ja||0;const z=w.zena||0;const cj=w.cilJa||5;const cz=w.cilZena||5;return'<div class="at-hist-item"><span style="color:var(--text-2)">'+wl+'</span><span style="color:#6366F1;font-weight:700">Já '+j+'/'+cj+'</span><span style="color:#EC4899;font-weight:700">Žena '+z+'/'+cz+'</span></div>';}).join('');}catch(e){console.error('loadATHistory:',e);}}
 function toast(m,t=''){const e=document.getElementById('toast');e.innerHTML='<i data-lucide="'+(t==='success'?'check-circle':t==='error'?'alert-circle':'info')+'" style="width:16px;height:16px"></i> '+m;e.className='toast show'+(t?' '+t:'');_ci();setTimeout(()=>e.classList.remove('show'),3000)}
 window.openM=id=>{document.getElementById(id).style.display='flex';_ci()};
 window.closeM=id=>{document.getElementById(id).style.display='none'};
