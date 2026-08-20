@@ -1020,6 +1020,38 @@ input, select, textarea {
 
 </style>
 
+<style id="tasks-direct-ui-v1">
+@media(max-width:768px){
+  #panel-ukoly .todo-qd{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    min-height:38px!important;height:38px!important;padding:0 14px!important;
+    border-radius:999px!important;border:1px solid #E2E6EF!important;
+    background:#F8FAFC!important;color:#64748B!important;
+    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
+    flex:0 0 auto!important;box-shadow:none!important;
+  }
+  #panel-ukoly .todo-qd.active{
+    background:#6366F1!important;border-color:#6366F1!important;color:#fff!important;
+    box-shadow:0 4px 12px rgba(99,102,241,.18)!important;
+  }
+  #panel-ukoly .todo-qd[data-val="other"]{font-size:0!important;}
+  #panel-ukoly .todo-qd[data-val="other"]:after{content:'Více';font-size:12px!important;}
+  #panel-ukoly .todo-qw{
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    min-height:36px!important;height:36px!important;padding:0 14px!important;
+    border-radius:999px!important;border:1px solid #E2E6EF!important;
+    background:#fff!important;color:#64748B!important;
+    font-size:12px!important;font-weight:700!important;white-space:nowrap!important;
+    flex:0 0 auto!important;
+  }
+  #panel-ukoly .todo-qw.active{
+    background:#EEF2FF!important;border-color:#C7D2FE!important;color:#4F46E5!important;
+  }
+  #panel-ukoly .card{border-radius:18px!important;padding:16px!important;}
+  #panel-ukoly .todo-add .fi{height:48px!important;border-radius:14px!important;font-size:16px!important;}
+  #panel-ukoly .todo-add .btn-p{height:48px!important;width:48px!important;min-width:48px!important;border-radius:14px!important;padding:0!important;}
+}
+</style>
 </head>
 <body>
 
@@ -1790,7 +1822,7 @@ window._todoDate='';window._todoWho='';
 window.tuToggleVice=function(e){e.stopPropagation();var m=document.getElementById('tu-vice-menu');m.classList.toggle('open');};
 window.tuCloseVice=function(){var m=document.getElementById('tu-vice-menu');if(m)m.classList.remove('open');};
 window.setTodoDateStr=function(type){var today=new Date();today.setHours(0,0,0,0);var d=new Date(today);if(type==='pozdeji')d.setDate(d.getDate()+14);else if(type==='mes')d.setDate(d.getDate()+30);window._todoDate='other';var dc=document.getElementById('todo-date-custom');if(dc){dc.value=d.toISOString().slice(0,10);dc.style.display='inline-block';}document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.remove('active');});};
-document.addEventListener('click',function(){tuCloseVice();});window._todoDate=val;document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('todo-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
+document.addEventListener('click',function(){tuCloseVice();});window.setTodoDate=function(el,val){window._todoDate=val;document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('todo-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
 window.setTodoWho=function(el,val){window._todoWho=val;document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});};
 window.addTodoV2=async function(){if(!familyId){toast('Nejsi přihlášen/a','error');return;}var el=document.getElementById('todo-input'),text=el.value.trim();if(!text)return;var today=new Date();today.setHours(0,0,0,0);var deadline='';if(window._todoDate==='dnes')deadline=today.toISOString().slice(0,10);else if(window._todoDate==='zitra'){var tm=new Date(today);tm.setDate(tm.getDate()+1);deadline=tm.toISOString().slice(0,10);}else if(window._todoDate==='tyden'){var we=new Date(today);we.setDate(we.getDate()+7);deadline=we.toISOString().slice(0,10);}else if(window._todoDate==='other'){var dc=document.getElementById('todo-date-custom');deadline=dc?dc.value:'';}var who=window._todoWho||(window.D._userName||'');await addDoc(famCol('todos'),{text:text,who:who,done:false,deadline:deadline,repeat:'',created:serverTimestamp()});el.value='';window._todoDate='';window._todoWho='';document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});var dc2=document.getElementById('todo-date-custom');if(dc2){dc2.value='';dc2.style.display='none';}await loadTodos();toast('Úkol přidán','success');};
 function renderTodos(){var today=new Date();today.setHours(0,0,0,0);var todayStr=today.toISOString().slice(0,10);var tmrw=new Date(today);tmrw.setDate(tmrw.getDate()+1);var tmrwStr=tmrw.toISOString().slice(0,10);var weekEnd=new Date(today);weekEnd.setDate(weekEnd.getDate()+7);var weekStr=weekEnd.toISOString().slice(0,10);
