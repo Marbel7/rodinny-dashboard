@@ -1,7 +1,7 @@
 // Service Worker pro Rodinný Dashboard
 // Stabilni HTML patch: opravuje rozbitou syntaxi a Google login pred parsovanim module scriptu.
-const CACHE_NAME = 'rodinny-dashboard-v31';
-const TASKS_FIX = '<script src="./tasks-fix.js?v=31"></script>';
+const CACHE_NAME = 'rodinny-dashboard-v32';
+const TASKS_FIX = '<script src="./tasks-fix.js?v=32"></script>';
 
 self.addEventListener('install', function(event) {
   self.skipWaiting();
@@ -19,8 +19,8 @@ self.addEventListener('activate', function(event) {
     const list = await clients.matchAll({type:'window', includeUncontrolled:true});
     await Promise.all(list.map(function(client) {
       try {
-        if (client.url && client.url.includes('/rodinny-dashboard/') && !client.url.includes('swfix=31')) {
-          return client.navigate(client.url + (client.url.includes('?') ? '&' : '?') + 'swfix=31');
+        if (client.url && client.url.includes('/rodinny-dashboard/') && !client.url.includes('swfix=32')) {
+          return client.navigate(client.url + (client.url.includes('?') ? '&' : '?') + 'swfix=32');
         }
       } catch(e) {}
       return null;
