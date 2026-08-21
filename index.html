@@ -1060,7 +1060,8 @@ input, select, textarea {
   <div class="auth-card">
     <div class="auth-icon"><i data-lucide="home" style="width:32px;height:32px"></i></div>
     <h1>Rodinný Dashboard</h1>
-    <p>Úkoly, finance a oslavy na jednom místě</p>
+    <p style="font-weight:600;color:var(--text);margin-bottom:4px">Ať je doma jasno.</p>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:0">Úkoly, nákupy a připomínky pro celou rodinu — na jednom místě.</p>
     <button class="btn-google" id="btn-login">
       <svg viewBox="0 0 24 24" width="20" height="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
       Přihlásit se přes Google
@@ -1108,19 +1109,12 @@ input, select, textarea {
     <div class="sb-sep"></div>
     <div class="sb-label">FINANCE</div>
     <button class="sb-item" data-tab="vydaje"><i data-lucide="wallet" class="ico"></i>Výdaje</button>
-    <button class="sb-item" data-tab="investice"><i data-lucide="trending-up" class="ico"></i>Investice</button>
 
     <div class="sb-sep"></div>
-    <div class="sb-label">ŽIVOT</div>
-    <button class="sb-item" data-tab="cile"><i data-lucide="target" class="ico"></i>Cíle</button>
-    <button class="sb-item" data-tab="seznamy"><i data-lucide="shopping-cart" class="ico"></i>Seznamy</button>
-    <button class="sb-item" data-tab="oslavy"><i data-lucide="cake" class="ico"></i>Narozeniny/Svátky</button>
-    <button class="sb-item" data-tab="jidelnicek"><i data-lucide="utensils" class="ico"></i>Jídelníček</button>
-    <button class="sb-item" data-tab="poznamky"><i data-lucide="sticky-note" class="ico"></i>Sdílené poznámky</button>
-    <button class="sb-item" data-tab="dokumenty"><i data-lucide="file-text" class="ico"></i>Dokumenty & termíny</button>
+    <div class="sb-label">DOMÁCNOST</div>
+    <button class="sb-item" data-tab="seznamy"><i data-lucide="shopping-cart" class="ico"></i>Nákupní seznamy</button>
+    <button class="sb-item" data-tab="oslavy"><i data-lucide="cake" class="ico"></i>Narozeniny & svátky</button>
     <button class="sb-item" data-tab="odchod"><i data-lucide="door-open" class="ico"></i>Před odchodem</button>
-    <button class="sb-item" data-tab="aktivni-tyden" style="color:#F59E0B"><svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Aktivní týden</button>
-    <button class="sb-item" data-tab="dopisy"><i data-lucide="mail" class="ico"></i>Dopisy dětem</button>
 
     <div class="sb-sep"></div>
     <button class="sb-item" data-tab="nastaveni"><i data-lucide="settings" class="ico"></i>Nastavení</button>
@@ -1583,7 +1577,7 @@ input, select, textarea {
 
 <script type="module">import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,signInWithPopup,signInWithRedirect,getRedirectResult,GoogleAuthProvider,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,collection,addDoc,getDocs,doc,updateDoc,deleteDoc,query,orderBy,serverTimestamp,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,getDocs,doc,updateDoc,deleteDoc,query,orderBy,serverTimestamp,getDoc,setDoc,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ============================================================
 // NAVIGACE - jediná definice
@@ -1701,24 +1695,18 @@ getRedirectResult(auth).then(result=>{
   setLoginStatus('Chyba přihlášení: '+e.code,'#EF4444');
 });
 document.getElementById('btn-login').onclick=async()=>{
-  const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   setLoginStatus('Připojuji k Google…');
   try{
-    if(isMobile){
-      setLoginStatus('Přesměrovávám na Google…');
-      await signInWithRedirect(auth,prov);
-    }else{
-      await signInWithPopup(auth,prov);
-      setLoginStatus('✓ Přihlášeno','#10B981');
-    }
+    await signInWithPopup(auth,prov);
+    setLoginStatus('✓ Přihlášeno','#10B981');
   }catch(e){
     console.error('Auth error:',e.code,e.message);
-    if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
-      setLoginStatus('Popup blokován, přesměrovávám…');
-      try{await signInWithRedirect(auth,prov);}
-      catch(e2){setLoginStatus('Chyba: '+e2.message,'#EF4444');}
+    if(e.code==='auth/popup-blocked'){
+      setLoginStatus('Prohlížeč zablokoval přihlášení. Povolte vyskakovací okna pro tuto stránku a zkuste znovu.','#EF4444');
+    }else if(e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
+      setLoginStatus('Přihlášení bylo zrušeno. Zkuste to znovu.','#EF4444');
     }else{
-      setLoginStatus('Chyba: '+e.code+' — '+e.message,'#EF4444');
+      setLoginStatus('Chyba přihlášení. Zkuste to znovu nebo obnovte stránku.','#EF4444');
     }
   }
 };
@@ -1729,7 +1717,13 @@ async function checkOrSetupFamily(user){
   let userSnap;
   try{userSnap=await getDoc(userRef)}catch(e){
     console.error('checkOrSetupFamily error:',e.code);
-    if(e.code==='permission-denied'){setTimeout(()=>checkOrSetupFamily(user),2000);return}
+    if(e.code==='permission-denied'){
+      // Max 3 pokusy aby nedošlo k nekonečné smyčce
+      const retries=(window._familySetupRetries=(window._familySetupRetries||0)+1);
+      if(retries<3){setTimeout(()=>checkOrSetupFamily(user),2000);}
+      else{window._familySetupRetries=0;showFamilySetup();}
+      return;
+    }
     showFamilySetup();return;
   }
   if(userSnap.exists()&&userSnap.data().familyId){
@@ -1772,23 +1766,38 @@ function showApp(user){
 
 document.getElementById('btn-create-family').onclick=async()=>{
   const code=generateFamilyCode(),user=auth.currentUser;
-  try{await setDoc(doc(db,'families',code),{members:[{uid:user.uid,displayName:user.displayName,email:user.email}]});
+  try{
+    await setDoc(doc(db,'families',code),{
+      members:[{uid:user.uid,displayName:user.displayName,email:user.email}],
+      memberUids:[user.uid]
+    });
     await setDoc(doc(db,'users',user.uid),{familyId:code,displayName:user.displayName,email:user.email},{merge:true});
     familyId=code;showApp(user);toast('Rodina vytvořena! Kód: '+code,'success');
-  }catch(e){toast('Chyba: '+e.message,'error')}
+  }catch(e){toast('Chyba při vytváření rodiny. Zkus to znovu.','error');console.error('create-family:',e)}
 };
 document.getElementById('btn-join-family').onclick=async()=>{
   const code=document.getElementById('join-code').value.trim().toUpperCase();
   const errEl=document.getElementById('join-error');
   if(!code||code.length!==6){errEl.textContent='Zadej 6místný kód';errEl.style.display='block';return}
-  try{const famSnap=await getDoc(doc(db,'families',code));
-    if(!famSnap.exists()){errEl.textContent='Rodina nenalezena';errEl.style.display='block';return}
-    const user=auth.currentUser,members=famSnap.data().members||[];
-    if(!members.find(m=>m.uid===user.uid)){members.push({uid:user.uid,displayName:user.displayName,email:user.email});
-      await updateDoc(doc(db,'families',code),{members});}
+  try{
+    const famSnap=await getDoc(doc(db,'families',code));
+    if(!famSnap.exists()){errEl.textContent='Rodina s tímto kódem neexistuje.';errEl.style.display='block';return}
+    const user=auth.currentUser;
+    const existingUids=famSnap.data().memberUids||[];
+    if(!existingUids.includes(user.uid)){
+      // arrayUnion zajistí atomický zápis bez race condition při současném připojení více lidí
+      await updateDoc(doc(db,'families',code),{
+        members:arrayUnion({uid:user.uid,displayName:user.displayName,email:user.email}),
+        memberUids:arrayUnion(user.uid)
+      });
+    }
     await setDoc(doc(db,'users',user.uid),{familyId:code,displayName:user.displayName,email:user.email},{merge:true});
     familyId=code;errEl.style.display='none';showApp(user);toast('Připojeno k rodině!','success');
-  }catch(e){errEl.textContent='Chyba: '+e.message;errEl.style.display='block'}
+  }catch(e){
+    console.error('join-family:',e);
+    errEl.textContent=e.code==='permission-denied'?'Nemáš oprávnění připojit se k této rodině.':'Chyba připojení. Zkus to znovu.';
+    errEl.style.display='block';
+  }
 };
 
 onAuthStateChanged(auth,async u=>{if(u){setLoginStatus('✓ Přihlášen jako '+u.displayName,'#10B981');document.getElementById('auth-screen').style.display='none';await checkOrSetupFamily(u)}else{familyId=null;document.getElementById('auth-screen').style.display='flex';document.getElementById('family-setup').style.display='none';document.getElementById('app').style.display='none'}});
