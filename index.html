@@ -1712,6 +1712,24 @@ document.getElementById('btn-login').onclick=async()=>{
 };
 window.handleLogout=async()=>{if(confirm('Odhlásit se?'))await signOut(auth)};
 
+// Migrace: doplnit memberUids do rodinného dokumentu pokud chybí.
+// Spouští se tiše při každém přihlášení — bezpečné, idempotentní.
+async function migrateMemberUids(fid, famSnap){
+  try{
+    const data=famSnap.data();
+    // Pokud memberUids již existuje a není prázdné, nic nedělat
+    if(data.memberUids&&data.memberUids.length>0)return;
+    // Sestavit memberUids z existujícího pole members
+    const uids=(data.members||[]).map(m=>m.uid).filter(Boolean);
+    if(!uids.length)return;
+    await updateDoc(doc(db,'families',fid),{memberUids:uids});
+    console.log('migrateMemberUids: doplněno',uids.length,'uid(s) pro rodinu',fid);
+  }catch(e){
+    // Migrace je best-effort — selhání nesmí blokovat přihlášení
+    console.warn('migrateMemberUids selhala (nevadí):',e.code);
+  }
+}
+
 async function checkOrSetupFamily(user){
   const userRef=doc(db,'users',user.uid);
   let userSnap;
@@ -1729,8 +1747,13 @@ async function checkOrSetupFamily(user){
   if(userSnap.exists()&&userSnap.data().familyId){
     const fid=userSnap.data().familyId;
     try{const famSnap=await getDoc(doc(db,'families',fid));
-      if(famSnap.exists()){familyId=fid;showApp(user);return}
-    }catch(e){}
+      if(famSnap.exists()){
+        familyId=fid;
+        // Migrace: doplnit memberUids pokud chybí (starší rodiny)
+        await migrateMemberUids(fid, famSnap);
+        showApp(user);return
+      }
+    }catch(e){console.error('checkOrSetupFamily famSnap:',e);}
     await setDoc(userRef,{familyId:null},{merge:true});
   }
   showFamilySetup();
