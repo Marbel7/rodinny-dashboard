@@ -1837,7 +1837,7 @@ onAuthStateChanged(auth,async u=>{if(u){setLoginStatus('✓ Přihlášen jako '+
 function setGreeting(n){const h=new Date().getHours(),g=h<12?'Dobré ráno':h<18?'Dobré odpoledne':'Dobrý večer';const ge=document.getElementById('greeting');if(ge)ge.textContent=g+', '+n+'!';const d=new Date(),dn=['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'],mn=['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];const de=document.getElementById('today-date');if(de)de.textContent=dn[d.getDay()]+' '+d.getDate()+'. '+mn[d.getMonth()]+' '+d.getFullYear()}
 async function loadAll(){
   const fns = [loadTodos,loadV,loadI,loadC,loadSz,loadBdays,loadPoznamky,loadDokumenty,loadOdchod,loadJidelnicek,loadDopisy,loadAktivniTyden];
-  const results = await Promise.allSettled(fns.map(fn => fn().catch(e => {
+  const results = await Promise.allSettled(fns.map(fn => Promise.resolve().then(()=>fn()).catch(e => {
     console.error(fn.name + ' failed:', e);
     return null;
   })));
