@@ -1578,7 +1578,7 @@ input, select, textarea {
 
 <script type="module">import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,signInWithPopup,signInWithRedirect,getRedirectResult,GoogleAuthProvider,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,collection,addDoc,getDocs,doc,updateDoc,deleteDoc,query,orderBy,serverTimestamp,getDoc,setDoc,arrayUnion}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,getDocs,doc,updateDoc,deleteDoc,query,orderBy,serverTimestamp,getDoc,setDoc,arrayUnion,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ============================================================
 // NAVIGACE - jediná definice
@@ -1711,7 +1711,13 @@ document.getElementById('btn-login').onclick=async()=>{
     }
   }
 };
-window.handleLogout=async()=>{if(confirm('Odhlásit se?'))await signOut(auth)};
+window.handleLogout=async()=>{
+  if(confirm('Odhlásit se?')){
+    // Odpojit realtime listener před odhlášením
+    if(window._unsubTodos){window._unsubTodos();window._unsubTodos=null;}
+    await signOut(auth);
+  }
+};
 
 // Migrace: doplnit memberUids do rodinného dokumentu pokud chybí.
 // Spouští se tiše při každém přihlášení — bezpečné, idempotentní.
@@ -1840,7 +1846,22 @@ async function loadAll(){
 }
 
 // TODOS
-async function loadTodos(){try{if(!familyId)return;const s=await getDocs(query(famCol('todos'),orderBy('created','desc')));D.todos=s.docs.map(d=>({id:d.id,...d.data()}));renderTodos()}catch(e){console.error('loadTodos error:',e);D.todos=[];renderTodos()}}
+window._unsubTodos=null;
+function loadTodos(){
+  if(!familyId)return;
+  if(window._unsubTodos){window._unsubTodos();window._unsubTodos=null;}
+  try{
+    const q=query(famCol('todos'),orderBy('created','desc'));
+    window._unsubTodos=onSnapshot(q,(snap)=>{
+      D.todos=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderTodos();
+    },(e)=>{
+      console.error('loadTodos onSnapshot error:',e);
+      if(D.todos.length===0)renderTodos();
+      toast(e.code==='permission-denied'?'Nemáš přístup k úkolům.':'Nepodařilo se načíst úkoly — zkontroluj připojení.','error');
+    });
+  }catch(e){console.error('loadTodos setup:',e);D.todos=[];renderTodos();}
+}
 
 window._todoDate='';window._todoWho='';
 window.tuToggleVice=function(e){e.stopPropagation();var m=document.getElementById('tu-vice-menu');m.classList.toggle('open');};
@@ -1848,7 +1869,7 @@ window.tuCloseVice=function(){var m=document.getElementById('tu-vice-menu');if(m
 window.setTodoDateStr=function(type){var today=new Date();today.setHours(0,0,0,0);var d=new Date(today);if(type==='pozdeji')d.setDate(d.getDate()+14);else if(type==='mes')d.setDate(d.getDate()+30);window._todoDate='other';var dc=document.getElementById('todo-date-custom');if(dc){dc.value=d.toISOString().slice(0,10);dc.style.display='inline-block';}document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.remove('active');});};
 document.addEventListener('click',function(){tuCloseVice();});window.setTodoDate=function(el,val){window._todoDate=val;document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('todo-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
 window.setTodoWho=function(el,val){window._todoWho=val;document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});};
-window.addTodoV2=async function(){if(!familyId){toast('Nejsi přihlášen/a','error');return;}var el=document.getElementById('todo-input'),text=el.value.trim();if(!text)return;var today=new Date();today.setHours(0,0,0,0);var deadline='';if(window._todoDate==='dnes')deadline=today.toISOString().slice(0,10);else if(window._todoDate==='zitra'){var tm=new Date(today);tm.setDate(tm.getDate()+1);deadline=tm.toISOString().slice(0,10);}else if(window._todoDate==='tyden'){var we=new Date(today);we.setDate(we.getDate()+7);deadline=we.toISOString().slice(0,10);}else if(window._todoDate==='other'){var dc=document.getElementById('todo-date-custom');deadline=dc?dc.value:'';}var who=window._todoWho||(window.D._userName||'');await addDoc(famCol('todos'),{text:text,who:who,done:false,deadline:deadline,repeat:'',created:serverTimestamp()});el.value='';window._todoDate='';window._todoWho='';document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});var dc2=document.getElementById('todo-date-custom');if(dc2){dc2.value='';dc2.style.display='none';}await loadTodos();toast('Úkol přidán','success');};
+window.addTodoV2=async function(){if(!familyId){toast('Nejsi přihlášen/a','error');return;}var el=document.getElementById('todo-input'),text=el.value.trim();if(!text)return;var today=new Date();today.setHours(0,0,0,0);var deadline='';if(window._todoDate==='dnes')deadline=today.toISOString().slice(0,10);else if(window._todoDate==='zitra'){var tm=new Date(today);tm.setDate(tm.getDate()+1);deadline=tm.toISOString().slice(0,10);}else if(window._todoDate==='tyden'){var we=new Date(today);we.setDate(we.getDate()+7);deadline=we.toISOString().slice(0,10);}else if(window._todoDate==='other'){var dc=document.getElementById('todo-date-custom');deadline=dc?dc.value:'';}var who=window._todoWho||(window.D._userName||'');await addDoc(famCol('todos'),{text:text,who:who,done:false,deadline:deadline,repeat:'',created:serverTimestamp()});el.value='';window._todoDate='';window._todoWho='';document.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});document.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val==='')});var dc2=document.getElementById('todo-date-custom');if(dc2){dc2.value='';dc2.style.display='none';}toast('Úkol přidán','success');};
 function renderTodos(){var today=new Date();today.setHours(0,0,0,0);var todayStr=today.toISOString().slice(0,10);var tmrw=new Date(today);tmrw.setDate(tmrw.getDate()+1);var tmrwStr=tmrw.toISOString().slice(0,10);var weekEnd=new Date(today);weekEnd.setDate(weekEnd.getDate()+7);var weekStr=weekEnd.toISOString().slice(0,10);
 var CHEV='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 function itemHtml(t){var meta=[];if(t.who)meta.push(t.who);if(t.deadline){var d=new Date(t.deadline);var diff=Math.round((d-today)/(864e5));if(diff<0)meta.push('Po termínu');else if(diff===0)meta.push('Dnes');else if(diff===1)meta.push('Zítra');else meta.push(d.toLocaleDateString('cs-CZ'));}if(t.repeat)meta.push('Opakuje se');
@@ -1898,11 +1919,23 @@ window._todoEditDate='';window._todoEditWho='';
 window.setTodoEditDate=function(el,val){window._todoEditDate=val;el.closest('.fg').querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});var dc=document.getElementById('t-date-custom');if(dc)dc.style.display=val==='other'?'inline-block':'none';};
 window.setTodoEditWho=function(el,val){window._todoEditWho=val;el.closest('.fg').querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val===val)});};
 window.openTodoEdit=function(id){var t=D.todos.find(function(x){return x.id===id;});if(!t)return;document.getElementById('te-id').value=id;document.getElementById('t-text').value=t.text||'';window._todoEditWho=t.who||'';window._todoEditDate='';var today=new Date();today.setHours(0,0,0,0);var todayStr=today.toISOString().slice(0,10);var tmrw=new Date(today);tmrw.setDate(tmrw.getDate()+1);var tmrwStr=tmrw.toISOString().slice(0,10);var we=new Date(today);we.setDate(we.getDate()+7);var weStr=we.toISOString().slice(0,10);if(!t.deadline)window._todoEditDate='';else if(t.deadline===todayStr)window._todoEditDate='dnes';else if(t.deadline===tmrwStr)window._todoEditDate='zitra';else if(t.deadline<=weStr)window._todoEditDate='tyden';else{window._todoEditDate='other';}var dc=document.getElementById('t-date-custom');if(dc){dc.value=t.deadline||'';dc.style.display=window._todoEditDate==='other'?'inline-block':'none';}var modal=document.getElementById('m-todo');modal.querySelectorAll('.todo-qw').forEach(function(b){b.classList.toggle('active',b.dataset.val===(t.who||''))});modal.querySelectorAll('.todo-qd').forEach(function(b){b.classList.toggle('active',b.dataset.val===window._todoEditDate)});openM('m-todo');};
-window.saveTodoEdit=async function(){var id=document.getElementById('te-id').value;if(!id)return;var text=document.getElementById('t-text').value.trim();if(!text){toast('Vyplňte text','error');return;}var today=new Date();today.setHours(0,0,0,0);var deadline='';if(window._todoEditDate==='dnes')deadline=today.toISOString().slice(0,10);else if(window._todoEditDate==='zitra'){var tm=new Date(today);tm.setDate(tm.getDate()+1);deadline=tm.toISOString().slice(0,10);}else if(window._todoEditDate==='tyden'){var we=new Date(today);we.setDate(we.getDate()+7);deadline=we.toISOString().slice(0,10);}else if(window._todoEditDate==='other'){var dc=document.getElementById('t-date-custom');deadline=dc?dc.value:'';}await updateDoc(famDoc('todos',id),{text:text,who:window._todoEditWho,deadline:deadline});closeM('m-todo');toast('Úkol upraven','success');await loadTodos();};
-window.delTodoFromModal=async function(){var id=document.getElementById('te-id').value;if(!id)return;if(!confirm('Smazat úkol?'))return;closeM('m-todo');await deleteDoc(famDoc('todos',id));toast('Úkol smazán','success');await loadTodos();};
-window.toggleTodo=async(id,done)=>{await updateDoc(famDoc('todos',id),{done});D.todos=D.todos.map(t=>t.id===id?{...t,done}:t);renderTodos()};
-window.delTodo=async id=>{await deleteDoc(famDoc('todos',id));await loadTodos()};
-window.clearDoneTodos=async()=>{const done=D.todos.filter(t=>t.done);if(!done.length){toast('Žádné hotové','error');return}if(!confirm('Smazat '+done.length+' hotových úkolů?'))return;await Promise.all(done.map(t=>deleteDoc(famDoc('todos',t.id))));await loadTodos();toast('Hotové smazány','success')};
+window.saveTodoEdit=async function(){var id=document.getElementById('te-id').value;if(!id)return;var text=document.getElementById('t-text').value.trim();if(!text){toast('Vyplňte text','error');return;}var today=new Date();today.setHours(0,0,0,0);var deadline='';if(window._todoEditDate==='dnes')deadline=today.toISOString().slice(0,10);else if(window._todoEditDate==='zitra'){var tm=new Date(today);tm.setDate(tm.getDate()+1);deadline=tm.toISOString().slice(0,10);}else if(window._todoEditDate==='tyden'){var we=new Date(today);we.setDate(we.getDate()+7);deadline=we.toISOString().slice(0,10);}else if(window._todoEditDate==='other'){var dc=document.getElementById('t-date-custom');deadline=dc?dc.value:'';}await updateDoc(famDoc('todos',id),{text:text,who:window._todoEditWho,deadline:deadline});closeM('m-todo');toast('Úkol upraven','success');};
+window.delTodoFromModal=async function(){var id=document.getElementById('te-id').value;if(!id)return;if(!confirm('Smazat úkol?'))return;closeM('m-todo');await deleteDoc(famDoc('todos',id));toast('Úkol smazán','success');};
+window.toggleTodo=async(id,done)=>{
+  // Optimistický update: okamžitě zobrazit nový stav
+  D.todos=D.todos.map(t=>t.id===id?{...t,done}:t);renderTodos();
+  try{
+    await updateDoc(famDoc('todos',id),{done});
+    // onSnapshot potvrdí finální stav ze serveru
+  }catch(e){
+    // Při chybě vrátit původní stav
+    D.todos=D.todos.map(t=>t.id===id?{...t,done:!done}:t);renderTodos();
+    toast('Nepodařilo se uložit — zkontroluj připojení.','error');
+    console.error('toggleTodo:',e);
+  }
+};
+window.delTodo=async id=>{try{await deleteDoc(famDoc('todos',id));}catch(e){toast('Nepodařilo se smazat úkol.','error');console.error('delTodo:',e);}};
+window.clearDoneTodos=async()=>{const done=D.todos.filter(t=>t.done);if(!done.length){toast('Žádné hotové','error');return}if(!confirm('Smazat '+done.length+' hotových úkolů?'))return;await Promise.all(done.map(t=>deleteDoc(famDoc('todos',t.id))));toast('Hotové smazány','success')};
 
 // VÝDAJE
 async function loadV(){const s=await getDocs(query(famCol('vydaje'),orderBy('created','desc')));D.vydaje=s.docs.map(d=>({id:d.id,...d.data()}));renderV();stats()}
@@ -2665,7 +2698,7 @@ window.quickAddTodo=async()=>{
   const deadline=document.getElementById('todo-date-dash')?.value||'';
   const who=document.getElementById('todo-who-dash')?.value||'';
   const priority=document.getElementById('todo-pri-dash')?.value||'med';
-  try{await addDoc(famCol('todos'),{text,who,done:false,deadline,priority,repeat:'',created:serverTimestamp()});el.value='';const mo=document.getElementById('todo-more-opts');if(mo)mo.style.display='none';await loadTodos();toast('Úkol přidán ✓','success')}catch(e){console.error('addTodo error:',e);toast('Chyba: '+e.message,'error')};
+  try{await addDoc(famCol('todos'),{text,who,done:false,deadline,priority,repeat:'',created:serverTimestamp()});el.value='';const mo=document.getElementById('todo-more-opts');if(mo)mo.style.display='none';toast('Úkol přidán ✓','success')}catch(e){console.error('addTodo error:',e);toast('Chyba: '+e.message,'error')};
 };
 
 
