@@ -1681,6 +1681,7 @@ _ci();
 let familyId=null;
 function famCol(name){if(!familyId)throw new Error('No familyId');return collection(db,'families',familyId,name)}
 function famDoc(colName,id){return doc(db,'families',familyId,colName,id)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 // esc(): bezpečné vložení uživatelského textu do innerHTML — prevence XSS
 // Escapuje znaky které by prohlížeč interpretoval jako HTML/JS
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
