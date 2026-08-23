@@ -1714,6 +1714,39 @@ document.getElementById('btn-login').onclick=async()=>{
     }
   }
 };
+
+window.getInviteUrl=function(code){
+  var base=location.origin+location.pathname.replace(/\/$/,'');
+  return base+'?join='+(code||familyId||'');
+};
+window.shareInviteLink=function(){
+  var code=familyId||'';
+  var url=window.getInviteUrl(code);
+  var text='Připoj se k naší domácnosti v Rodinném Dashboardu 🏠';
+  if(navigator.share){
+    navigator.share({title:'Rodinný Dashboard',text:text,url:url}).catch(function(e){
+      if(e.name!=='AbortError')window.copyInviteLink();
+    });
+  }else{window.copyInviteLink();}
+};
+window.copyInviteLink=function(){
+  var url=window.getInviteUrl(familyId||'');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(function(){toast('Odkaz zkopírován!','success');}).catch(function(){_fallbackCopy(url);});
+  }else{_fallbackCopy(url);}
+};
+function _fallbackCopy(text){
+  var ta=document.createElement('textarea');
+  ta.value=text;ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast('Odkaz zkopírován!','success');}
+  catch(e){toast('Kód rodiny: '+familyId,'info');}
+  document.body.removeChild(ta);
+}
+window.closeInviteModal=function(){
+  document.getElementById('m-invite').style.display='none';
+};
+
 window.handleLogout=async()=>{
   if(confirm('Odhlásit se?')){
     // Odpojit realtime listener před odhlášením
@@ -1805,7 +1838,9 @@ document.getElementById('btn-create-family').onclick=async()=>{
       memberUids:[user.uid]
     });
     await setDoc(doc(db,'users',user.uid),{familyId:code,displayName:user.displayName,email:user.email},{merge:true});
-    familyId=code;showApp(user);toast('Rodina vytvořena! Kód: '+code,'success');
+    familyId=code;showApp(user);
+    document.getElementById('invite-code-display').textContent=code;
+    var m=document.getElementById('m-invite');m.style.display='flex';
   }catch(e){toast('Chyba při vytváření rodiny. Zkus to znovu.','error');console.error('create-family:',e)}
 };
 document.getElementById('btn-join-family').onclick=async()=>{
@@ -1840,6 +1875,20 @@ getRedirectResult(auth).then(function(r){
 }).catch(function(e){
   if(e.code&&e.code!=='auth/no-auth-event')console.warn('redirect:',e.code);
 });
+
+
+// Auto-fill kódu rodiny z URL parametru ?join=KOD
+(function(){
+  try{
+    var joinCode=new URLSearchParams(location.search).get('join');
+    if(joinCode&&joinCode.length===6){
+      window.addEventListener('load',function(){
+        var jc=document.getElementById('join-code');
+        if(jc){jc.value=joinCode.toUpperCase();jc.style.borderColor='#6366F1';}
+      });
+    }
+  }catch(e){}
+})();
 
 onAuthStateChanged(auth,async u=>{if(u){setLoginStatus('✓ Přihlášen jako '+u.displayName,'#10B981');document.getElementById('auth-screen').style.display='none';await checkOrSetupFamily(u)}else{familyId=null;document.getElementById('auth-screen').style.display='flex';document.getElementById('family-setup').style.display='none';document.getElementById('app').style.display='none'}});
 function setGreeting(n){const h=new Date().getHours(),g=h<12?'Dobré ráno':h<18?'Dobré odpoledne':'Dobrý večer';const ge=document.getElementById('greeting');if(ge)ge.textContent=g+', '+n+'!';const d=new Date(),dn=['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'],mn=['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];const de=document.getElementById('today-date');if(de)de.textContent=dn[d.getDay()]+' '+d.getDate()+'. '+mn[d.getMonth()]+' '+d.getFullYear()}
@@ -3049,5 +3098,29 @@ window.jidelnicekDoNakupu = async function() {
   </div>
 </div>
 
+
+<!-- MODAL: Pozvánka do rodiny -->
+<div id="m-invite" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--surface);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <div style="font-size:36px;margin-bottom:8px">🏠</div>
+    <h2 style="margin:0 0 6px;font-size:19px;color:var(--text)">Rodina vytvořena!</h2>
+    <p style="color:var(--text-2);font-size:13px;margin:0 0 18px">Pozvi partnera — stačí sdílet odkaz.</p>
+    <div style="background:var(--surface-2,#F1F5F9);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Kód rodiny</div>
+      <div id="invite-code-display" style="font-size:26px;font-weight:800;letter-spacing:6px;color:var(--accent,#6366F1)">——</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+      <button onclick="window.shareInviteLink()" class="btn btn-p" style="width:100%;justify-content:center;font-size:15px;gap:8px">
+        📤 Sdílet odkaz
+      </button>
+      <button onclick="window.copyInviteLink()" class="btn" style="width:100%;justify-content:center;background:var(--surface-2,#F1F5F9);border:1px solid var(--border)">
+        📋 Zkopírovat odkaz
+      </button>
+    </div>
+    <button onclick="window.closeInviteModal()" style="background:none;border:none;color:var(--text-3);font-size:13px;cursor:pointer;padding:6px">
+      Přeskočit →
+    </button>
+  </div>
+</div>
 </body>
 </html>
