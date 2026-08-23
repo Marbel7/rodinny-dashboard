@@ -1708,7 +1708,7 @@ function getInviteUrl(code){
   return base + '?join=' + (code||familyId||'');
 }
 
-function shareInviteLink(){
+window.shareInviteLink=function(){
   const code = familyId || document.getElementById('invite-code-display').textContent.replace(/[^A-Z0-9]/g,'');
   const url = getInviteUrl(code);
   const text = 'Připoj se k naší domácnosti v Rodinném Dashboardu 🏠';
@@ -1721,7 +1721,7 @@ function shareInviteLink(){
   }
 }
 
-function copyInviteLink(){
+window.copyInviteLink=function(){
   const code = familyId || document.getElementById('invite-code-display').textContent.replace(/[^A-Z0-9]/g,'');
   copyToClip(getInviteUrl(code));
 }
@@ -1741,16 +1741,13 @@ function _copyFallback(text){
   document.body.removeChild(ta);
 }
 
-function closeInviteModal(){
+window.closeInviteModal=function(){
   document.getElementById('m-invite').style.display='none';
   lucide.createIcons();
 }
 
 // Upgrade copyFamilyCode v sidebaru — sdílí odkaz místo jen kopírování kódu
-function copyFamilyCode(){
-  if(navigator.share){ shareInviteLink(); }
-  else { copyToClip(getInviteUrl(familyId)); }
-}
+// copyFamilyCode je definována výše jako window.copyFamilyCode
 
 // ===== AUTO-FILL Z URL ?join=KOD =====
 (function(){
@@ -1772,7 +1769,7 @@ function copyFamilyCode(){
   }
 })();
 
-handleLogout=async()=>{
+window.handleLogout=async()=>{
   if(confirm('Odhlásit se?')){
     // Odpojit realtime listener před odhlášením
     if(window._unsubTodos){window._unsubTodos();window._unsubTodos=null;}
