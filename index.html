@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0F172A">
-<title>Rodinný Dashboard</title>
+<title>Rodio</title>
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
 <style id="core-components-v2">
 
@@ -1085,7 +1085,7 @@ input, select, textarea {
         <div class="auth-logo-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-        <div class="auth-logo-text">Rodinný<br>Dashboard</div>
+        <div class="auth-logo-text">Rodio</div>
       </div>
       <div class="auth-badge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -1757,7 +1757,7 @@ window.copyFamilyCode=function(){
   if(!familyId)return;
   var url=location.origin+location.pathname.replace(/\/$/,'')+'?join='+familyId;
   if(navigator.share){
-    navigator.share({title:'Rodinný Dashboard',text:'Připoj se k naší rodině',url:url}).catch(function(){_copyUrl(url);});
+    navigator.share({title:'Rodio',text:'Připoj se k naší rodině',url:url}).catch(function(){_copyUrl(url);});
   }else{_copyUrl(url);}
 };
 function _copyUrl(url){
@@ -1808,7 +1808,7 @@ window.shareInviteLink=function(){
   var url=window.getInviteUrl(code);
   var text='Připoj se k naší domácnosti v Rodinném Dashboardu 🏠';
   if(navigator.share){
-    navigator.share({title:'Rodinný Dashboard',text:text,url:url}).catch(function(e){
+    navigator.share({title:'Rodio',text:text,url:url}).catch(function(e){
       if(e.name!=='AbortError')window.copyInviteLink();
     });
   }else{window.copyInviteLink();}
