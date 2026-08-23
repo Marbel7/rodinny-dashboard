@@ -1054,6 +1054,39 @@ input, select, textarea {
 </style>
 </head>
 <body>
+<div id="_dbg" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0F172A;color:#A5F3FC;font-size:13px;padding:16px;z-index:99999;overflow-y:auto;font-family:monospace">
+  <div style="font-weight:700;margin-bottom:8px;color:#FCD34D">🔍 Debug panel</div>
+  <div id="_dbg_log"></div>
+</div>
+<script>
+// Debug panel - zobrazí se po 3 sekundách pokud je prázdná stránka nebo chyba
+var _dbgLog = [];
+function _log(msg, color) {
+  _dbgLog.push('<div style="color:'+(color||'#A5F3FC')+';margin:2px 0">'+msg+'</div>');
+  var el = document.getElementById('_dbg_log');
+  if(el) el.innerHTML = _dbgLog.join('');
+}
+// Zobrazit panel
+function _showDbg() {
+  document.getElementById('_dbg').style.display='block';
+}
+// Zachytit JS chyby
+window.onerror = function(msg, src, line, col, err) {
+  _log('❌ JS ERROR: '+msg+' (řádek '+line+')', '#F87171');
+  _log('   soubor: '+(src||'?').split('/').pop(), '#94A3B8');
+  _showDbg();
+  return false;
+};
+window.onunhandledrejection = function(e) {
+  _log('❌ PROMISE: '+(e.reason?.message||e.reason||'?'), '#F87171');
+  _showDbg();
+};
+_log('✅ Inline script OK');
+// Zobrazit po 4 sec automaticky pro diagnostiku
+setTimeout(function() {
+  _showDbg();
+}, 4000);
+</script>
 
 <!-- LOGIN -->
 <div id="auth-screen" style="display:flex">
@@ -1666,7 +1699,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-const app=initializeApp({apiKey:"AIzaSyA8WFwNZ_ljLSmK7cvdWufEsY9vGsi9Ers",authDomain:"rodinny-dashboard-4c316.firebaseapp.com",projectId:"rodinny-dashboard-4c316",storageBucket:"rodinny-dashboard-4c316.firebasestorage.app",messagingSenderId:"854662524014",appId:"1:854662524014:web:6b960a6088878c34c4ca7f"});
+const app=initializeApp({apiKey:"AIzaSyA8WFwNZ_ljLSmK7cvdWufEsY9vGsi9Ers",authDomain:"rodinny-dashboard-4c316.firebaseapp.com",projectId:"rodinny-dashboard-4c316",storageBucket:"rodinny-dashboard-4c316.firebasestorage.app",messagingSenderId:"854662524014",appId:"1:854662524014:web:6b960a6088878c34c4ca7f"});_log('✅ Firebase OK');_log('Domain: '+location.hostname);
 const auth=getAuth(app),db=getFirestore(app),prov=new GoogleAuthProvider();
 // getRedirectResult odstraněno — používáme pouze popup
 if(typeof window.lucide==='undefined'){window.lucide={createIcons:function(){}}}
@@ -1688,7 +1721,7 @@ function setLoginStatus(msg,color){var el=document.getElementById('login-status'
 // Auth: popup pro všechny prohlížeče
 // Voláno synchronně z onclick — Safari to akceptuje jako user gesture
 // NIKDY nepoužívat signInWithRedirect — způsobuje blank page na iOS Safari
-document.getElementById('btn-login').onclick=function(){
+document.getElementById('btn-login').onclick=function(){_log('👆 BTN CLICK - spouštím popup');
   setLoginStatus('⏳ onclick OK, spouštím popup…','#6366F1');
   console.log('BTN_CLICK');  setLoginStatus('Připojuji k Google…');
   signInWithPopup(auth,prov).then(function(){
@@ -1909,7 +1942,7 @@ document.getElementById('btn-join-family').onclick=async()=>{
   }
 };
 
-onAuthStateChanged(auth,async u=>{if(u){setLoginStatus('✓ Přihlášen jako '+u.displayName,'#10B981');document.getElementById('auth-screen').style.display='none';await checkOrSetupFamily(u)}else{familyId=null;document.getElementById('auth-screen').style.display='flex';document.getElementById('family-setup').style.display='none';document.getElementById('app').style.display='none'}});
+_log('✅ Module init dokončen');onAuthStateChanged(auth,async u=>{if(u){setLoginStatus('✓ Přihlášen jako '+u.displayName,'#10B981');document.getElementById('auth-screen').style.display='none';await checkOrSetupFamily(u)}else{familyId=null;document.getElementById('auth-screen').style.display='flex';document.getElementById('family-setup').style.display='none';document.getElementById('app').style.display='none'}});
 function setGreeting(n){const h=new Date().getHours(),g=h<12?'Dobré ráno':h<18?'Dobré odpoledne':'Dobrý večer';const ge=document.getElementById('greeting');if(ge)ge.textContent=g+', '+n+'!';const d=new Date(),dn=['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'],mn=['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];const de=document.getElementById('today-date');if(de)de.textContent=dn[d.getDay()]+' '+d.getDate()+'. '+mn[d.getMonth()]+' '+d.getFullYear()}
 async function loadAll(){
   const fns = [loadTodos,loadV,loadI,loadC,loadSz,loadBdays,loadPoznamky,loadDokumenty,loadOdchod,loadJidelnicek,loadDopisy,loadAktivniTyden];
