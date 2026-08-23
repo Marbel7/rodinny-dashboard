@@ -1704,23 +1704,24 @@ document.getElementById('btn-login').onclick=function(){
   });
 }
 
-// Zpracovat výsledek redirect přihlášení (Safari flow)
-// Volá se TIŠE — chyba "žádný redirect" je normální stav, nezobrazujeme ji
+});
+
+// Zpracovat výsledek redirect přihlášení — iOS Safari flow
+// Na iOS Safari signInWithPopup přesměruje přes firebaseapp.com místo popup okna.
+// Po návratu musíme výsledek zpracovat tímto voláním.
+// Pokud žádný redirect neproběhl, Firebase vrátí null — to je normální stav.
 getRedirectResult(auth).then(function(result){
-  if(result&&result.user){
-    setLoginStatus('✓ Přihlášeno','#10B981');
+  if(result && result.user){
+    // Redirect proběhl úspěšně — onAuthStateChanged se postará o zbytek
+    setLoginStatus('✓ Přihlášeno přes Google','#10B981');
+    console.log('getRedirectResult: přihlášen jako', result.user.displayName);
   }
 }).catch(function(e){
-  // Ignorovat — jen logujeme pro debugging
-  if(e.code&&e.code!=='auth/no-auth-event'){
-    console.warn('getRedirectResult (ignorováno):', e.code);
+  // Ignorovat — "žádný redirect" je normální, ostatní logujeme
+  if(e.code && e.code !== 'auth/no-auth-event' && e.code !== 'auth/null-user'){
+    console.warn('getRedirectResult (info):', e.code);
   }
 });
-// ===== SDÍLENÍ POZVÁNKY =====
-function getInviteUrl(code){
-  const base = location.origin + location.pathname.replace(/\/$/,'');
-  return base + '?join=' + (code||familyId||'');
-}
 
 window.shareInviteLink=function(){
   const code = familyId || document.getElementById('invite-code-display').textContent.replace(/[^A-Z0-9]/g,'');
