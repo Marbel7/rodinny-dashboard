@@ -1689,6 +1689,7 @@ function setLoginStatus(msg,color){var el=document.getElementById('login-status'
 // Voláno synchronně z onclick — Safari to akceptuje jako user gesture
 // NIKDY nepoužívat signInWithRedirect — způsobuje blank page na iOS Safari
 document.getElementById('btn-login').onclick=function(){
+  alert('TEST: onclick funguje!');
   setLoginStatus('Připojuji k Google…');
   signInWithPopup(auth,prov).then(function(){
     setLoginStatus('✓ Přihlášeno','#10B981');
