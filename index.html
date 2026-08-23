@@ -1689,7 +1689,6 @@ function setLoginStatus(msg,color){var el=document.getElementById('login-status'
 // Voláno synchronně z onclick — Safari to akceptuje jako user gesture
 // NIKDY nepoužívat signInWithRedirect — způsobuje blank page na iOS Safari
 document.getElementById('btn-login').onclick=function(){
-  alert('TEST: onclick funguje!');
   setLoginStatus('Připojuji k Google…');
   signInWithPopup(auth,prov).then(function(){
     setLoginStatus('✓ Přihlášeno','#10B981');
@@ -1907,7 +1906,22 @@ document.getElementById('btn-join-family').onclick=async()=>{
   }
 };
 
-onAuthStateChanged(auth,async u=>{if(u){setLoginStatus('✓ Přihlášen jako '+u.displayName,'#10B981');document.getElementById('auth-screen').style.display='none';await checkOrSetupFamily(u)}else{familyId=null;document.getElementById('auth-screen').style.display='flex';document.getElementById('family-setup').style.display='none';document.getElementById('app').style.display='none'}});
+onAuthStateChanged(auth,async u=>{if(u){
+  setLoginStatus('✓ Přihlášen jako '+u.displayName,'#10B981');
+  document.getElementById('auth-screen').style.display='none';
+  try{
+    await checkOrSetupFamily(u);
+  }catch(e){
+    console.error('checkOrSetupFamily error:',e);
+    document.getElementById('auth-screen').style.display='flex';
+    setLoginStatus('Chyba přihlášení: '+e.message,'#EF4444');
+  }
+}else{
+  familyId=null;
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('family-setup').style.display='none';
+  document.getElementById('app').style.display='none';
+}});
 function setGreeting(n){const h=new Date().getHours(),g=h<12?'Dobré ráno':h<18?'Dobré odpoledne':'Dobrý večer';const ge=document.getElementById('greeting');if(ge)ge.textContent=g+', '+n+'!';const d=new Date(),dn=['neděle','pondělí','úterý','středa','čtvrtek','pátek','sobota'],mn=['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];const de=document.getElementById('today-date');if(de)de.textContent=dn[d.getDay()]+' '+d.getDate()+'. '+mn[d.getMonth()]+' '+d.getFullYear()}
 async function loadAll(){
   const fns = [loadTodos,loadV,loadI,loadC,loadSz,loadBdays,loadPoznamky,loadDokumenty,loadOdchod,loadJidelnicek,loadDopisy,loadAktivniTyden];
