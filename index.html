@@ -1688,8 +1688,7 @@ function setLoginStatus(msg,color){var el=document.getElementById('login-status'
 // Auth: popup pro všechny prohlížeče
 // Voláno synchronně z onclick — Safari to akceptuje jako user gesture
 // NIKDY nepoužívat signInWithRedirect — způsobuje blank page na iOS Safari
-document.getElementById('btn-login').onclick=function(){_log('👆 BTN CLICK - spouštím popup');
-  setLoginStatus('⏳ onclick OK, spouštím popup…','#6366F1');
+document.getElementById('btn-login').onclick=function(){
   setLoginStatus('Připojuji k Google…');
   signInWithPopup(auth,prov).then(function(){
     setLoginStatus('✓ Přihlášeno','#10B981');
@@ -1698,12 +1697,12 @@ document.getElementById('btn-login').onclick=function(){_log('👆 BTN CLICK - s
     if(e.code==='auth/popup-blocked'){
       setLoginStatus('Safari zablokoval přihlášení. Povolte vyskakovací okna a zkuste znovu.','#EF4444');
     }else if(e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user'){
-      setLoginStatus('Přihlášení bylo zrušeno — zkuste znovu.','#94A3B8');
+      setLoginStatus('Přihlášení zrušeno — zkuste znovu.','#94A3B8');
     }else{
       setLoginStatus('Chyba přihlášení ('+e.code+'). Zkuste znovu.','#EF4444');
     }
   });
-};
+}
 
 // Zpracovat výsledek redirect přihlášení (Safari flow)
 // Volá se TIŠE — chyba "žádný redirect" je normální stav, nezobrazujeme ji
