@@ -1181,7 +1181,7 @@ input, select, textarea {
 
     <div class="sb-sep"></div>
     <div class="sb-label">DOMÁCNOST</div>
-    <button class="sb-item" data-tab="seznamy"><i data-lucide="shopping-cart" class="ico"></i>Nákupní seznamy</button>
+    <button class="sb-item" data-tab="seznamy"><i data-lucide="shopping-cart" class="ico"></i>Seznamy</button>
     <button class="sb-item" data-tab="oslavy"><i data-lucide="cake" class="ico"></i>Narozeniny & svátky</button>
     <button class="sb-item" data-tab="odchod"><i data-lucide="door-open" class="ico"></i>Před odchodem</button>
 
@@ -2282,7 +2282,7 @@ function updateDnesAgenda(){
   // Narozeniny zítra
   const zitra=new Date(today);zitra.setDate(zitra.getDate()+1);
   const zitraStr=(zitra.getDate()+'.'+(zitra.getMonth()+1)+'.');
-  // Nákupní seznam
+  // Seznamy
   if(D.seznamy){const nakup=D.seznamy.find(s=>s.nazev&&s.nazev.toLowerCase().includes('nákup'));if(nakup){const items2=(nakup.items||[]).filter(i=>!i.done);if(items2.length)items.push('🛒 '+items2.length+' položek v nákupu');}}
   const banner=document.getElementById('dnes-agenda');
   // Narozeniny dnes nebo zítra
@@ -2970,13 +2970,13 @@ window.jidelnicekDoNakupu = async function() {
     return;
   }
 
-  // Najít nákupní seznam (první seznam s "nákup" v názvu)
+  // Najít seznam (první seznam s "nákup" v názvu)
   const seznamy = window.D.seznamy || [];
   let nakupSz = seznamy.find(function(s) {
     return s.nazev && s.nazev.toLowerCase().includes('nákup');
   });
 
-  // Pokud nákupní seznam neexistuje, vytvoř ho
+  // Pokud seznam neexistuje, vytvoř ho
   if (!nakupSz) {
     const ref = await addDoc(famCol('seznamy'), {
       nazev: 'Nákup',
@@ -2986,7 +2986,7 @@ window.jidelnicekDoNakupu = async function() {
     });
     await loadSz();
     nakupSz = (window.D.seznamy || []).find(function(s) { return s.id === ref.id; });
-    if (!nakupSz) { toast('Nepodařilo se vytvořit nákupní seznam', 'error'); return; }
+    if (!nakupSz) { toast('Nepodařilo se vytvořit seznam', 'error'); return; }
   }
 
   // Sestavit nové položky ze surovin (každá surovina = jedna položka)
