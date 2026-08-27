@@ -2308,7 +2308,7 @@ function getWeekLabel(key){const m=key.match(/(\d+)-W(\d+)/);return m?'Týden '+
 function getWeekDates(){const now=new Date();const today=new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()));const day=today.getUTCDay()||7;const mon=new Date(today);mon.setUTCDate(today.getUTCDate()-day+1);const labels=['PO','ÚT','ST','ČT','PÁ','SO','NE'];return labels.map((lbl,i)=>{const d=new Date(mon);d.setUTCDate(mon.getUTCDate()+i);return{date:d.toISOString().slice(0,10),label:lbl,dayNum:d.getUTCDate(),month:d.getUTCMonth()+1};});}
 function getWeekRangeLabel(){const days=getWeekDates();const f=days[0],l=days[6];const mn=['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'];return f.dayNum+'. – '+l.dayNum+'. '+mn[l.month-1];}
 window.D.at={jaDays:[],zenaDays:[],cilJa:3,cilZena:3,weekKey:''};
-async function loadAktivniTyden(){try{if(!familyId)return;const wk=getWeekKey();window.D.at.weekKey=wk;try{const metaSnap=await getDoc(famDoc('aktivniTyden','_meta'));if(metaSnap.exists()){const m=metaSnap.data();window.D.at.cilJa=m.cilJa||5;window.D.at.cilZena=m.cilZena||5;}}catch(e){}const snap=await getDoc(famDoc('aktivniTyden',wk));if(snap.exists()){const d=snap.data();window.D.at.jaDays=Array.isArray(d.jaDays)?d.jaDays:[];window.D.at.zenaDays=Array.isArray(d.zenaDays)?d.zenaDays:[];if(d.cilJa)window.D.at.cilJa=d.cilJa;if(d.cilZena)window.D.at.cilZena=d.cilZena;}else{window.D.at.jaDays=[];window.D.at.zenaDays=[];}renderAktivniTyden();}catch(e){console.error('loadAktivniTyden:',e);}}
+async function loadAktivniTyden(){try{if(!familyId)return;const wk=getWeekKey();window.D.at.weekKey=wk;try{const metaSnap=await getDoc(famDoc('aktivniTyden','_meta'));if(metaSnap.exists()){const m=metaSnap.data();window.D.at.cilJa=m.cilJa||5;window.D.at.cilZena=m.cilZena||5;}}catch(e){}const snap=await getDoc(famDoc('aktivniTyden',wk));if(snap.exists()){const d=snap.data();window.D.at.jaDays=Array.isArray(d.jaDays)?d.jaDays:[];window.D.at.zenaDays=Array.isArray(d.zenaDays)?d.zenaDays:[];if(d.cilJa)window.D.at.cilJa=d.cilJa;if(d.cilZena)window.D.at.cilZena=d.cilZena;}else{window.D.at.jaDays=[];window.D.at.zenaDays=[];}renderAktivniTyden();loadATHistory();}catch(e){console.error('loadAktivniTyden:',e);}}
 function atDayGrid(days,doneDays,type,interactive){const color=type==='ja'?'#6366F1':'#EC4899';const todayStr=new Date().toISOString().slice(0,10);const CHECK='<polyline points="10 13 14 17 22 9" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';return'<div class="at-days">'+days.map(function(d){const isDone=doneDays.indexOf(d.date)>=0;const isToday=d.date===todayStr;const isFuture=d.date>todayStr;const fill=isDone?color:'none';const stroke=isDone?color:isToday?color:'#CBD5E1';const sw=isToday&&!isDone?'2.5':'2';const op=isFuture?'0.3':'1';const oc=interactive&&!isFuture?' onclick="toggleDay(\''+type+'\',\''+d.date+'\')"':'';const lblColor=isToday?' style="color:'+color+';font-weight:800"':'';return'<div class="at-day"'+oc+'><span class="at-day-lbl"'+lblColor+'>'+d.label+'</span><svg width="36" height="36" viewBox="0 0 36 36" style="display:block;flex-shrink:0;opacity:'+op+'"><circle cx="18" cy="18" r="15" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw+'"/>'+(isDone?CHECK:'')+'</svg></div>';}).join('')+'</div>';}
 function renderAktivniTyden(){
   var jaDays=window.D.at.jaDays;
@@ -2334,10 +2334,8 @@ function renderAktivniTyden(){
   else{motivace='💪 Pojďte na to! Přidejte první trénink.';}
 
   // Série
-  var serieStr='';
-  if(window.D.at.serie!==undefined){
-    serieStr='<div style="font-size:12px;color:var(--text-3);margin-top:4px">🔥 Série: '+window.D.at.serie+' '+(window.D.at.serie===1?'týden':'týdny')+'</div>';
-  }
+  var serie=window.D.at.serie||0;
+  var serieStr='<div class="at-serie-txt" style="font-size:12px;color:var(--text-3);margin-top:4px">🔥 Série: '+serie+' '+(serie===1?'týden':'týdny')+'</div>';
 
   // Progress bar HTML
   var progressHtml='<div style="margin:12px 0 4px">'
@@ -2370,31 +2368,104 @@ function renderAktivniTyden(){
   if(full)full.innerHTML=inner(true,false);
   var wkFull=document.getElementById('at-week-label-full');
   if(wkFull)wkFull.textContent=rangeLabel;
-  loadATHistory();
+  // loadATHistory se volá samostatně — NEVOLAT zde aby nedošlo k zacyklení
 }
 // Přepínání dnů v MINULÝCH týdnech (z historie)
+// Cache pro data history týdnů (aby nebylo třeba znovu načítat z Firestore)
+window._atHistCache={};
+
 window.toggleDayForWeek=async function(who,dateStr,weekKey){
   if(!familyId)return;
-  // Načíst aktuální data z Firestore pro daný týden
   try{
-    var snap=await getDoc(famDoc('aktivniTyden',weekKey));
-    var data=snap.exists()?snap.data():{};
-    var jaDays=Array.isArray(data.jaDays)?data.jaDays.slice():[];
-    var zenaDays=Array.isArray(data.zenaDays)?data.zenaDays.slice():[];
+    // Použít cache nebo načíst
+    var cached=window._atHistCache[weekKey];
+    var jaDays=cached?cached.jaDays.slice():[];
+    var zenaDays=cached?cached.zenaDays.slice():[];
+    if(!cached){
+      var snap=await getDoc(famDoc('aktivniTyden',weekKey));
+      if(snap.exists()){var d2=snap.data();jaDays=Array.isArray(d2.jaDays)?d2.jaDays.slice():[];zenaDays=Array.isArray(d2.zenaDays)?d2.zenaDays.slice():[];}
+    }
     var days=who==='ja'?jaDays:zenaDays;
     var idx=days.indexOf(dateStr);
     if(idx>=0)days.splice(idx,1);else days.push(dateStr);
     if(who==='ja')jaDays=days;else zenaDays=days;
+    // Aktualizovat cache
+    var cj=cached?(cached.cilJa||3):3;
+    var cz=cached?(cached.cilZena||3):3;
+    window._atHistCache[weekKey]={jaDays:jaDays,zenaDays:zenaDays,cilJa:cj,cilZena:cz};
+    // Uložit
     await setDoc(famDoc('aktivniTyden',weekKey),{jaDays:jaDays,zenaDays:zenaDays,weekKey:weekKey},{merge:true});
-    // Překreslit historii
-    loadATHistory();
+    // Překreslit POUZE tento týden v historii (bez zacyklení)
+    _renderHistWeek(weekKey,{jaDays:jaDays,zenaDays:zenaDays,cilJa:cj,cilZena:cz},true);
     toast(idx>=0?'Trénink odebrán':'Trénink přidán','success');
   }catch(e){console.error('toggleDayForWeek:',e);toast('Chyba uložení','error');}
+};
+
+// Pomocná funkce — překreslit jeden týden v historii
+function _renderHistWeek(wk,data,expanded){
+  var el=document.getElementById('at-hist-'+wk);
+  if(!el)return;
+  var wkDates=getWeekDatesFromKey(wk);
+  el.innerHTML=_buildHistWeekHTML(wk,data,wkDates,expanded);
+}
+
+// Přepnout rozbalení týdne
+window.atToggleWeek=function(wk){
+  var el=document.getElementById('at-hist-'+wk);
+  if(!el)return;
+  var cached=window._atHistCache[wk];
+  if(!cached)return;
+  var isExpanded=el.getAttribute('data-expanded')==='1';
+  el.setAttribute('data-expanded',isExpanded?'0':'1');
+  var wkDates=getWeekDatesFromKey(wk);
+  el.innerHTML=_buildHistWeekHTML(wk,cached,wkDates,!isExpanded);
 };
 
 window.toggleDay=async function(who,dateStr){if(!familyId)return;const days=who==='ja'?window.D.at.jaDays:window.D.at.zenaDays;const idx=days.indexOf(dateStr);const next=days.slice();if(idx>=0)next.splice(idx,1);else next.push(dateStr);if(who==='ja')window.D.at.jaDays=next;else window.D.at.zenaDays=next;renderAktivniTyden();try{const wk=window.D.at.weekKey;await setDoc(famDoc('aktivniTyden',wk),{jaDays:window.D.at.jaDays,zenaDays:window.D.at.zenaDays,cilJa:window.D.at.cilJa,cilZena:window.D.at.cilZena,weekKey:wk},{merge:true});const cnt=who==='ja'?window.D.at.jaDays.length:window.D.at.zenaDays.length;const cil=who==='ja'?window.D.at.cilJa:window.D.at.cilZena;if(cnt===cil)toast('🔥 Splněno!','success');}catch(e){console.error('toggleDay:',e);if(who==='ja')window.D.at.jaDays=days;else window.D.at.zenaDays=days;renderAktivniTyden();toast('Chyba uložení','error');}};
 async function saveATCil(){if(!familyId)return;const cilJa=Math.min(7,parseInt(document.getElementById('at-cil-ja').value)||5);const cilZena=Math.min(7,parseInt(document.getElementById('at-cil-zena').value)||5);window.D.at.cilJa=cilJa;window.D.at.cilZena=cilZena;try{await setDoc(famDoc('aktivniTyden','_meta'),{cilJa,cilZena},{merge:true});await setDoc(famDoc('aktivniTyden',window.D.at.weekKey),{cilJa,cilZena},{merge:true});renderAktivniTyden();toast('Cíl uložen','success');}catch(e){console.error('saveATCil:',e);}}
 window.saveATCil=saveATCil;
+// Sestavit HTML pro jeden týden v historii
+function _buildHistWeekHTML(wk,w,wkDates,expanded){
+  var jaDays=w.jaDays||[];var zenaDays=w.zenaDays||[];
+  var cj=w.cilJa||3;var cz=w.cilZena||3;
+  var j=jaDays.length;var z=zenaDays.length;
+  var splneno=j>=cj&&z>=cz;
+  var badge=splneno?'🟢':'🟡';
+  var wl=getWeekLabel(wk);
+  var arrow=expanded?'▲':'▽';
+  
+  var base='<div style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 0" onclick="window.atToggleWeek(\''+wk+'\')">'
+    +'<span style="font-size:12px">'+badge+'</span>'
+    +'<span style="font-size:12px;color:var(--text-2)">'+wl+'</span>'
+    +'<span style="font-size:11px;color:#6366F1;font-weight:600">Já '+j+'/'+cj+'</span>'
+    +'<span style="font-size:11px;color:#EC4899;font-weight:600">Žena '+z+'/'+cz+'</span>'
+    +'<span style="margin-left:auto;font-size:10px;color:var(--text-3)">'+arrow+'</span>'
+    +'</div>';
+  
+  if(!expanded)return base;
+  
+  function miniGrid(days,who,color){
+    return'<div style="display:flex;gap:3px;margin:2px 0 6px">'
+      +wkDates.map(function(d){
+        var done=days.indexOf(d.date)>=0;
+        var oc=' onclick="window.toggleDayForWeek(\''+who+'\',\''+d.date+'\',\''+wk+'\')"';
+        return'<div style="flex:1;text-align:center;cursor:pointer"'+oc+'>'
+          +'<div style="font-size:8px;color:var(--text-3);margin-bottom:1px">'+d.label+'</div>'
+          +'<div style="width:100%;aspect-ratio:1;border-radius:50%;background:'+(done?color:'transparent')+';border:1.5px solid '+(done?color:'#CBD5E1')+';display:flex;align-items:center;justify-content:center;color:white;font-size:9px">'
+          +(done?'✓':'')+'</div></div>';
+      }).join('')+'</div>';
+  }
+  
+  return base
+    +'<div style="padding:4px 0 8px;border-top:1px solid var(--border-light,#F1F5F9)">'
+    +'<div style="font-size:10px;color:var(--text-3);margin-bottom:2px">JÁ</div>'
+    +miniGrid(jaDays,'ja','#6366F1')
+    +'<div style="font-size:10px;color:var(--text-3);margin-bottom:2px">ŽENA</div>'
+    +miniGrid(zenaDays,'zena','#EC4899')
+    +'<div style="font-size:9px;color:var(--text-3);text-align:right">Kliknutím oprav trénink</div>'
+    +'</div>';
+}
+
 async function loadATHistory(){
   var el=document.getElementById('at-history-list');
   if(!el)return;
@@ -2402,69 +2473,49 @@ async function loadATHistory(){
     if(!familyId)return;
     var snap=await getDocs(query(famCol('aktivniTyden'),orderBy('weekKey','desc')));
     var items=snap.docs.filter(function(d){return d.id!=='_meta';}).slice(0,20);
-    if(!items.length){el.innerHTML='<div class="empty" style="padding:16px"><p>Zatím žádná data</p></div>';return;}
+    if(!items.length){el.innerHTML='<div style="padding:12px;font-size:13px;color:var(--text-3)">Zatím žádná data</div>';return;}
     
     // Výpočet série
     var serie=0;
-    var currentWk=window.D.at.weekKey;
     for(var si=0;si<items.length;si++){
       var sw=items[si].data();
-      var sj=Array.isArray(sw.jaDays)?sw.jaDays.length:(sw.ja||0);
-      var sz=Array.isArray(sw.zenaDays)?sw.zenaDays.length:(sw.zena||0);
+      var sj=Array.isArray(sw.jaDays)?sw.jaDays.length:0;
+      var sz=Array.isArray(sw.zenaDays)?sw.zenaDays.length:0;
       var scj=sw.cilJa||3;var scz=sw.cilZena||3;
       if(sj>=scj&&sz>=scz)serie++;else break;
     }
     window.D.at.serie=serie;
     
-    // Render každého týdne s interaktivní mřížkou
-    el.innerHTML=items.map(function(doc){
+    // Naplnit cache
+    items.forEach(function(doc){
       var w=doc.data();
-      var wk=doc.id;
-      var isPast=wk!==currentWk;
-      var wl=getWeekLabel(wk);
-      var jaDays=Array.isArray(w.jaDays)?w.jaDays:(w.ja?[]:[]);
-      var zenaDays=Array.isArray(w.zenaDays)?w.zenaDays:(w.zena?[]:[]);
-      var cj=w.cilJa||3;var cz=w.cilZena||3;
-      var j=jaDays.length;var z=zenaDays.length;
-      var splneno=j>=cj&&z>=cz;
-      var badge=splneno?'🟢':'🟡';
-      
-      // Mřížka dnů pro tento týden
-      var wkDates=getWeekDatesFromKey(wk);
-      var editNote=isPast?'<div style="font-size:10px;color:var(--text-3);text-align:right;margin-top:4px">Kliknutím oprav záznam</div>':'';
-      
-      function miniGrid(days,who,color){
-        return'<div style="display:flex;gap:4px;margin:4px 0 2px">'
-          +wkDates.map(function(d){
-            var done=days.indexOf(d.date)>=0;
-            var oc=' onclick="window.toggleDayForWeek(\''+who+'\',\''+d.date+'\',\''+wk+'\')"';
-            return'<div style="flex:1;text-align:center;cursor:pointer"'+oc+'>'
-              +'<div style="font-size:9px;color:var(--text-3);margin-bottom:2px">'+d.label+'</div>'
-              +'<div style="width:100%;aspect-ratio:1;border-radius:50%;background:'+(done?color:'transparent')+';border:1.5px solid '+(done?color:'#CBD5E1')+';display:flex;align-items:center;justify-content:center;font-size:10px">'
-              +(done?'✓':'')
-              +'</div></div>';
-          }).join('')
-          +'</div>';
-      }
-      
-      return'<div style="padding:12px 0;border-bottom:1px solid var(--border)">'
-        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
-        +'<span style="font-size:14px">'+badge+'</span>'
-        +'<span style="font-size:13px;font-weight:600;color:var(--text)">'+wl+'</span>'
-        +'<span style="margin-left:auto;font-size:12px;color:#6366F1;font-weight:700">Já '+j+'/'+cj+'</span>'
-        +'<span style="font-size:12px;color:#EC4899;font-weight:700">Žena '+z+'/'+cz+'</span>'
-        +'</div>'
-        +'<div style="font-size:11px;color:var(--text-3);margin-bottom:2px">JÁ</div>'
-        +miniGrid(jaDays,'ja','#6366F1')
-        +'<div style="font-size:11px;color:var(--text-3);margin:4px 0 2px">ŽENA</div>'
-        +miniGrid(zenaDays,'zena','#EC4899')
-        +editNote
+      window._atHistCache[doc.id]={
+        jaDays:Array.isArray(w.jaDays)?w.jaDays:[],
+        zenaDays:Array.isArray(w.zenaDays)?w.zenaDays:[],
+        cilJa:w.cilJa||3,cilZena:w.cilZena||3
+      };
+    });
+    
+    // Render — minimalistický seznam, vše sbaleno
+    el.innerHTML=items.map(function(doc){
+      var w=window._atHistCache[doc.id];
+      var wkDates=getWeekDatesFromKey(doc.id);
+      return'<div id="at-hist-'+doc.id+'" data-expanded="0" style="border-bottom:1px solid var(--border)">'
+        +_buildHistWeekHTML(doc.id,w,wkDates,false)
         +'</div>';
     }).join('');
     
-    // Překreslit hlavní panel pro sérii
-    renderAktivniTyden();
+    // Aktualizovat sérii v hlavním panelu BEZ volání loadATHistory (nesmí zacyklit)
+    _renderAtSerie();
   }catch(e){console.error('loadATHistory:',e);}
+}
+
+// Překreslit pouze sérii v hlavním panelu (bez zacyklení)
+function _renderAtSerie(){
+  var serieEls=document.querySelectorAll('.at-serie-txt');
+  serieEls.forEach(function(el){
+    el.textContent='🔥 Série: '+( window.D.at.serie||0)+' '+(window.D.at.serie===1?'týden':'týdny');
+  });
 }
 function toast(m,t=''){const e=document.getElementById('toast');e.innerHTML='<i data-lucide="'+(t==='success'?'check-circle':t==='error'?'alert-circle':'info')+'" style="width:16px;height:16px"></i> '+m;e.className='toast show'+(t?' '+t:'');_ci();setTimeout(()=>e.classList.remove('show'),3000)}
 window.openM=id=>{document.getElementById(id).style.display='flex';_ci()};
