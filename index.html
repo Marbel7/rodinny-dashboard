@@ -2313,53 +2313,49 @@ function atDayGrid(days,doneDays,type,interactive){const color=type==='ja'?'#636
 function renderAktivniTyden(){
   var jaDays=window.D.at.jaDays;
   var zenaDays=window.D.at.zenaDays;
-  var cilJa=window.D.at.cilJa;
-  var cilZena=window.D.at.cilZena;
+  var cilJa=window.D.at.cilJa||3;
+  var cilZena=window.D.at.cilZena||3;
   var wkDates=getWeekDates();
   var rangeLabel=getWeekRangeLabel();
   var jaCount=jaDays.length;
   var zenaCount=zenaDays.length;
-  var cilTotal=cilJa+cilZena;
-  var total=Math.min(jaCount+zenaCount,cilTotal);
-  var pct=cilTotal>0?Math.round((total/cilTotal)*100):0;
-  var zbyvá=Math.max(0,cilTotal-total);
-  var splneno=jaCount>=cilJa&&zenaCount>=cilZena;
-  
-  // Motivační zpráva
-  var motivace;
-  if(splneno){motivace='🎉 Týden splněn! Jste skvělí!';}
-  else if(zbyvá===1){motivace='💪 Už jen 1 trénink!';}
-  else if(zbyvá===2){motivace='🎯 Ještě 2 tréninky!';}
-  else if(total>0){motivace='🎯 Ještě '+zbyvá+' tréninků do společného cíle';}
-  else{motivace='💪 Pojďte na to! Přidejte první trénink.';}
+  var serieJa=window.D.at.serieJa||0;
+  var serieZena=window.D.at.serieZena||0;
 
-  // Série
-  var serie=window.D.at.serie||0;
-  var serieStr='<div class="at-serie-txt" style="font-size:12px;color:var(--text-3);margin-top:4px">🔥 Série: '+serie+' '+(serie===1?'týden':'týdny')+'</div>';
+  // Individuální motivace
+  function personMsg(count,cil){
+    if(count>cil)return'🔥 Cíl překonán!';
+    if(count===cil)return'🎉 Cíl splněn!';
+    var zb=cil-count;
+    if(zb===1)return'🎯 Ještě 1 trénink';
+    return'🎯 Ještě '+zb+' tréninky';
+  }
+  function serieLabel(s){return s+' '+(s===1?'týden':'týdny');}
 
-  // Progress bar HTML
-  var progressHtml='<div style="margin:12px 0 4px">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
-    +'<span style="font-size:13px;font-weight:700;color:var(--text)">🏆 Společně tento týden</span>'
-    +'<span style="font-size:14px;font-weight:800;color:#6366F1">'+total+' / '+cilTotal+'</span>'
-    +'</div>'
-    +'<div style="background:#E2E8F0;border-radius:8px;height:10px;overflow:hidden">'
-    +'<div style="background:linear-gradient(90deg,#6366F1,#818CF8);width:'+pct+'%;height:100%;border-radius:8px;transition:width .3s"></div>'
-    +'</div>'
-    +'<div style="font-size:12px;color:var(--text-2);margin-top:6px;text-align:center">'+motivace+'</div>'
-    +serieStr
-    +'</div>'
-    +'<div style="height:1px;background:var(--border);margin:12px 0"></div>';
+  // Sekce pro jednoho uživatele
+  function personSection(label,count,cil,days,who,serie,color,interactive){
+    var countColor=count>=cil?'#22C55E':color;
+    return'<div style="margin-bottom:4px">'
+      +'<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:2px">'
+      +'<span style="font-size:13px;font-weight:700;color:'+color+'">'+label+'</span>'
+      +'<span style="font-size:24px;font-weight:800;color:'+countColor+'">'+count+' <span style="font-size:14px;font-weight:500;color:var(--text-3)">/ '+cil+'</span></span>'
+      +(serie>0?'<span class="at-serie-txt-'+who+'" style="margin-left:auto;font-size:11px;color:var(--text-3)">🔥 '+serieLabel(serie)+'</span>':'<span class="at-serie-txt-'+who+'" style="margin-left:auto;font-size:11px;color:var(--text-3)"></span>')
+      +'</div>'
+      +'<div style="font-size:12px;color:var(--text-2);margin-bottom:8px">'+personMsg(count,cil)+'</div>'
+      +atDayGrid(wkDates,days,who,interactive)
+      +'</div>';
+  }
+
+  // Sekundární info — společně (malé)
+  var spolecneHtml='<div style="text-align:center;font-size:11px;color:var(--text-3);margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">Společně '+(jaCount+zenaCount)+' tréninků tento týden</div>';
 
   function inner(interactive,showHeader){
     var hdr=showHeader?'<div class="at-header"><div class="at-title">⚡ AKTIVNÍ TÝDEN</div><span class="at-week-chip">'+rangeLabel+'</span></div>':'';
     return hdr
-      +progressHtml
-      +'<div class="at-user-row"><span class="at-label ja">JÁ</span><span class="at-count-sm" style="color:#6366F1">'+jaCount+' / '+cilJa+'</span></div>'
-      +atDayGrid(wkDates,jaDays,'ja',interactive)
-      +'<div class="at-divider"></div>'
-      +'<div class="at-user-row"><span class="at-label zena">ŽENA</span><span class="at-count-sm" style="color:#EC4899">'+zenaCount+' / '+cilZena+'</span></div>'
-      +atDayGrid(wkDates,zenaDays,'zena',interactive);
+      +personSection('JÁ',jaCount,cilJa,jaDays,'ja',serieJa,'#6366F1',interactive)
+      +'<div class="at-divider" style="margin:12px 0"></div>'
+      +personSection('ŽENA',zenaCount,cilZena,zenaDays,'zena',serieZena,'#EC4899',interactive)
+      +spolecneHtml;
   }
 
   var dash=document.getElementById('at-dash-card');
@@ -2406,7 +2402,7 @@ function _renderHistWeek(wk,data,expanded){
   var el=document.getElementById('at-hist-'+wk);
   if(!el)return;
   var wkDates=getWeekDatesFromKey(wk);
-  el.innerHTML=_buildHistWeekHTML(wk,data,wkDates,expanded);
+  el.innerHTML=_buildHistWeekHTML(wk,data,wkDates,expanded,wk===window.D.at.weekKey);
 }
 
 // Přepnout rozbalení týdne
@@ -2418,29 +2414,31 @@ window.atToggleWeek=function(wk){
   var isExpanded=el.getAttribute('data-expanded')==='1';
   el.setAttribute('data-expanded',isExpanded?'0':'1');
   var wkDates=getWeekDatesFromKey(wk);
-  el.innerHTML=_buildHistWeekHTML(wk,cached,wkDates,!isExpanded);
+  el.innerHTML=_buildHistWeekHTML(wk,cached,wkDates,!isExpanded,wk===window.D.at.weekKey);
 };
 
 window.toggleDay=async function(who,dateStr){if(!familyId)return;const days=who==='ja'?window.D.at.jaDays:window.D.at.zenaDays;const idx=days.indexOf(dateStr);const next=days.slice();if(idx>=0)next.splice(idx,1);else next.push(dateStr);if(who==='ja')window.D.at.jaDays=next;else window.D.at.zenaDays=next;renderAktivniTyden();try{const wk=window.D.at.weekKey;await setDoc(famDoc('aktivniTyden',wk),{jaDays:window.D.at.jaDays,zenaDays:window.D.at.zenaDays,cilJa:window.D.at.cilJa,cilZena:window.D.at.cilZena,weekKey:wk},{merge:true});const cnt=who==='ja'?window.D.at.jaDays.length:window.D.at.zenaDays.length;const cil=who==='ja'?window.D.at.cilJa:window.D.at.cilZena;if(cnt===cil)toast('🔥 Splněno!','success');}catch(e){console.error('toggleDay:',e);if(who==='ja')window.D.at.jaDays=days;else window.D.at.zenaDays=days;renderAktivniTyden();toast('Chyba uložení','error');}};
 async function saveATCil(){if(!familyId)return;const cilJa=Math.min(7,parseInt(document.getElementById('at-cil-ja').value)||5);const cilZena=Math.min(7,parseInt(document.getElementById('at-cil-zena').value)||5);window.D.at.cilJa=cilJa;window.D.at.cilZena=cilZena;try{await setDoc(famDoc('aktivniTyden','_meta'),{cilJa,cilZena},{merge:true});await setDoc(famDoc('aktivniTyden',window.D.at.weekKey),{cilJa,cilZena},{merge:true});renderAktivniTyden();toast('Cíl uložen','success');}catch(e){console.error('saveATCil:',e);}}
 window.saveATCil=saveATCil;
 // Sestavit HTML pro jeden týden v historii
-function _buildHistWeekHTML(wk,w,wkDates,expanded){
+function _buildHistWeekHTML(wk,w,wkDates,expanded,isCurrent){
   var jaDays=w.jaDays||[];var zenaDays=w.zenaDays||[];
   var cj=w.cilJa||3;var cz=w.cilZena||3;
   var j=jaDays.length;var z=zenaDays.length;
-  var splneno=j>=cj&&z>=cz;
-  var badge=splneno?'🟢':'🟡';
   var wl=getWeekLabel(wk);
   var arrow=expanded?'▲':'▽';
+
+  // Individuální odznaky
+  // Aktuální týden = 🟡 (probíhá)
+  // Minulý splněný = 🟢, nesplněný = ○
+  function badge(count,cil,current){
+    if(current)return'🟡';
+    return count>=cil?'🟢':'○';
+  }
+  var badgeJa=badge(j,cj,isCurrent);
+  var badgeZena=badge(z,cz,isCurrent);
   
-  var base='<div style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 0" onclick="window.atToggleWeek(\''+wk+'\')">'
-    +'<span style="font-size:12px">'+badge+'</span>'
-    +'<span style="font-size:12px;color:var(--text-2)">'+wl+'</span>'
-    +'<span style="font-size:11px;color:#6366F1;font-weight:600">Já '+j+'/'+cj+'</span>'
-    +'<span style="font-size:11px;color:#EC4899;font-weight:600">Žena '+z+'/'+cz+'</span>'
-    +'<span style="margin-left:auto;font-size:10px;color:var(--text-3)">'+arrow+'</span>'
-    +'</div>';
+  var base='<div style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 0" onclick="window.atToggleWeek(\''+wk+'\')">'    +'<span style="font-size:11px;color:var(--text-3)">'+wl+'</span>'    +'<span style="font-size:11px">'+badgeJa+'</span>'    +'<span style="font-size:11px;color:#6366F1;font-weight:600">Já '+j+'/'+cj+'</span>'    +'<span style="font-size:11px;color:var(--text-3)">·</span>'    +'<span style="font-size:11px">'+badgeZena+'</span>'    +'<span style="font-size:11px;color:#EC4899;font-weight:600">Žena '+z+'/'+cz+'</span>'    +'<span style="margin-left:auto;font-size:10px;color:var(--text-3)">'+arrow+'</span>'    +'</div>';
   
   if(!expanded)return base;
   
@@ -2474,18 +2472,23 @@ async function loadATHistory(){
     var snap=await getDocs(query(famCol('aktivniTyden'),orderBy('weekKey','desc')));
     var items=snap.docs.filter(function(d){return d.id!=='_meta';}).slice(0,20);
     if(!items.length){el.innerHTML='<div style="padding:12px;font-size:13px;color:var(--text-3)">Zatím žádná data</div>';return;}
-    
-    // Výpočet série
-    var serie=0;
-    for(var si=0;si<items.length;si++){
-      var sw=items[si].data();
-      var sj=Array.isArray(sw.jaDays)?sw.jaDays.length:0;
-      var sz=Array.isArray(sw.zenaDays)?sw.zenaDays.length:0;
-      var scj=sw.cilJa||3;var scz=sw.cilZena||3;
-      if(sj>=scj&&sz>=scz)serie++;else break;
-    }
-    window.D.at.serie=serie;
-    
+
+    var currentWk=window.D.at.weekKey;
+
+    // Individuální série — počítáme jen dokončené minulé týdny
+    var serieJa=0,serieZena=0,jaActive=true,zenaActive=true;
+    items.forEach(function(doc){
+      if(doc.id===currentWk)return; // aktuální týden nepočítáme
+      var w=doc.data();
+      var j=Array.isArray(w.jaDays)?w.jaDays.length:0;
+      var z=Array.isArray(w.zenaDays)?w.zenaDays.length:0;
+      var cj=w.cilJa||3;var cz=w.cilZena||3;
+      if(jaActive){if(j>=cj)serieJa++;else jaActive=false;}
+      if(zenaActive){if(z>=cz)serieZena++;else zenaActive=false;}
+    });
+    window.D.at.serieJa=serieJa;
+    window.D.at.serieZena=serieZena;
+
     // Naplnit cache
     items.forEach(function(doc){
       var w=doc.data();
@@ -2495,27 +2498,30 @@ async function loadATHistory(){
         cilJa:w.cilJa||3,cilZena:w.cilZena||3
       };
     });
-    
-    // Render — minimalistický seznam, vše sbaleno
+
+    // Render — minimalistický seznam, sbaleno
     el.innerHTML=items.map(function(doc){
       var w=window._atHistCache[doc.id];
       var wkDates=getWeekDatesFromKey(doc.id);
       return'<div id="at-hist-'+doc.id+'" data-expanded="0" style="border-bottom:1px solid var(--border)">'
-        +_buildHistWeekHTML(doc.id,w,wkDates,false)
+        +_buildHistWeekHTML(doc.id,w,wkDates,false,doc.id===currentWk)
         +'</div>';
     }).join('');
-    
-    // Aktualizovat sérii v hlavním panelu BEZ volání loadATHistory (nesmí zacyklit)
+
+    // Aktualizovat série v panelu
     _renderAtSerie();
   }catch(e){console.error('loadATHistory:',e);}
 }
 
-// Překreslit pouze sérii v hlavním panelu (bez zacyklení)
+
+// Překreslit série (individuální) bez zacyklení
 function _renderAtSerie(){
-  var serieEls=document.querySelectorAll('.at-serie-txt');
-  serieEls.forEach(function(el){
-    el.textContent='🔥 Série: '+( window.D.at.serie||0)+' '+(window.D.at.serie===1?'týden':'týdny');
-  });
+  var sj=window.D.at.serieJa||0;var sz=window.D.at.serieZena||0;
+  function lbl(s){return s+' '+(s===1?'týden':'týdny');}
+  var jaEls=document.querySelectorAll('.at-serie-txt-ja');
+  jaEls.forEach(function(el){el.textContent=sj>0?'🔥 '+lbl(sj):'';});
+  var zenaEls=document.querySelectorAll('.at-serie-txt-zena');
+  zenaEls.forEach(function(el){el.textContent=sz>0?'🔥 '+lbl(sz):'';});
 }
 function toast(m,t=''){const e=document.getElementById('toast');e.innerHTML='<i data-lucide="'+(t==='success'?'check-circle':t==='error'?'alert-circle':'info')+'" style="width:16px;height:16px"></i> '+m;e.className='toast show'+(t?' '+t:'');_ci();setTimeout(()=>e.classList.remove('show'),3000)}
 window.openM=id=>{document.getElementById(id).style.display='flex';_ci()};
